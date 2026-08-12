@@ -1,0 +1,75 @@
+@startuml
+title Diagrama de Clases - Sugoi (Plataforma para Gestión de Citas)
+
+class Usuario {
+    -Long id
+    -String nombre
+    -String correo
+    -String password
+    -Boolean activo
+    +iniciarSesion(): Boolean
+    +cerrarSesion(): void
+}
+
+class Cliente {
+    -String telefono
+    +reservarCita(): Boolean
+    +cancelarCita(idCita: Long): Boolean
+}
+
+class Empleado {
+    -String especialidad
+    +consultarAgenda(): List
+    +actualizarEstadoCita(idCita: Long): Boolean
+}
+
+class Administrador {
+    -String permisos
+    +registrarEmpleado(): void
+    +gestionarServicio(): void
+}
+
+class Servicio {
+    -Long id
+    -String nombre
+    -String descripcion
+    -Double precio
+    -Integer duracionMinutos
+    -String categoria
+    -Boolean activo
+    +actualizarPrecio(precio: Double): void
+}
+
+class HorarioDisponibilidad {
+    -Long id
+    -LocalDate fecha
+    -LocalTime horaInicio
+    -LocalTime horaFin
+    -String estado
+    +marcarComoOcupado(): void
+}
+
+class Cita {
+    -Long id
+    -LocalDate fecha
+    -LocalTime hora
+    -String estado
+    -LocalDateTime fechaRegistro
+    +reprogramar(fecha: LocalDate, hora: LocalTime): Boolean
+    +cancelar(): Boolean
+}
+
+' --- Herencia ---
+Usuario <|-- Cliente : Herencia
+Usuario <|-- Empleado : Herencia
+Usuario <|-- Administrador : Herencia
+
+' --- Relaciones y Multiplicidad ---
+Cliente "1" -- "0..*" Cita : realiza >
+Empleado "1" -- "0..*" Cita : atiende >
+Servicio "1" -- "0..*" Cita : incluye >
+Empleado "1" *-- "0..*" HorarioDisponibilidad : contiene >
+Empleado "0..*" -- "0..*" Servicio : presta >
+Administrador "1" ..> "0..*" Servicio : gestiona >
+
+@enduml
