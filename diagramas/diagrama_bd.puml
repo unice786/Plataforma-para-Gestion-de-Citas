@@ -1,0 +1,118 @@
+@startuml diagrama_bd
+
+' Configuración visual
+hide circle
+skinparam linetype ortho
+
+entity "usuarios" as usuarios {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * correo : VARCHAR(150) <<UNIQUE>>
+  * password : VARCHAR(255)
+  * activo : BOOLEAN
+}
+
+entity "clientes" as clientes {
+  * id : BIGINT <<PK, FK>>
+  --
+  * telefono : VARCHAR(20)
+}
+
+entity "especialidades" as especialidades {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100) <<UNIQUE>>
+  descripcion : TEXT
+}
+
+entity "empleados" as empleados {
+  * id : BIGINT <<PK, FK>>
+  --
+  * especialidad_id : BIGINT <<FK>>
+}
+
+entity "roles" as roles {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(50) <<UNIQUE>>
+  descripcion : VARCHAR(255)
+}
+
+entity "administradores" as administradores {
+  * id : BIGINT <<PK, FK>>
+  --
+}
+
+entity "administrador_rol" as administrador_rol {
+  * administrador_id : BIGINT <<PK, FK>>
+  * rol_id : BIGINT <<PK, FK>>
+}
+
+entity "categorias_servicio" as categorias_servicio {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(50) <<UNIQUE>>
+  descripcion : TEXT
+}
+
+entity "servicios" as servicios {
+  * id : BIGINT <<PK>>
+  --
+  * categoria_id : BIGINT <<FK>>
+  * nombre : VARCHAR(100)
+  descripcion : TEXT
+  * precio : DECIMAL(10,2)
+  * duracion_minutos : INT
+  * activo : BOOLEAN
+}
+
+entity "empleado_servicio" as empleado_servicio {
+  * empleado_id : BIGINT <<PK, FK>>
+  * servicio_id : BIGINT <<PK, FK>>
+}
+
+entity "horarios_disponibilidad" as horarios_disponibilidad {
+  * id : BIGINT <<PK>>
+  --
+  * empleado_id : BIGINT <<FK>>
+  * fecha : DATE
+  * hora_inicio : TIME
+  * hora_fin : TIME
+  estado : VARCHAR(20)
+}
+
+entity "citas" as citas {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * empleado_id : BIGINT <<FK>>
+  * servicio_id : BIGINT <<FK>>
+  * fecha : DATE
+  * hora : TIME
+  estado : VARCHAR(20)
+  fecha_registro : DATETIME
+}
+
+' Relaciones y Heredado (Inheritance JOINED)
+usuarios ||--o| clientes
+usuarios ||--o| empleados
+usuarios ||--o| administradores
+
+' Catalogos y Tablas del Dominio
+especialidades ||--o{ empleados
+empleados ||--o{ horarios_disponibilidad
+
+categorias_servicio ||--o{ servicios
+
+empleados ||--o{ empleado_servicio
+servicios ||--o{ empleado_servicio
+
+administradores ||--o{ administrador_rol
+roles ||--o{ administrador_rol
+
+clientes ||--o{ citas
+empleados ||--o{ citas
+servicios ||--o{ citas
+
+@enduml
