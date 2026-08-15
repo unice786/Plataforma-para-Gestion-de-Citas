@@ -1,53 +1,58 @@
-estes es el entidad de relacion
+@startuml
+title Diagrama Entidad-Relación Normalizado (3FN) - Sugoi
 
-
-@startuml Diagrama_Entidad_Relacion
-
-' Configuración visual básica
-hide circle
-
-skinparam linetype ortho
-
-entity "usuarios" as usuario {
+entity "usuarios" as usuarios {
   * id : BIGINT <<PK>>
   --
   * nombre : VARCHAR(100)
-  * correo : VARCHAR(150) <<UNIQUE>>
+  * correo : VARCHAR(150)
   * password : VARCHAR(255)
   * activo : BOOLEAN
 }
 
-entity "administradores" as administrador {
-  * id : BIGINT <<PK, FK>>
-}
-
-entity "clientes" as cliente {
-  * id : BIGINT <<PK, FK>>
+entity "clientes" as clientes {
+  * usuario_id : BIGINT <<PK, FK>>
   --
   * telefono : VARCHAR(20)
 }
 
-entity "empleados" as empleado {
-  * id : BIGINT <<PK, FK>>
+entity "especialidades" as especialidades {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  descripcion : VARCHAR(255)
+}
+
+entity "empleados" as empleados {
+  * usuario_id : BIGINT <<PK, FK>>
   --
   * especialidad_id : BIGINT <<FK>>
 }
 
-entity "especialidades" as especialidad {
+entity "roles" as roles {
   * id : BIGINT <<PK>>
   --
-  * nombre : VARCHAR(100) <<UNIQUE>>
+  * nombre : VARCHAR(50)
+  descripcion : VARCHAR(255)
+}
+
+entity "administradores" as administradores {
+  * usuario_id : BIGINT <<PK, FK>>
+}
+
+entity "administrador_rol" as admin_rol {
+  * administrador_id : BIGINT <<PK, FK>>
+  * rol_id : BIGINT <<PK, FK>>
+}
+
+entity "categorias_servicio" as categorias {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(50)
   descripcion : TEXT
 }
 
-entity "categorias_servicio" as categoria_servicio {
-  * id : BIGINT <<PK>>
-  --
-  * nombre : VARCHAR(50) <<UNIQUE>>
-  descripcion : TEXT
-}
-
-entity "servicios" as servicio {
+entity "servicios" as servicios {
   * id : BIGINT <<PK>>
   --
   * categoria_id : BIGINT <<FK>>
@@ -58,22 +63,17 @@ entity "servicios" as servicio {
   * activo : BOOLEAN
 }
 
-entity "empleado_servicio" as empleado_servicio {
-  * empleado_id : BIGINT <<PK, FK>>
-  * servicio_id : BIGINT <<PK, FK>>
-}
-
-entity "horarios_disponibilidad" as horario_disponibilidad {
+entity "horarios_disponibilidad" as horarios {
   * id : BIGINT <<PK>>
   --
   * empleado_id : BIGINT <<FK>>
   * fecha : DATE
   * hora_inicio : TIME
   * hora_fin : TIME
-  * estado : VARCHAR(20)
+  estado : VARCHAR(20)
 }
 
-entity "citas" as cita {
+entity "citas" as citas {
   * id : BIGINT <<PK>>
   --
   * cliente_id : BIGINT <<FK>>
@@ -85,23 +85,27 @@ entity "citas" as cita {
   * fecha_registro : DATETIME
 }
 
-' Relaciones de Herencia (JOINED)
-usuario ||--|| administrador : "es un"
-usuario ||--|| cliente : "es un"
-usuario ||--|| empleado : "es un"
+entity "empleado_servicio" as emp_serv {
+  * empleado_id : BIGINT <<PK, FK>>
+  * servicio_id : BIGINT <<PK, FK>>
+}
 
-' Otras relaciones
-especialidad ||--o{ empleado
-categoria_servicio ||--o{ servicio
-empleado ||--o{ horario_disponibilidad
+' Herencia
+usuarios ||--|| clientes
+usuarios ||--|| empleados
+usuarios ||--|| administradores
 
-' Relación Muchos a Muchos
-empleado ||--o{ empleado_servicio
-servicio ||--o{ empleado_servicio
+' Catálogos y Seguridad
+especialidades ||--o{ empleados
+categorias ||--o{ servicios
+administradores ||--o{ admin_rol
+roles ||--o{ admin_rol
 
-' Relaciones de Cita
-cliente ||--o{ cita
-empleado ||--o{ cita
-servicio ||--o{ cita
-
+' Operaciones
+empleados ||--o{ horarios
+clientes ||--o{ citas
+empleados ||--o{ citas
+servicios ||--o{ citas
+empleados ||--o{ emp_serv
+servicios ||--o{ emp_serv
 @enduml
