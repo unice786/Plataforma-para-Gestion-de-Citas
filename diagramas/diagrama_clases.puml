@@ -1,75 +1,108 @@
-@startuml
-title Diagrama de Clases - Sugoi (Plataforma para Gestión de Citas)
+@startuml Diagrama_Clases_JPA
 
-class Usuario {
-    -Long id
-    -String nombre
-    -String correo
-    -String password
-    -Boolean activo
-    +iniciarSesion(): Boolean
-    +cerrarSesion(): void
+package "com.gestioncitas" {
+
+    ' Enumeraciones
+    enum EstadoCita <<Enumerated>> {
+        PENDIENTE
+        CONFIRMADA
+        CANCELADA
+        COMPLETADA
+    }
+
+    enum EstadoHorario <<Enumerated>> {
+        DISPONIBLE
+        RESERVADO
+        BLOQUEADO
+    }
+
+    ' Clase Base Mapeada
+    abstract class Usuario <<MappedSuperclass>> {
+        - id : Long
+        - nombre : String
+        - correo : String
+        - password : String
+        - activo : Boolean
+    }
+
+    class Administrador <<Entity>> {
+    }
+
+    class Cliente <<Entity>> {
+        - telefono : String
+        - citas : List<Cita>
+    }
+
+    class Empleado <<Entity>> {
+        - especialidad : Especialidad
+        - servicios : List<Servicio>
+        - horarios : List<HorarioDisponibilidad>
+        - citas : List<Cita>
+    }
+
+    class Especialidad <<Entity>> {
+        - id : Long
+        - nombre : String
+        - descripcion : String
+        - empleados : List<Empleado>
+    }
+
+    class CategoriaServicio <<Entity>> {
+        - id : Long
+        - nombre : String
+        - descripcion : String
+        - servicios : List<Servicio>
+    }
+
+    class Servicio <<Entity>> {
+        - id : Long
+        - nombre : String
+        - descripcion : String
+        - precio : BigDecimal
+        - duracionMinutos : Integer
+        - activo : Boolean
+        - categoria : CategoriaServicio
+        - empleados : List<Empleado>
+    }
+
+    class HorarioDisponibilidad <<Entity>> {
+        - id : Long
+        - fecha : LocalDate
+        - horaInicio : LocalTime
+        - horaFin : LocalTime
+        - estado : EstadoHorario
+        - empleado : Empleado
+    }
+
+    class Cita <<Entity>> {
+        - id : Long
+        - fecha : LocalDate
+        - hora : LocalTime
+        - estado : EstadoCita
+        - fechaRegistro : LocalDateTime
+        - cliente : Cliente
+        - empleado : Empleado
+        - servicio : Servicio
+    }
+
+    ' Relaciones de herencia Java
+    Usuario <|-- Administrador
+    Usuario <|-- Cliente
+    Usuario <|-- Empleado
+
+    ' Relaciones de composición/asociación
+    Empleado "*" --> "1" Especialidad : "tiene"
+    Servicio "*" --> "1" CategoriaServicio : "pertenece a"
+    HorarioDisponibilidad "*" --> "1" Empleado : "asignado a"
+
+    Empleado "1" *-- "*" HorarioDisponibilidad
+    Empleado "1" *-- "*" Cita
+    Cliente "1" *-- "*" Cita
+
+    Empleado "*" -- "*" Servicio : "asociados"
+    Cita "*" --> "1" Servicio : "reserva"
+    Cita --> EstadoCita
+    HorarioDisponibilidad --> EstadoHorario
 }
-
-class Cliente {
-    -String telefono
-    +reservarCita(): Boolean
-    +cancelarCita(idCita: Long): Boolean
-}
-
-class Empleado {
-    -String especialidad
-    +consultarAgenda(): List
-    +actualizarEstadoCita(idCita: Long): Boolean
-}
-
-class Administrador {
-    -String permisos
-    +registrarEmpleado(): void
-    +gestionarServicio(): void
-}
-
-class Servicio {
-    -Long id
-    -String nombre
-    -String descripcion
-    -Double precio
-    -Integer duracionMinutos
-    -String categoria
-    -Boolean activo
-    +actualizarPrecio(precio: Double): void
-}
-
-class HorarioDisponibilidad {
-    -Long id
-    -LocalDate fecha
-    -LocalTime horaInicio
-    -LocalTime horaFin
-    -String estado
-    +marcarComoOcupado(): void
-}
-
-class Cita {
-    -Long id
-    -LocalDate fecha
-    -LocalTime hora
-    -String estado
-    -LocalDateTime fechaRegistro
-    +reprogramar(fecha: LocalDate, hora: LocalTime): Boolean
-    +cancelar(): Boolean
-}
-
-' --- Herencia ---
-Usuario <|-- Cliente : Herencia
-Usuario <|-- Empleado : Herencia
-Usuario <|-- Administrador : Herencia
-
-' --- Relaciones y Multiplicidad ---
-Cliente "1" -- "0..*" Cita : realiza >
-Empleado "1" -- "0..*" Cita : atiende >
-Servicio "1" -- "0..*" Cita : incluye >
-Empleado "1" *-- "0..*" HorarioDisponibilidad : contiene >
-Empleado "0..*" -- "0..*" Servicio : presta >
-Administrador "1" ..> "0..*" Servicio : gestiona >
 
 @enduml

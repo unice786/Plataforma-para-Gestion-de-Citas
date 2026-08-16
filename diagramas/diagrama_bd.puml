@@ -1,5 +1,5 @@
-@startuml
-title Diagrama Entidad-Relación Normalizado (3FN) - Sugoi
+@startuml Diagrama_Entidad_Relacion_3FN
+title Diagrama Entidad-Relación Normalizado (3FN) - Plataforma Citas
 
 entity "usuarios" as usuarios {
   * id : BIGINT <<PK>>
@@ -13,7 +13,7 @@ entity "usuarios" as usuarios {
 entity "clientes" as clientes {
   * usuario_id : BIGINT <<PK, FK>>
   --
-  * telefono : VARCHAR(20)
+  telefono : VARCHAR(20)
 }
 
 entity "especialidades" as especialidades {
@@ -70,7 +70,7 @@ entity "horarios_disponibilidad" as horarios {
   * fecha : DATE
   * hora_inicio : TIME
   * hora_fin : TIME
-  estado : VARCHAR(20)
+  * estado : VARCHAR(20)
 }
 
 entity "citas" as citas {
@@ -90,7 +90,7 @@ entity "empleado_servicio" as emp_serv {
   * servicio_id : BIGINT <<PK, FK>>
 }
 
-' Herencia
+' Relaciones de Herencia Base
 usuarios ||--|| clientes
 usuarios ||--|| empleados
 usuarios ||--|| administradores
@@ -108,4 +108,5 @@ empleados ||--o{ citas
 servicios ||--o{ citas
 empleados ||--o{ emp_serv
 servicios ||--o{ emp_serv
+
 @enduml
