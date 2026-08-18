@@ -1,24 +1,25 @@
 package com.gestioncitas.plataformacitas.modelos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "usuarios")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "especialidades")
 @Getter
 @Setter
 @NoArgsConstructor
-public abstract class Usuario {
+public class Especialidad {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,12 +28,9 @@ public abstract class Usuario {
 	@Column(nullable = false, length = 100)
 	private String nombre;
 
-	@Column(nullable = false, unique = true, length = 150)
-	private String correo;
+	@Column(length = 255)
+	private String descripcion;
 
-	@Column(nullable = false, length = 255)
-	private String password;
-
-	@Column(nullable = false)
-	private Boolean activo = true;
+	@OneToMany(mappedBy = "especialidad")
+	private List<Empleado> empleados = new ArrayList<>();
 }
