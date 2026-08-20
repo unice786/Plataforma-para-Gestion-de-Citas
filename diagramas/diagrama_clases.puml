@@ -1,23 +1,8 @@
 @startuml Diagrama_Clases_JPA
 
-package "com.gestioncitas" {
+package com.gestioncitas {
 
-    ' Enumeraciones
-    enum EstadoCita <<Enumerated>> {
-        PENDIENTE
-        CONFIRMADA
-        CANCELADA
-        COMPLETADA
-    }
-
-    enum EstadoHorario <<Enumerated>> {
-        DISPONIBLE
-        RESERVADO
-        BLOQUEADO
-    }
-
-    ' Clase Base Mapeada
-    abstract class Usuario <<MappedSuperclass>> {
+    abstract class Usuario {
         - id : Long
         - nombre : String
         - correo : String
@@ -25,36 +10,36 @@ package "com.gestioncitas" {
         - activo : Boolean
     }
 
-    class Administrador <<Entity>> {
+    class Administrador {
     }
 
-    class Cliente <<Entity>> {
+    class Cliente {
         - telefono : String
         - citas : List<Cita>
     }
 
-    class Empleado <<Entity>> {
+    class Empleado {
         - especialidad : Especialidad
         - servicios : List<Servicio>
         - horarios : List<HorarioDisponibilidad>
         - citas : List<Cita>
     }
 
-    class Especialidad <<Entity>> {
+    class Especialidad {
         - id : Long
         - nombre : String
         - descripcion : String
         - empleados : List<Empleado>
     }
 
-    class CategoriaServicio <<Entity>> {
+    class CategoriaServicio {
         - id : Long
         - nombre : String
         - descripcion : String
         - servicios : List<Servicio>
     }
 
-    class Servicio <<Entity>> {
+    class Servicio {
         - id : Long
         - nombre : String
         - descripcion : String
@@ -65,20 +50,20 @@ package "com.gestioncitas" {
         - empleados : List<Empleado>
     }
 
-    class HorarioDisponibilidad <<Entity>> {
+    class HorarioDisponibilidad {
         - id : Long
         - fecha : LocalDate
         - horaInicio : LocalTime
         - horaFin : LocalTime
-        - estado : EstadoHorario
+        - estado : String
         - empleado : Empleado
     }
 
-    class Cita <<Entity>> {
+    class Cita {
         - id : Long
         - fecha : LocalDate
         - hora : LocalTime
-        - estado : EstadoCita
+        - estado : String
         - fechaRegistro : LocalDateTime
         - cliente : Cliente
         - empleado : Empleado
@@ -101,10 +86,6 @@ package "com.gestioncitas" {
 
     Empleado "*" -- "*" Servicio : "asociados"
     Cita "*" --> "1" Servicio : "reserva"
-    Cita --> EstadoCita
-    HorarioDisponibilidad --> EstadoHorario
 }
 
 @enduml
-
-
