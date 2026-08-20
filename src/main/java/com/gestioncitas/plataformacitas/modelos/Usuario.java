@@ -1,74 +1,42 @@
 package com.gestioncitas.plataformacitas.modelos;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
-@MappedSuperclass
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "usuarios")
+@Inheritance(strategy = InheritanceType.JOINED)
+@Data
 public abstract class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String nombre;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(nullable = false, unique = true)
     private String correo;
 
-    @Column(length = 20)
-    private String telefono;
-
     @Column(nullable = false)
-    private String contrasena;
+    private String password;
 
-    public Usuario() {
-    }
+    private Boolean activo = true;
 
-    public Usuario(Long id, String nombre, String correo, String telefono, String contrasena) {
-        this.id = id;
-        this.nombre = nombre;
-        this.correo = correo;
-        this.telefono = telefono;
-        this.contrasena = contrasena;
-    }
+    private Boolean verificado = false;
 
-    public Long getId() {
-        return id;
-    }
+    @Column(name = "token_verificacion")
+    private String tokenVerificacion;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "token_expiracion")
+    private LocalDateTime tokenExpiracion;
 
-    public String getNombre() {
-        return nombre;
-    }
+    @Column(name = "token_recuperacion")
+    private String tokenRecuperacion;
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
-    }
+    @Column(name = "token_recuperacion_expiracion")
+    private LocalDateTime tokenRecuperacionExpiracion;
 }
