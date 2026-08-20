@@ -2,8 +2,8 @@ package com.gestioncitas.plataformacitas.servicios;
 
 import java.util.List;
 
-import com.gestioncitas.plataformacitas.dtos.EmpleadoRequestDTO;
-import com.gestioncitas.plataformacitas.dtos.EmpleadoResponseDTO;
+import com.gestioncitas.plataformacitas.dto.EmpleadoRequestDTO;
+import com.gestioncitas.plataformacitas.dto.EmpleadoResponseDTO;
 
 public interface EmpleadoService {
 

@@ -1,4 +1,4 @@
-package com.gestioncitas.plataformacitas.dtos;
+package com.gestioncitas.plataformacitas.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

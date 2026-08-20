@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestioncitas.plataformacitas.dtos.EmpleadoRequestDTO;
-import com.gestioncitas.plataformacitas.dtos.EmpleadoResponseDTO;
-import com.gestioncitas.plataformacitas.dtos.HorarioRequestDTO;
-import com.gestioncitas.plataformacitas.dtos.HorarioResponseDTO;
+import com.gestioncitas.plataformacitas.dto.EmpleadoRequestDTO;
+import com.gestioncitas.plataformacitas.dto.EmpleadoResponseDTO;
+import com.gestioncitas.plataformacitas.dto.HorarioRequestDTO;
+import com.gestioncitas.plataformacitas.dto.HorarioResponseDTO;
 import com.gestioncitas.plataformacitas.servicios.EmpleadoService;
 import com.gestioncitas.plataformacitas.servicios.HorarioDisponibilidadService;
 
