@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gestioncitas.plataformacitas.dtos.HorarioRequestDTO;
-import com.gestioncitas.plataformacitas.dtos.HorarioResponseDTO;
+import com.gestioncitas.plataformacitas.dto.HorarioRequestDTO;
+import com.gestioncitas.plataformacitas.dto.HorarioResponseDTO;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 import com.gestioncitas.plataformacitas.repositorios.EmpleadoRepository;

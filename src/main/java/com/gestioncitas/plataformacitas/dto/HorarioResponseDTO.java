@@ -1,4 +1,4 @@
-package com.gestioncitas.plataformacitas.dtos;
+package com.gestioncitas.plataformacitas.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
