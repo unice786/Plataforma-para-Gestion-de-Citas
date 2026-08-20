@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Citas - Registro</title>
+    <title>Plataforma Citas - Iniciar Sesión</title>
     <script>
         (function(){
             var saved = localStorage.getItem('auth-theme');
@@ -44,55 +44,52 @@
 </button>
 
 <div class="auth-page">
-    <div class="auth-container reverse">
+    <div class="auth-container">
 
         <div class="auth-hero">
-            <h2>¡Únete a nuestra comunidad!</h2>
-            <p>Regístrate para reservar tus citas, dar seguimiento a tu historial y mucho más. Es rápido y gratis.</p>
+            <h2>¡Bienvenido de nuevo!</h2>
+            <p>Inicia sesión para acceder a tu cuenta y gestionar tus citas.</p>
         </div>
 
         <div class="auth-card">
-            <h1 class="brand-title">Crear Cuenta</h1>
-            <p class="brand-subtitle">Regístrate en Plataforma de Citas</p>
+            <h1 class="brand-title">Iniciar Sesión</h1>
+            <p class="brand-subtitle">Ingresa a tu cuenta de Plataforma de Citas</p>
 
+            <div th:if="${param.verificado}" class="alert alert-success">
+                ¡Cuenta verificada! Ya puedes iniciar sesión.
+            </div>
+            <div th:if="${param.recuperada}" class="alert alert-success">
+                ¡Contraseña actualizada! Ya puedes iniciar sesión.
+            </div>
+            <div th:if="${param['error-verificacion']}" class="alert alert-danger">
+                El enlace de verificación no es válido o expiró.
+            </div>
             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-            <form th:action="@{/registro}" th:object="${cliente}" method="post">
+            <form th:action="@{/login}" method="post">
                 <div class="input-icon-group">
                     <i class="bi bi-person input-icon"></i>
-                    <label for="nombre" class="form-label">Nombre completo</label>
-                    <input type="text" id="nombre" th:field="*{nombre}" class="form-control" placeholder="Nombre completo">
-                    <div th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger small"></div>
-                </div>
-                <div class="input-icon-group">
-                    <i class="bi bi-envelope input-icon"></i>
                     <label for="correo" class="form-label">Correo electrónico</label>
-                    <input type="email" id="correo" th:field="*{correo}" class="form-control" placeholder="Correo electrónico">
-                    <div th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}" class="text-danger small"></div>
-                </div>
-                <div class="input-icon-group">
-                    <i class="bi bi-telephone input-icon"></i>
-                    <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="text" id="telefono" th:field="*{telefono}" class="form-control" placeholder="Teléfono">
-                    <div th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}" class="text-danger small"></div>
+                    <input type="email" id="correo" name="correo" class="form-control" required placeholder="Correo electrónico">
                 </div>
                 <div class="input-icon-group">
                     <i class="bi bi-lock input-icon"></i>
                     <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" id="password" th:field="*{password}" class="form-control" placeholder="Contraseña (mín. 8 caracteres)">
-                    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-danger small"></div>
-                </div>
-                <div class="input-icon-group">
-                    <i class="bi bi-lock-fill input-icon"></i>
-                    <label for="confirmarPassword" class="form-label">Confirmar contraseña</label>
-                    <input type="password" id="confirmarPassword" th:field="*{confirmarPassword}" class="form-control" placeholder="Confirmar contraseña">
-                    <div th:if="${#fields.hasErrors('confirmarPassword')}" th:errors="*{confirmarPassword}" class="text-danger small"></div>
+                    <input type="password" id="password" name="password" class="form-control" required placeholder="Contraseña">
                 </div>
 
-                <button type="submit" class="btn-auth-submit">Registrarse</button>
+                <div class="auth-row-options">
+                    <label class="auth-remember">
+                        <input type="checkbox" name="remember-me">
+                        Recuérdame
+                    </label>
+                    <a th:href="@{/recuperar}">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn-auth-submit">Ingresar</button>
             </form>
 
-            <p class="auth-switch">¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión</a></p>
+            <p class="auth-switch">¿No tienes cuenta? <a th:href="@{/registro}">Regístrate</a></p>
         </div>
 
     </div>
