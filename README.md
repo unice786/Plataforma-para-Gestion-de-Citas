@@ -1,5 +1,11 @@
 # Sugoi - Plataforma para Gestión de Citas
 
+## Diagrama de Clases
+![Diagrama de Clases](https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_clases.puml&v=3)
+
+## Diagrama Entidad-Relación (DER)
+![Diagrama DER](https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_bd.puml&v=3)
+
 Sistema de gestión de citas desarrollado con **Spring Boot 3 + Spring Data JPA + MySQL**. El backend y las vistas de autenticación se construyen con Thymeleaf, y la seguridad de contraseñas usa **BCrypt**.
 
 ---
@@ -136,7 +142,7 @@ src/main/resources/
 - Las contraseñas se guardan **únicamente** como hash BCrypt (nunca en texto plano).
 - El registro usa un **DTO** (`ClienteRegistroDTO`), por lo que no se aceptan campos extra desde el formulario (protección contra *mass assignment*).
 - El login valida el hash con `PasswordEncoder.matches()`.
-- Los tokens de verificación y recuperación son UUID aleatorios con expiración (24 h y 1 h respectivamente).
+- Los tokens de verificación y recuperación son UUID aleatorios con expiración (24 h y 30 min respectivamente).
 - La recuperación no revela si un correo existe (mensaje genérico) para evitar enumeración de cuentas.
 
 > **Nota**: `SecurityConfig` tiene acceso abierto en todas las rutas (la sesión se valida manualmente en los controladores) y **CSRF activado** (los formularios Thymeleaf inyectan el token automáticamente). Para producción se debe restringir el acceso por rol.
@@ -157,10 +163,3 @@ Cubre el servicio de usuario: registro exitoso, correo duplicado, contraseñas q
 
 - Módulos funcionales del sistema (servicios, citas, empleados, administración).
 - Roles y permisos con Spring Security (acceso por perfil).
-
----
-
-## Diagramas
-
-- **Diagrama de Clases**: [ver](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_clases.puml?v=3)
-- **Diagrama Entidad-Relación (DER)**: [ver](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_bd.puml?v=3)
