@@ -2,101 +2,90 @@
 
 package com.gestioncitas {
 
-   abstract class Usuario {
-       - id : Long
-       - nombre : String
-       - correo : String
-       - password : String
-       - activo : Boolean
-   }
+    abstract class Usuario {
+        - id : Long
+        - nombre : String
+        - correo : String
+        - password : String
+        - activo : Boolean
+    }
 
-   class Administrador {
-   }
+    class Administrador {
+    }
 
-   class Cliente {
-       - telefono : String
-       - citas : List<Cita>
-   }
+    class Cliente {
+        - telefono : String
+        - citas : List<Cita>
+    }
 
+    class Empleado {
+        - especialidad : Especialidad
+        - servicios : List<Servicio>
+        - horarios : List<HorarioDisponibilidad>
+        - citas : List<Cita>
+    }
 
-   class Empleado {
-       - especialidad : Especialidad
-       - servicios : List<Servicio>
-       - horarios : List<HorarioDisponibilidad>
-       - citas : List<Cita>
-   }
+    class Especialidad {
+        - id : Long
+        - nombre : String
+        - descripcion : String
+        - empleados : List<Empleado>
+    }
 
+    class CategoriaServicio {
+        - id : Long
+        - nombre : String
+        - descripcion : String
+        - servicios : List<Servicio>
+    }
 
-   class Especialidad {
-       - id : Long
-       - nombre : String
-       - descripcion : String
-       - empleados : List<Empleado>
-   }
+    class Servicio {
+        - id : Long
+        - nombre : String
+        - descripcion : String
+        - precio : BigDecimal
+        - duracionMinutos : Integer
+        - activo : Boolean
+        - categoria : CategoriaServicio
+        - empleados : List<Empleado>
+    }
 
+    class HorarioDisponibilidad {
+        - id : Long
+        - fecha : LocalDate
+        - horaInicio : LocalTime
+        - horaFin : LocalTime
+        - estado : String
+        - empleado : Empleado
+    }
 
-   class CategoriaServicio {
-       - id : Long
-       - nombre : String
-       - descripcion : String
-       - servicios : List<Servicio>
-   }
+    class Cita {
+        - id : Long
+        - fecha : LocalDate
+        - hora : LocalTime
+        - estado : String
+        - fechaRegistro : LocalDateTime
+        - cliente : Cliente
+        - empleado : Empleado
+        - servicio : Servicio
+    }
 
+    ' Relaciones de herencia Java
+    Usuario <|-- Administrador
+    Usuario <|-- Cliente
+    Usuario <|-- Empleado
 
-   class Servicio {
-       - id : Long
-       - nombre : String
-       - descripcion : String
-       - precio : BigDecimal
-       - duracionMinutos : Integer
-       - activo : Boolean
-       - categoria : CategoriaServicio
-       - empleados : List<Empleado>
-   }
+    ' Relaciones de composición/asociación
+    Empleado "*" --> "1" Especialidad : "tiene"
+    Servicio "*" --> "1" CategoriaServicio : "pertenece a"
+    HorarioDisponibilidad "*" --> "1" Empleado : "asignado a"
 
+    Empleado "1" *-- "*" HorarioDisponibilidad
+    Empleado "1" *-- "*" Cita
+    Cliente "1" *-- "*" Cita
 
-   class HorarioDisponibilidad {
-       - id : Long
-       - fecha : LocalDate
-       - horaInicio : LocalTime
-       - horaFin : LocalTime
-       - estado : String
-       - empleado : Empleado
-   }
-
-
-   class Cita {
-       - id : Long
-       - fecha : LocalDate
-       - hora : LocalTime
-       - estado : String
-       - fechaRegistro : LocalDateTime
-       - cliente : Cliente
-       - empleado : Empleado
-       - servicio : Servicio
-   }
-
-
-   ' Relaciones de herencia Java
-   Usuario <|-- Administrador
-   Usuario <|-- Cliente
-   Usuario <|-- Empleado
-
-
-   ' Relaciones de composición/asociación
-   Empleado "*" --> "1" Especialidad : "tiene"
-   Servicio "*" --> "1" CategoriaServicio : "pertenece a"
-   HorarioDisponibilidad "*" --> "1" Empleado : "asignado a"
-
-
-   Empleado "1" *-- "*" HorarioDisponibilidad
-   Empleado "1" *-- "*" Cita
-   Cliente "1" *-- "*" Cita
-
-
-   Empleado "*" -- "*" Servicio : "asociados"
-   Cita "*" --> "1" Servicio : "reserva"
+    Empleado "*" -- "*" Servicio : "asociados"
+    Cita "*" --> "1" Servicio : "reserva"
 }
-
 
 @enduml
