@@ -70,6 +70,61 @@ package com.gestioncitas {
         - servicio : Servicio
     }
 
+    ' ===== Capa de Lógica de Negocio (Servicios) =====
+    ' Define los requerimientos de acceso a datos (repositorios)
+
+    class UsuarioService <<service>> {
+        + autenticar(correo, password) : Optional<Usuario>
+        + registrar(ClienteRegistroDTO) : Optional<Cliente>
+        + verificar(token) : Optional<Usuario>
+        + solicitarRecuperacion(correo) : Optional<Usuario>
+        + tokenRecuperacionExiste(token) : boolean
+        + tokenRecuperacionValido(token) : boolean
+        + restablecerPassword(RestablecerPasswordDTO) : Optional<Usuario>
+    }
+
+    class EmpleadoService <<service>> {
+        + crear(EmpleadoRequestDTO) : EmpleadoResponseDTO
+        + actualizar(id : Long, EmpleadoRequestDTO) : EmpleadoResponseDTO
+        + darDeBaja(id : Long) : EmpleadoResponseDTO
+        + listarActivos() : List<EmpleadoResponseDTO>
+    }
+
+    class HorarioDisponibilidadService <<service>> {
+        + asignar(HorarioRequestDTO) : HorarioResponseDTO
+        + consultarDisponibilidad(empleadoId : Long, fecha : LocalDate) : List<HorarioResponseDTO>
+    }
+
+    ' ===== Capa de Acceso a Datos (Repositorios) =====
+    ' Métodos específicos declarados además de los heredados de JpaRepository
+
+    class UsuarioRepository <<repository>> {
+        + findByCorreo(correo : String) : Optional<Usuario>
+        + findByTokenVerificacion(token : String) : Optional<Usuario>
+        + findByTokenRecuperacion(token : String) : Optional<Usuario>
+        + existsByCorreo(correo : String) : boolean
+    }
+
+    class ClienteRepository <<repository>> {
+    }
+
+    class AdministradorRepository <<repository>> {
+    }
+
+    class EmpleadoRepository <<repository>> {
+        + existsByCorreo(correo : String) : boolean
+        + existsByCorreoAndIdNot(correo : String, id : Long) : boolean
+        + findByActivoTrue() : List<Empleado>
+    }
+
+    class EspecialidadRepository <<repository>> {
+    }
+
+    class HorarioDisponibilidadRepository <<repository>> {
+        + findByEmpleadoIdAndFechaAndEstado(empleadoId : Long, fecha : LocalDate, estado : String) : List<HorarioDisponibilidad>
+        + findByEmpleadoIdAndEstado(empleadoId : Long, estado : String) : List<HorarioDisponibilidad>
+    }
+
     ' Relaciones de herencia Java
     Usuario <|-- Administrador
     Usuario <|-- Cliente
@@ -86,6 +141,14 @@ package com.gestioncitas {
 
     Empleado "*" -- "*" Servicio : "asociados"
     Cita "*" --> "1" Servicio : "reserva"
+
+    ' Dependencias de la capa de servicios sobre los repositorios
+    UsuarioService ..> UsuarioRepository : usa
+    UsuarioService ..> ClienteRepository : usa
+    EmpleadoService ..> EmpleadoRepository : usa
+    EmpleadoService ..> EspecialidadRepository : usa
+    HorarioDisponibilidadService ..> HorarioDisponibilidadRepository : usa
+    HorarioDisponibilidadService ..> EmpleadoRepository : usa
 }
 
 @enduml
