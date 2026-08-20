@@ -50,8 +50,7 @@
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
-		<!-- Herramientas de Desarrollo -->
+<!-- Herramientas de Desarrollo -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
