@@ -1,43 +1,60 @@
 package com.gestioncitas.plataformacitas.modelos;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
-import jakarta.persistence.Table;
+  import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "usuarios")
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class Usuario {
+  import jakarta.persistence.Column;
+  import jakarta.persistence.Entity;
+  import jakarta.persistence.GeneratedValue;
+  import jakarta.persistence.GenerationType;
+  import jakarta.persistence.Id;
+  import jakarta.persistence.Inheritance;
+  import jakarta.persistence.InheritanceType;
+  import jakarta.persistence.Table;
+  import jakarta.persistence.Transient;
+  import lombok.Data;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Entity
+  @Table(name = "usuarios")
+  @Inheritance(strategy = InheritanceType.JOINED)
+  @Data
+  public abstract class Usuario {
 
-    @Column(nullable = false, length = 100)
-    private String nombre;
+      @Id
+      @GeneratedValue(strategy = GenerationType.IDENTITY)
+      private Long id;
 
-    @Column(nullable = false, unique = true, length = 150)
-    private String correo;
+      @Column(nullable = false)
+      private String nombre;
 
-    @Column(name = "password", nullable = false, length = 255)
-    private String contrasena;
+      @Column(nullable = false, unique = true, length = 150)
+      private String correo;
 
-    @Column(nullable = false)
-    private Boolean activo = true;
+      @Column(name = "password", nullable = false, length = 255)
+      private String password;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public String getCorreo() { return correo; }
-    public void setCorreo(String correo) { this.correo = correo; }
-    public String getContrasena() { return contrasena; }
-    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
-    public Boolean getActivo() { return activo; }
-    public void setActivo(Boolean activo) { this.activo = activo; }
-}
+      @Column(nullable = false)
+      private Boolean activo = true;
+
+      private Boolean verificado = false;
+
+      @Column(name = "token_verificacion")
+      private String tokenVerificacion;
+
+      @Column(name = "token_expiracion")
+      private LocalDateTime tokenExpiracion;
+
+      @Column(name = "token_recuperacion")
+      private String tokenRecuperacion;
+
+      @Column(name = "token_recuperacion_expiracion")
+      private LocalDateTime tokenRecuperacionExpiracion;
+
+      @Transient
+      public String getContrasena() {
+          return password;
+      }
+
+      public void setContrasena(String contrasena) {
+          this.password = contrasena;
+      }
+  }
