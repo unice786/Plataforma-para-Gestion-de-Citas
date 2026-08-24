@@ -8,6 +8,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Bloques de Horarios de Disponibilidad (para los próximos 60 días).
  */
 @Component
+@ConditionalOnProperty(name = "app.datos-demo.habilitado", havingValue = "true", matchIfMissing = true)
 public class DataInitializer implements CommandLineRunner {
 
     private final ClienteRepository clienteRepository;
@@ -25,19 +28,22 @@ public class DataInitializer implements CommandLineRunner {
     private final EspecialidadRepository especialidadRepository;
     private final EmpleadoRepository empleadoRepository;
     private final HorarioDisponibilidadRepository horarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(ClienteRepository clienteRepository,
                            CategoriaServicioRepository categoriaRepository,
                            ServicioRepository servicioRepository,
                            EspecialidadRepository especialidadRepository,
                            EmpleadoRepository empleadoRepository,
-                           HorarioDisponibilidadRepository horarioRepository) {
+                           HorarioDisponibilidadRepository horarioRepository,
+                           PasswordEncoder passwordEncoder) {
         this.clienteRepository = clienteRepository;
         this.categoriaRepository = categoriaRepository;
         this.servicioRepository = servicioRepository;
         this.especialidadRepository = especialidadRepository;
         this.empleadoRepository = empleadoRepository;
         this.horarioRepository = horarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -53,7 +59,7 @@ public class DataInitializer implements CommandLineRunner {
             Cliente clienteDemo = new Cliente();
             clienteDemo.setNombre("Ana López (Cliente Demo)");
             clienteDemo.setCorreo("ana.lopez@ejemplo.com");
-            clienteDemo.setContrasena("123456");
+            clienteDemo.setPassword(passwordEncoder.encode("123456"));
             clienteDemo.setTelefono("0991234567");
             clienteDemo.setActivo(true);
             clienteRepository.save(clienteDemo);
@@ -61,7 +67,7 @@ public class DataInitializer implements CommandLineRunner {
             Cliente cliente2 = new Cliente();
             cliente2.setNombre("Juan Pérez");
             cliente2.setCorreo("juan.perez@ejemplo.com");
-            cliente2.setContrasena("123456");
+            cliente2.setPassword(passwordEncoder.encode("123456"));
             cliente2.setTelefono("0987654321");
             cliente2.setActivo(true);
             clienteRepository.save(cliente2);
@@ -143,7 +149,7 @@ public class DataInitializer implements CommandLineRunner {
             Empleado emp1 = new Empleado();
             emp1.setNombre("Carlos Mendoza (Especialista)");
             emp1.setCorreo("carlos.mendoza@empresa.com");
-            emp1.setContrasena("123456");
+            emp1.setPassword(passwordEncoder.encode("123456"));
             emp1.setActivo(true);
             emp1.setEspecialidad(especialidad);
             emp1.setServicios(new ArrayList<>(servicios));
@@ -152,7 +158,7 @@ public class DataInitializer implements CommandLineRunner {
             Empleado emp2 = new Empleado();
             emp2.setNombre("Dra. Sofía Herrera");
             emp2.setCorreo("sofia.herrera@empresa.com");
-            emp2.setContrasena("123456");
+            emp2.setPassword(passwordEncoder.encode("123456"));
             emp2.setActivo(true);
             emp2.setEspecialidad(especialidad);
             emp2.setServicios(new ArrayList<>(servicios));
@@ -192,11 +198,7 @@ public class DataInitializer implements CommandLineRunner {
             for (Empleado emp : empleados) {
                 // Verificar si ya tiene bloques en esa fecha
                 List<HorarioDisponibilidad> existentes = horarioRepository
-                        .findDisponiblesByServicioAndFecha(
-                                emp.getServicios().isEmpty() ? 1L : emp.getServicios().get(0).getId(),
-                                fecha,
-                                "DISPONIBLE"
-                        );
+                        .findByEmpleadoIdAndFechaAndEstado(emp.getId(), fecha, "DISPONIBLE");
 
                 if (existentes.isEmpty()) {
                     // Turno Mañana: 08:00 - 12:00
