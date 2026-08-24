@@ -1,6 +1,9 @@
 package com.gestioncitas.plataformacitas.modelos;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -15,12 +18,18 @@ public abstract class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "El nombre es obligatorio")
+    @Size(max = 100, message = "El nombre no puede superar los 100 caracteres")
+    @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false, unique = true)
+    @NotBlank(message = "El correo es obligatorio")
+    @Email(message = "Ingresa un correo electrónico válido")
+    @Size(max = 150, message = "El correo no puede superar los 150 caracteres")
+    @Column(nullable = false, unique = true, length = 150)
     private String correo;
 
+    @NotBlank(message = "La contraseña es obligatoria")
     @Column(nullable = false)
     private String password;
 

@@ -1,5 +1,6 @@
 package com.gestioncitas.plataformacitas.modelos;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,45 +11,55 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "citas")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Cita {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id", nullable = false)
-    private Cliente cliente;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "empleado_id", nullable = false)
-    private Empleado empleado;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "servicio_id", nullable = false)
-    private Servicio servicio;
-    private LocalDate fecha;
-    private LocalTime hora;
-    @Enumerated(EnumType.STRING)
-    private EstadoCita estado = EstadoCita.PENDIENTE;
-    @jakarta.persistence.Column(name = "fecha_registro")
-    private LocalDateTime fechaRegistro;
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
-    public Empleado getEmpleado() { return empleado; }
-    public void setEmpleado(Empleado empleado) { this.empleado = empleado; }
-    public Servicio getServicio() { return servicio; }
-    public void setServicio(Servicio servicio) { this.servicio = servicio; }
-    public LocalDate getFecha() { return fecha; }
-    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
-    public LocalTime getHora() { return hora; }
-    public void setHora(LocalTime hora) { this.hora = hora; }
-    public EstadoCita getEstado() { return estado; }
-    public void setEstado(EstadoCita estado) { this.estado = estado; }
-    public LocalDateTime getFechaRegistro() { return fechaRegistro; }
-    public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@NotNull(message = "El cliente de la cita es obligatorio")
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "cliente_id", nullable = false)
+	private Cliente cliente;
+
+	@NotNull(message = "El empleado de la cita es obligatorio")
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "empleado_id", nullable = false)
+	private Empleado empleado;
+
+	@NotNull(message = "El servicio de la cita es obligatorio")
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "servicio_id", nullable = false)
+	private Servicio servicio;
+
+	@NotNull(message = "La fecha de la cita es obligatoria")
+	@Column(nullable = false)
+	private LocalDate fecha;
+
+	@NotNull(message = "La hora de la cita es obligatoria")
+	@Column(nullable = false)
+	private LocalTime hora;
+
+	@NotNull(message = "El estado de la cita es obligatorio")
+	@Enumerated(EnumType.STRING)
+	@Column(length = 20, nullable = false)
+	private EstadoCita estado = EstadoCita.PENDIENTE;
+
+	@NotNull(message = "La fecha de registro es obligatoria")
+	@Column(name = "fecha_registro", nullable = false)
+	private LocalDateTime fechaRegistro = LocalDateTime.now();
 }
