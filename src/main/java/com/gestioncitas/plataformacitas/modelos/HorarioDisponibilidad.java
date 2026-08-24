@@ -6,8 +6,6 @@ package com.gestioncitas.plataformacitas.modelos;
 
   import jakarta.persistence.Column;
   import jakarta.persistence.Entity;
-  import jakarta.persistence.EnumType;
-  import jakarta.persistence.Enumerated;
   import jakarta.persistence.FetchType;
   import jakarta.persistence.GeneratedValue;
   import jakarta.persistence.GenerationType;
@@ -43,8 +41,7 @@ package com.gestioncitas.plataformacitas.modelos;
       @Column(name = "hora_fin", nullable = false)
       private LocalTime horaFin;
 
-      @Enumerated(EnumType.STRING)
       @Column(nullable = false, length = 20)
-      private EstadoHorario estado = EstadoHorario.DISPONIBLE;
+      private String estado = "DISPONIBLE";
   }
 
