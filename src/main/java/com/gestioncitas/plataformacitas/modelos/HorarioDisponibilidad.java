@@ -43,5 +43,13 @@ package com.gestioncitas.plataformacitas.modelos;
 
       @Column(nullable = false, length = 20)
       private String estado = "DISPONIBLE";
+
+      public void setEstado(String estado) {
+          this.estado = estado;
+      }
+
+      public void setEstado(EstadoHorario estado) {
+          this.estado = estado == null ? null : estado.name();
+      }
   }
 

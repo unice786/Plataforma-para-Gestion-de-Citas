@@ -9,6 +9,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
+import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
+import com.gestioncitas.plataformacitas.repositorios.EmpleadoRepository;
+import com.gestioncitas.plataformacitas.repositorios.HorarioDisponibilidadRepository;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,8 +36,20 @@ class ServicioControllerTests {
     @Autowired
     private CategoriaServicioRepository categoriaServicioRepository;
 
+    @Autowired
+    private CitaRepository citaRepository;
+
+    @Autowired
+    private HorarioDisponibilidadRepository horarioDisponibilidadRepository;
+
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
+
     @BeforeEach
     void prepararBaseDeDatos() {
+        citaRepository.deleteAll();
+        horarioDisponibilidadRepository.deleteAll();
+        empleadoRepository.deleteAll();
         servicioRepository.deleteAll();
         categoriaServicioRepository.deleteAll();
     }
