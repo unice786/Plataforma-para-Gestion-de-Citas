@@ -59,7 +59,7 @@ public class DataInitializer implements CommandLineRunner {
             Cliente clienteDemo = new Cliente();
             clienteDemo.setNombre("Ana López (Cliente Demo)");
             clienteDemo.setCorreo("ana.lopez@ejemplo.com");
-            clienteDemo.setPassword(passwordEncoder.encode("123456"));
+            clienteDemo.setPassword(passwordEncoder.encode("CitasDemo2026!"));
             clienteDemo.setTelefono("0991234567");
             clienteDemo.setActivo(true);
             clienteRepository.save(clienteDemo);
@@ -67,7 +67,7 @@ public class DataInitializer implements CommandLineRunner {
             Cliente cliente2 = new Cliente();
             cliente2.setNombre("Juan Pérez");
             cliente2.setCorreo("juan.perez@ejemplo.com");
-            cliente2.setPassword(passwordEncoder.encode("123456"));
+            cliente2.setPassword(passwordEncoder.encode("CitasDemo2026!"));
             cliente2.setTelefono("0987654321");
             cliente2.setActivo(true);
             clienteRepository.save(cliente2);
@@ -149,7 +149,7 @@ public class DataInitializer implements CommandLineRunner {
             Empleado emp1 = new Empleado();
             emp1.setNombre("Carlos Mendoza (Especialista)");
             emp1.setCorreo("carlos.mendoza@empresa.com");
-            emp1.setPassword(passwordEncoder.encode("123456"));
+            emp1.setPassword(passwordEncoder.encode("CitasDemo2026!"));
             emp1.setActivo(true);
             emp1.setEspecialidad(especialidad);
             emp1.setServicios(new ArrayList<>(servicios));
@@ -158,7 +158,7 @@ public class DataInitializer implements CommandLineRunner {
             Empleado emp2 = new Empleado();
             emp2.setNombre("Dra. Sofía Herrera");
             emp2.setCorreo("sofia.herrera@empresa.com");
-            emp2.setPassword(passwordEncoder.encode("123456"));
+            emp2.setPassword(passwordEncoder.encode("CitasDemo2026!"));
             emp2.setActivo(true);
             emp2.setEspecialidad(especialidad);
             emp2.setServicios(new ArrayList<>(servicios));
