@@ -42,6 +42,8 @@
     <i class="bi bi-sun-fill" id="themeIcon"></i>
 </button>
 
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
 <main class="app-shell">
     <a class="app-back-link" th:href="@{/servicios}"><i class="bi bi-arrow-left"></i>Ir al catálogo</a>
 
@@ -50,7 +52,7 @@
             <h1>Mis citas</h1>
             <p>Citas programadas de <span th:text="${cliente.nombre}"></span>.</p>
         </div>
-        <a class="btn-pill outline" th:href="@{/clientes/{clienteId}/citas(clienteId=${cliente.id})}">
+        <a class="btn-pill outline" th:href="@{/mis-citas}">
             <i class="bi bi-arrow-clockwise"></i>Actualizar
         </a>
     </header>

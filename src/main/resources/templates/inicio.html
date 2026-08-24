@@ -43,23 +43,10 @@
     <i class="bi bi-sun-fill" id="themeIcon"></i>
 </button>
 
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
 <div class="auth-page">
     <div class="auth-container" style="flex-direction:column;justify-content:flex-start;gap:24px;max-width:760px;">
-
-        <div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-            <h1 class="brand-title" style="font-size:1.6rem;margin:0;">
-                <i class="bi bi-heart-fill me-2" style="color:var(--auth-accent);"></i>Plataforma de Citas
-            </h1>
-            <div style="display:flex;align-items:center;gap:16px;">
-                <span style="color:var(--auth-text-soft);">
-                    <i class="bi bi-person-circle me-1"></i>
-                    <span th:text="'Hola, ' + ${usuario.nombre}"></span>
-                </span>
-                <a th:href="@{/logout}" class="btn-auth-submit" style="width:auto;height:44px;padding:0 22px;font-size:.92rem;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                </a>
-            </div>
-        </div>
 
         <div class="auth-card" style="flex:none;width:100%;">
             <div th:if="${param.bienvenido}" class="alert alert-success">
@@ -69,7 +56,24 @@
             <h2 class="brand-title" style="font-size:1.5rem;margin-bottom:6px;">Bienvenido a la Plataforma de Citas</h2>
             <p class="brand-subtitle" th:text="'Tu cuenta: ' + ${usuario.correo}"></p>
 
-            <p style="color:var(--auth-text-soft);margin:0;">Aquí se mostrará el contenido principal del sistema (servicios, citas y administración).</p>
+            <p style="color:var(--auth-text-soft);margin:0 0 4px;">¿Qué quieres hacer hoy?</p>
+            <div class="quick-grid">
+                <a class="quick-card" th:href="@{/servicios}">
+                    <i class="bi bi-spa"></i>
+                    <strong>Servicios</strong>
+                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Explora el catálogo</span>
+                </a>
+                <a class="quick-card" th:href="@{/mis-citas}">
+                    <i class="bi bi-calendar-check"></i>
+                    <strong>Mis citas</strong>
+                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Revisa tus reservas</span>
+                </a>
+                <a class="quick-card" th:href="@{/admin/servicios}">
+                    <i class="bi bi-gear"></i>
+                    <strong>Administración</strong>
+                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Gestiona servicios</span>
+                </a>
+            </div>
         </div>
 
     </div>

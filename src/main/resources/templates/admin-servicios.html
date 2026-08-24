@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${servicio.id == null ? 'Nuevo servicio' : 'Editar servicio'}">Plataforma Citas - Servicio</title>
+    <title>Plataforma Citas - Administrar servicios</title>
     <script>
         (function(){
             var saved = localStorage.getItem('auth-theme');
@@ -42,59 +42,72 @@
     <i class="bi bi-sun-fill" id="themeIcon"></i>
 </button>
 
-<main class="app-shell narrow">
-    <a class="app-back-link" th:href="@{/admin/servicios}"><i class="bi bi-arrow-left"></i>Volver al listado</a>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
 
+<main class="app-shell">
     <header class="app-header">
-        <h1 th:text="${servicio.id == null ? 'Nuevo servicio' : 'Editar servicio'}"></h1>
+        <div>
+            <h1>Administración de servicios</h1>
+            <p>Crea, edita o retira servicios del catálogo.</p>
+        </div>
+        <a class="btn-pill" th:href="@{/admin/servicios/nuevo}">
+            <i class="bi bi-plus-lg"></i>Nuevo servicio
+        </a>
     </header>
 
-    <div class="app-alert alert-warning" role="alert" th:if="${#lists.isEmpty(categorias)}">
-        No hay categorías registradas. Debes crear al menos una categoría antes de guardar un servicio.
+    <div class="app-alert alert-success" role="status" th:if="${exito}" th:text="${exito}"></div>
+    <div class="app-alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <section class="app-card flush" th:if="${not #lists.isEmpty(servicios)}">
+        <div class="table-responsive">
+            <table class="table-app">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
+                    <th>Estado</th>
+                    <th class="text-end-cell">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="servicio : ${servicios}">
+                    <td>
+                        <span class="cell-strong" th:text="${servicio.nombre}"></span>
+                        <small class="cell-muted" th:text="${servicio.descripcion}"></small>
+                    </td>
+                    <td th:text="${servicio.categoria.nombre}"></td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}"></td>
+                    <td><span th:text="${servicio.duracionMinutos}"></span> min</td>
+                    <td>
+                        <span class="badge-soft" th:if="${servicio.activo}">Activo</span>
+                        <span class="badge-soft neutral" th:unless="${servicio.activo}">Retirado</span>
+                    </td>
+                    <td class="text-end-cell">
+                        <div class="d-inline-flex gap-2">
+                            <a class="btn-pill outline small" th:href="@{/admin/servicios/{id}/editar(id=${servicio.id})}">
+                                <i class="bi bi-pencil-square"></i>Editar
+                            </a>
+                            <form class="d-inline" th:if="${servicio.activo}"
+                                  th:action="@{/admin/servicios/{id}/eliminar(id=${servicio.id})}" method="post">
+                                <button class="btn-pill danger-outline small" type="submit"
+                                        onclick="return confirm('¿Quieres retirar este servicio del catálogo?');">
+                                    <i class="bi bi-trash3"></i>Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(servicios)}">
+        <i class="bi bi-inbox"></i>
+        Todavía no hay servicios registrados.
     </div>
-
-    <form class="app-card" th:object="${servicio}"
-          th:action="${servicio.id == null} ? @{/admin/servicios} : @{/admin/servicios/{id}/editar(id=${servicio.id})}"
-          method="post">
-        <div class="mb-3">
-            <label class="form-label" for="nombre">Nombre</label>
-            <input id="nombre" class="form-control" type="text" th:field="*{nombre}" maxlength="100" required>
-            <div class="invalid-feedback d-block" th:errors="*{nombre}"></div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="categoria">Categoría</label>
-            <select id="categoria" class="form-select" th:field="*{categoria.id}" required>
-                <option value="">Selecciona una categoría</option>
-                <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
-            </select>
-            <div class="invalid-feedback d-block" th:errors="*{categoria}"></div>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label" for="descripcion">Descripción</label>
-            <textarea id="descripcion" class="form-control" th:field="*{descripcion}" maxlength="1000" rows="4"></textarea>
-            <div class="invalid-feedback d-block" th:errors="*{descripcion}"></div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label" for="precio">Precio ($)</label>
-                <input id="precio" class="form-control" type="number" th:field="*{precio}" min="0.01" step="0.01" required>
-                <div class="invalid-feedback d-block" th:errors="*{precio}"></div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label" for="duracion">Duración (minutos)</label>
-                <input id="duracion" class="form-control" type="number" th:field="*{duracionMinutos}" min="1" required>
-                <div class="invalid-feedback d-block" th:errors="*{duracionMinutos}"></div>
-            </div>
-        </div>
-
-        <div class="app-actions">
-            <a class="btn-pill outline" th:href="@{/admin/servicios}">Cancelar</a>
-            <button class="btn-pill" type="submit" th:disabled="${#lists.isEmpty(categorias)}">Guardar servicio</button>
-        </div>
-    </form>
 </main>
 
 <script>

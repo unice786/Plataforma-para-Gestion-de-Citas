@@ -31,13 +31,13 @@ public class ServicioController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("servicios", servicioRepository.findAllByOrderByNombreAsc());
-        return "admin/servicios/lista";
+        return "admin-servicios";
     }
 
     @GetMapping("/nuevo")
     public String mostrarFormularioNuevo(Model model) {
         prepararFormulario(model, new Servicio());
-        return "admin/servicios/formulario";
+        return "admin-servicio-formulario";
     }
 
     @PostMapping
@@ -48,7 +48,7 @@ public class ServicioController {
         validarCategoria(servicio, resultado);
         if (resultado.hasErrors()) {
             prepararFormulario(model, servicio);
-            return "admin/servicios/formulario";
+            return "admin-servicio-formulario";
         }
 
         servicio.setActivo(true);
@@ -66,7 +66,7 @@ public class ServicioController {
             return "redirect:/admin/servicios";
         }
         prepararFormulario(model, servicio);
-        return "admin/servicios/formulario";
+        return "admin-servicio-formulario";
     }
 
     @PostMapping("/{id}/editar")
@@ -85,7 +85,7 @@ public class ServicioController {
         if (resultado.hasErrors()) {
             servicio.setId(id);
             prepararFormulario(model, servicio);
-            return "admin/servicios/formulario";
+            return "admin-servicio-formulario";
         }
 
         existente.setNombre(servicio.getNombre());

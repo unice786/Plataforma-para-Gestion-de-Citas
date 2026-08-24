@@ -17,6 +17,6 @@ public class CatalogoServicioController {
     @GetMapping("/servicios")
     public String mostrarCatalogo(Model model) {
         model.addAttribute("servicios", servicioRepository.findByActivoTrueOrderByNombreAsc());
-        return "servicios/catalogo";
+        return "catalogo-servicios";
     }
 }
