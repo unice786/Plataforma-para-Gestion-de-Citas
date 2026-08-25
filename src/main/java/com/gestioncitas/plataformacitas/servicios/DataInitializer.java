@@ -27,6 +27,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -196,20 +197,46 @@ public class DataInitializer implements CommandLineRunner {
         crearEmpleadoSiNoExiste("Luis Ramírez (Barbero)", "luis.ramirez@empresa.com", especialidadBarberia);
         crearEmpleadoSiNoExiste("Valentina Cruz (Estilista)", "valentina.cruz@empresa.com", especialidadBarberia);
 
-        // 5. Asegurar que todos los empleados tengan asignados todos los servicios
+        // 5. Servicios agrupados por rubro
+        List<Servicio> serviciosSalud = servicios.stream()
+                .filter(s -> s.getCategoria().getId().equals(categoriaSalud.getId()))
+                .toList();
+        List<Servicio> serviciosBarberia = servicios.stream()
+                .filter(s -> s.getCategoria().getId().equals(categoriaBarberia.getId()))
+                .toList();
+
+        Map<String, List<Servicio>> serviciosPorCorreo = Map.of(
+                "carlos.mendoza@empresa.com", serviciosSalud,
+                "sofia.herrera@empresa.com", serviciosSalud,
+                "luis.ramirez@empresa.com", serviciosBarberia,
+                "valentina.cruz@empresa.com", serviciosBarberia
+        );
+
+        // 6. Vincular cada especialista solo con los servicios de su rubro
+        //    (repara también vínculos incorrectos de versiones anteriores)
         for (Empleado emp : empleadoRepository.findAll()) {
-            List<Servicio> actuales = emp.getServicios();
-            boolean incompleto = actuales == null || actuales.isEmpty();
-            if (!incompleto) {
-                List<Long> idsActuales = actuales.stream().map(Servicio::getId).toList();
-                incompleto = servicios.stream().anyMatch(s -> !idsActuales.contains(s.getId()));
+            List<Servicio> correctos = serviciosPorCorreo.get(emp.getCorreo());
+            if (correctos == null) {
+                continue;
             }
-            if (incompleto) {
-                emp.setServicios(new ArrayList<>(servicios));
+
+            Set<Long> idsCorrectos = new HashSet<>();
+            for (Servicio s : correctos) {
+                idsCorrectos.add(s.getId());
+            }
+
+            boolean difiere = emp.getServicios() == null
+                    || emp.getServicios().size() != idsCorrectos.size()
+                    || emp.getServicios().stream()
+                            .map(Servicio::getId)
+                            .anyMatch(id -> !idsCorrectos.contains(id));
+
+            if (difiere) {
+                emp.setServicios(new ArrayList<>(correctos));
                 empleadoRepository.save(emp);
             }
         }
-        System.out.println("[DataInitializer] Especialistas verificados y vinculados a los servicios.");
+        System.out.println("[DataInitializer] Especialistas verificados y vinculados a los servicios de su rubro.");
     }
 
     private CategoriaServicio obtenerOCrearCategoria(String nombre, String descripcion) {
