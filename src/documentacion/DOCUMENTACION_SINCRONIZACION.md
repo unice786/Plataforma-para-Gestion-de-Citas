@@ -56,6 +56,34 @@ Se definió a **`develop` como línea canónica**: es la única con la suite de 
 | `ClienteRestController.java` + `ClienteResponseDTO.java` | Solo servían al frontend standalone descartado |
 | Plantillas reestructuradas (`templates/admin/servicios/...`, `templates/servicios/catalogo.html`) | Pertenecen a la estructura antigua; ninguna vista actual las referencia |
 
+### Cuadro del proceso
+
+```mermaid
+flowchart TD
+    DEV["develop<br/>línea canónica · pruebas 17/17"]
+    MAIN["main<br/>SCRUM-1 integrado vía PR 15"]
+    CONFLICT{"PR 16<br/>29 archivos en conflicto"}
+    KEEP["Se conserva de develop<br/>plantillas planas · reserva integrada<br/>DataInitializer · application.properties<br/>docker-compose.yml restaurado"]
+    ADOPT["Se adopta de main<br/>DOCUMENTACION_SCRUM_12 y 15<br/>diagramas/script.sql"]
+    DROP["Se descarta de main<br/>reserva standalone · PaginaInicioController<br/>ClienteRestController · plantillas antiguas"]
+    TEST["Verificación<br/>mvnw test 17/17 · JDK 21 ok<br/>0 diferencias entre ramas"]
+    SYNC["push --force-with-lease<br/>main = develop"]
+
+    DEV --> CONFLICT
+    MAIN --> CONFLICT
+    CONFLICT --> KEEP
+    CONFLICT --> ADOPT
+    CONFLICT --> DROP
+    KEEP --> TEST
+    ADOPT --> TEST
+    DROP --> TEST
+    TEST --> SYNC
+
+    style DEV fill:#1a7f37,color:#fff
+    style MAIN fill:#9e6a03,color:#fff
+    style SYNC fill:#1a7f37,color:#fff
+```
+
 ---
 
 ## 4. Commits de la Release
