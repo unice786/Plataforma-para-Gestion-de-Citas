@@ -1,6 +1,19 @@
 # Sincronización develop → main (Release Estable)
 
-Documentación del proceso de sincronización entre las ramas `develop` y `main`, la resolución de conflictos del PR #16 y el estado final de la release revisable por el docente.
+*Informe del trabajo realizado para revisión del docente/coordinador.*
+
+Documentación del proceso de sincronización entre las ramas `develop` y `main`, la resolución de conflictos del PR #16 y el estado final de la release.
+
+## Resumen Ejecutivo
+
+| Aspecto | Detalle |
+|---|---|
+| Trabajo realizado | Sincronización de `develop` → `main` para cerrar la release estable, resolviendo los **29 conflictos** del PR #16 |
+| Estrategia | `develop` como línea canónica; adopción solo de aportes neutros de `main`; descarte de duplicados |
+| Resultado | Ramas idénticas (`main` = `develop`), suite completa en verde (**17/17 pruebas**) y compilación JDK 21 correcta |
+| Alcance funcional | Reserva de citas en línea (API de servicios/citas + disponibilidad), administración de servicios, registro/login y recuperación de cuenta |
+| Responsable | Grupo 5 - Equipo de desarrollo |
+| Evidencias | PRs #15, #16 y #18 · commits listados en la sección 4 · convención de commits `[SCRUM-x]` aplicada |
 
 ---
 
@@ -90,20 +103,17 @@ flowchart TD
 
 Convención aplicada: `[SCRUM-x] Nombre del integrante: descripción`. Un autor por commit según quién realizó cada trabajo.
 
-| SHA | Autoría (mensaje) | Contenido |
+| SHA | Código SCRUM | Contenido |
 |---|---|---|
-| `16182b3` | `[SCRUM-1] Sam Alonso` | Reserva de citas en línea: API de servicios/citas, disponibilidad por empleado y fecha, vista `reservar-cita` con JS, accesos en navegación e inicio, tests |
-| `2c34562` | `[SCRUM-7] May Menendez` | Corrección de `LazyInitializationException` en el listado admin de servicios (JOIN FETCH de categorías) |
-| `77fc8fe` | `[SCRUM-7] May Menendez` | Diseño: barra de navegación fija a todo lo ancho y selects legibles en modo oscuro (`color-scheme: dark`), limpieza de `.gitignore` |
-| `83438f5` | `[SCRUM-1] May Menendez` | Ampliación de datos demo: categoría Barbería y Estilo, 4 servicios de barbería, nuevos especialistas, inicialización idempotente |
-| `0639c5b` | `[SCRUM-1] May Menendez` | Especialistas vinculados solo a los servicios de su rubro (la disponibilidad ya no muestra barberos en servicios de salud ni viceversa) |
-| `fe160ed` | `[SCRUM-7] May Menendez` | Integración de origin/main a develop (merge canónico, adopción de documentación y script.sql, descarte de duplicados) |
-| `69f2cdd` | `[SCRUM-7] May Menendez` | Créditos de autoría en comentarios del código |
+| `16182b3` | `[SCRUM-1]` | Reserva de citas en línea: API de servicios/citas, disponibilidad por empleado y fecha, vista `reservar-cita` con JS, accesos en navegación e inicio, tests |
+| `2c34562` | `[SCRUM-7]` | Corrección de `LazyInitializationException` en el listado admin de servicios (JOIN FETCH de categorías) |
+| `77fc8fe` | `[SCRUM-7]` | Diseño: barra de navegación fija a todo lo ancho y selects legibles en modo oscuro (`color-scheme: dark`), limpieza de `.gitignore` |
+| `83438f5` | `[SCRUM-1]` | Ampliación de datos demo: categoría Barbería y Estilo, 4 servicios de barbería, nuevos especialistas, inicialización idempotente |
+| `0639c5b` | `[SCRUM-1]` | Especialistas vinculados solo a los servicios de su rubro (la disponibilidad ya no muestra barberos en servicios de salud ni viceversa) |
+| `fe160ed` | `[SCRUM-7]` | Integración de origin/main a develop (merge canónico, adopción de documentación y script.sql, descarte de duplicados) |
+| `69f2cdd` | `[SCRUM-7]` | Créditos de autoría en comentarios del código |
 
-La atribución por persona también quedó registrada en los comentarios del código fuente:
-
-- `CitaController.java` — *"(SCRUM-1, autor: Sam Alonso)"*.
-- `DataInitializer.java` — *"Datos base y adaptación al modelo actual: Sam Alonso. Ampliación (categoría Barbería y Estilo, servicios demo y especialistas vinculados por rubro): May Menendez"*.
+La autoría del trabajo también quedó registrada en los comentarios del código fuente (`CitaController.java`, `DataInitializer.java`), indicando el SCRUM correspondiente y el tipo de aporte.
 
 ---
 
@@ -142,4 +152,4 @@ Durante la revisión se detectó que el commit de merge había quedado sin el fo
 
 ---
 
-*Elaborado por: May Menendez — SCRUM-12*
+*Documento de entrega — Grupo 5*
