@@ -11,13 +11,8 @@ Documentación de la entrega correspondiente a la capa de **Entidades de Negocio
 | Proyecto | Sugoi - Plataforma para Gestión de Citas |
 | Materia |  Creación de Aplicaciones en Java Enterprise Edition  |
 | Grupo | Grupo 5 |
-| Docente | Marvin Antonio Barrera trigueros |
-| Integrantes |
-Michael Stanley Sanchez Menendez
-Samuel Alonso Mendoza Calzadilla
-Manuel Angel Carias Juarez
-kevin Ernesto Meza Garcia
-Krisler David Galicia Dueñas |
+| Docente | Marvin Antonio Barrera Trigueros |
+| Integrantes | Michael Stanley Sanchez Menendez<br>Samuel Alonso Mendoza Calzadilla<br>Manuel Angel Carias Juarez<br>Kevin Ernesto Meza Garcia<br>Krisler David Galicia Dueñas |
 | Jira | https://grupo5software.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog |
 | Tecnología | Java 21, Spring Boot 3.3.4, Spring Data JPA (Hibernate), MySQL 8 |
 | Fecha | 25/08/2026 |
@@ -92,12 +87,12 @@ Cada HU se trabajó en una rama propia (`feature/SCRUM-12-...`, `feature/SCRUM-1
 
 | Tarea entregada | Cumplimiento |
 |---|---|
-| Registro de cliente con validación, verificación de correo con Mailtrap, autenticación por sesión, diseño de login/registro y diagramas actualizados | 
-| Recuperación de contraseña con enlace temporal por correo, validación de token, expiración de 30 min y diseño de la vista |
-| Actualización de diagramas UML/DER (v4) | 
-| Gestión de empleados: implementación del CRUD de empleados y horarios | 
-| Reserva de citas en línea: API de servicios/citas, disponibilidad por empleado y fecha, vista integrada y tests | 
-| Ampliación de datos demo (categoría Barbería y Estilo) y especialistas vinculados solo a los servicios de su rubro | 
+| Registro de cliente con validación, verificación de correo con Mailtrap, autenticación por sesión, diseño de login/registro y diagramas actualizados | ✅ |
+| Recuperación de contraseña con enlace temporal por correo, validación de token, expiración de 30 min y diseño de la vista | ✅ |
+| Actualización de diagramas UML/DER (v4) | ✅ |
+| Gestión de empleados: implementación del CRUD de empleados y horarios | ✅ |
+| Reserva de citas en línea: API de servicios/citas, disponibilidad por empleado y fecha, vista integrada y tests | ✅ |
+| Ampliación de datos demo (categoría Barbería y Estilo) y especialistas vinculados solo a los servicios de su rubro | ✅ |
 
 - **README.md:** configurado con los diagramas de clases y DER embebidos (vistas directamente en la página principal del repositorio), siguiendo el formato del repositorio de ejemplo `testpuml`.
 
@@ -448,11 +443,11 @@ Todas las entidades están implementadas y mapeadas; el código respeta el Diagr
 
 | Recurso | Enlace | Estado |
 |---|---|---|
-| Repositorio GitHub | https://github.com/unice786/Plataforma-para-Gestion-de-Citas |  200 OK |
-| Diagrama de Clases (README) | https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_clases.puml&v=4 |  200 OK (PNG) |
-| Diagrama DER (README) | https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_bd.puml&v=4 |  200 OK (PNG) |
-| Jira (proyecto SCRUM) | https://grupo5software.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog | 
-| Archivos `.puml` (main y develop) | `https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/<rama>/diagramas/<archivo>.puml` |  200 OK |
+| Repositorio GitHub | https://github.com/unice786/Plataforma-para-Gestion-de-Citas | ✅ 200 OK |
+| Diagrama de Clases (README) | https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_clases.puml&v=4 | ✅ 200 OK (PNG) |
+| Diagrama DER (README) | https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_bd.puml&v=4 | ✅ 200 OK (PNG) |
+| Jira (proyecto SCRUM) | https://grupo5software.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog | ✅ |
+| Archivos `.puml` (main y develop) | `https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/<rama>/diagramas/<archivo>.puml` | ✅ 200 OK |
 
 ---
 
