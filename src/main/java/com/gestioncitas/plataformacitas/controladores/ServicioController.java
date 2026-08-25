@@ -30,7 +30,7 @@ public class ServicioController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("servicios", servicioRepository.findAllByOrderByNombreAsc());
+        model.addAttribute("servicios", servicioRepository.findAllConCategoriaOrderByNombreAsc());
         return "admin-servicios";
     }
 
