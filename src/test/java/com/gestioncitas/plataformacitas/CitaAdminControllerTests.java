@@ -1,0 +1,137 @@
+package com.gestioncitas.plataformacitas;
+
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
+import com.gestioncitas.plataformacitas.modelos.Cita;
+import com.gestioncitas.plataformacitas.modelos.Cliente;
+import com.gestioncitas.plataformacitas.modelos.Empleado;
+import com.gestioncitas.plataformacitas.modelos.Especialidad;
+import com.gestioncitas.plataformacitas.modelos.Servicio;
+import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
+import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
+import com.gestioncitas.plataformacitas.repositorios.ClienteRepository;
+import com.gestioncitas.plataformacitas.repositorios.EmpleadoRepository;
+import com.gestioncitas.plataformacitas.repositorios.EspecialidadRepository;
+import com.gestioncitas.plataformacitas.repositorios.HorarioDisponibilidadRepository;
+import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+class CitaAdminControllerTests {
+
+    @Autowired private MockMvc mockMvc;
+    @Autowired private CitaRepository citaRepository;
+    @Autowired private ClienteRepository clienteRepository;
+    @Autowired private EmpleadoRepository empleadoRepository;
+    @Autowired private ServicioRepository servicioRepository;
+    @Autowired private EspecialidadRepository especialidadRepository;
+    @Autowired private CategoriaServicioRepository categoriaServicioRepository;
+    @Autowired private HorarioDisponibilidadRepository horarioDisponibilidadRepository;
+
+    private LocalDate fechaPrimera;
+    private LocalDate fechaSegunda;
+
+    @BeforeEach
+    void prepararDatos() {
+        citaRepository.deleteAll();
+        horarioDisponibilidadRepository.deleteAll();
+        empleadoRepository.deleteAll();
+        servicioRepository.deleteAll();
+        clienteRepository.deleteAll();
+        especialidadRepository.deleteAll();
+        categoriaServicioRepository.deleteAll();
+
+        CategoriaServicio categoria = new CategoriaServicio();
+        categoria.setNombre("Bienestar");
+        categoria = categoriaServicioRepository.save(categoria);
+
+        Servicio servicio = new Servicio();
+        servicio.setNombre("Masaje relajante");
+        servicio.setDescripcion("Servicio de prueba");
+        servicio.setPrecio(new BigDecimal("30.00"));
+        servicio.setDuracionMinutos(45);
+        servicio.setActivo(true);
+        servicio.setCategoria(categoria);
+        servicio = servicioRepository.save(servicio);
+
+        Especialidad especialidad = new Especialidad();
+        especialidad.setNombre("Terapia");
+        especialidad = especialidadRepository.save(especialidad);
+
+        Empleado empleado = new Empleado();
+        empleado.setNombre("Profesional de prueba");
+        empleado.setCorreo("profesional@ejemplo.com");
+        empleado.setContrasena("123456");
+        empleado.setEspecialidad(especialidad);
+        empleado = empleadoRepository.save(empleado);
+
+        Cliente ana = crearCliente("Ana López", "ana@ejemplo.com");
+        Cliente bruno = crearCliente("Bruno Díaz", "bruno@ejemplo.com");
+        fechaPrimera = LocalDate.now().plusDays(2);
+        fechaSegunda = LocalDate.now().plusDays(4);
+        crearCita(ana, empleado, servicio, fechaPrimera, LocalTime.of(9, 0));
+        crearCita(bruno, empleado, servicio, fechaSegunda, LocalTime.of(11, 30));
+    }
+
+    @Test
+    void muestraTodasLasCitasConClienteServicioFechaYHora() throws Exception {
+        mockMvc.perform(get("/admin/citas"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/citas/lista"))
+                .andExpect(content().string(containsString("Ana López")))
+                .andExpect(content().string(containsString("Bruno Díaz")))
+                .andExpect(content().string(containsString("Masaje relajante")))
+                .andExpect(content().string(containsString("09:00")));
+    }
+
+    @Test
+    void filtraCitasPorFecha() throws Exception {
+        mockMvc.perform(get("/admin/citas").param("fecha", fechaPrimera.toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Ana López")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString("Bruno Díaz"))));
+    }
+
+    @Test
+    void filtraCitasPorNombreParcialDelCliente() throws Exception {
+        mockMvc.perform(get("/admin/citas").param("cliente", "bru"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Bruno Díaz")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(containsString("Ana López"))));
+    }
+
+    private Cliente crearCliente(String nombre, String correo) {
+        Cliente cliente = new Cliente();
+        cliente.setNombre(nombre);
+        cliente.setCorreo(correo);
+        cliente.setContrasena("123456");
+        cliente.setTelefono("70000000");
+        return clienteRepository.save(cliente);
+    }
+
+    private void crearCita(Cliente cliente, Empleado empleado, Servicio servicio, LocalDate fecha, LocalTime hora) {
+        Cita cita = new Cita();
+        cita.setCliente(cliente);
+        cita.setEmpleado(empleado);
+        cita.setServicio(servicio);
+        cita.setFecha(fecha);
+        cita.setHora(hora);
+        citaRepository.save(cita);
+    }
+}
