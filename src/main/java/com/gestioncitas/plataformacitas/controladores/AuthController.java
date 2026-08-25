@@ -29,6 +29,11 @@ public class AuthController {
         this.correoService = correoService;
     }
 
+    @GetMapping("/")
+    public String raiz() {
+        return "redirect:/servicios";
+    }
+
     @GetMapping("/login")
     public String login() {
         return "login";

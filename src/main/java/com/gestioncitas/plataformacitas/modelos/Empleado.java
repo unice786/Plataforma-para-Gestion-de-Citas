@@ -34,7 +34,7 @@ public class Empleado extends Usuario {
 	@OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<HorarioDisponibilidad> horarios = new ArrayList<>();
 
-	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@ManyToMany
 	@JoinTable(name = "empleado_servicio",
 			joinColumns = @JoinColumn(name = "empleado_id"),
 			inverseJoinColumns = @JoinColumn(name = "servicio_id"))
