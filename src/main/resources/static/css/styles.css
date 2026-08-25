@@ -34,6 +34,7 @@
 
 /* ---------- Tokens: tema oscuro ---------- */
 [data-theme="dark"]{
+    color-scheme:dark;
     --auth-bg:#14161f;
     --auth-line:rgba(255,255,255,.14);
     --auth-dot:rgba(255,255,255,.38);
@@ -356,7 +357,7 @@
     .brand-title{ font-size:1.7rem; }
 }
 /* ============================================================
-   APP PAGES — Catálogo / Admin de servicios / Mis citas
+   APP PAGES ï¿½ Catï¿½logo / Admin de servicios / Mis citas
    Reutiliza los tokens del tema claro/oscuro de las auth pages
    ============================================================ */
 
@@ -380,7 +381,7 @@
 }
 .app-shell.narrow{ max-width:760px; }
 
-/* ---------- Encabezado de página ---------- */
+/* ---------- Encabezado de pï¿½gina ---------- */
 .app-header{
     display:flex;
     align-items:flex-end;
@@ -416,7 +417,7 @@
 }
 .app-back-link:hover{ text-decoration:underline; }
 
-/* ---------- Botones píldora (mismo lenguaje que btn-auth-submit) ---------- */
+/* ---------- Botones pï¿½ldora (mismo lenguaje que btn-auth-submit) ---------- */
 .btn-pill{
     display:inline-flex;
     align-items:center;
@@ -469,7 +470,7 @@
 }
 .app-card.flush{ padding:0; overflow:hidden; }
 
-/* Grid del catálogo */
+/* Grid del catï¿½logo */
 .app-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
@@ -620,6 +621,10 @@
 }
 .app-card select.form-control,
 .app-card .form-select{ appearance:none; }
+select option{
+    background-color:var(--auth-card-bg);
+    color:var(--auth-text);
+}
 .app-card .form-control::placeholder{ color:var(--auth-input-ph); }
 .app-card .form-control:focus,
 .app-card .form-select:focus{
@@ -646,7 +651,7 @@
     margin-top:8px;
 }
 
-/* ---------- Estado vacío ---------- */
+/* ---------- Estado vacï¿½o ---------- */
 .empty-state{
     text-align:center;
     color:var(--auth-text-soft);
@@ -661,23 +666,23 @@
 }
 
 @media (max-width:576px){
-    .app-shell{ padding:76px 16px 48px; }
+    .app-shell{ padding:118px 16px 48px; }
     .app-header h1{ font-size:1.7rem; }
     .app-card{ padding:20px; }
     .table-app th,.table-app td{ padding:12px 14px; }
 }
 
-/* ---------- Barra de navegación de la app ---------- */
+/* ---------- Barra de navegaciï¿½n de la app ---------- */
 .app-nav{
     position:fixed;
-    top:16px;
-    left:50%;
-    transform:translateX(-50%);
+    top:0;
+    left:0;
+    right:0;
     z-index:15;
-    width:min(1080px,calc(100% - 32px));
+    width:100%;
     background-color:var(--auth-card-bg);
-    border-radius:100px;
-    box-shadow:var(--auth-card-shadow);
+    border-radius:0;
+    box-shadow:0 10px 30px -18px rgba(15,23,42,.35);
     transition:background-color .35s ease;
 }
 .app-nav-inner{
@@ -685,7 +690,9 @@
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    padding:10px 22px;
+    max-width:1080px;
+    margin:0 auto;
+    padding:12px 24px;
 }
 .app-nav-brand{
     font-family:'Baloo 2',sans-serif;
@@ -745,7 +752,7 @@
 }
 .app-nav-user a:hover{ transform:translateY(-2px); }
 
-/* Accesos rápidos del inicio */
+/* Accesos rï¿½pidos del inicio */
 .quick-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -782,6 +789,60 @@
 }
 
 @media (max-width:900px){
-    .app-nav{ border-radius:24px; top:12px; }
-    .app-nav-inner{ flex-wrap:wrap; justify-content:center; padding:14px 18px; }
+    .app-shell{ padding-top:118px; }
+    .app-nav-inner{ flex-wrap:wrap; justify-content:center; padding:12px 16px; }
+}
+
+/* ---------- Slots de horario (reserva de citas) ---------- */
+.slots-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+.slot{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width:110px;
+    padding:10px 14px;
+    background-color:var(--auth-input-bg);
+    border:1px solid var(--auth-input-border);
+    border-radius:14px;
+    color:var(--auth-text);
+    transition:border-color .15s ease,transform .1s ease;
+}
+.slot:hover{
+    border-color:var(--auth-accent);
+    transform:translateY(-2px);
+}
+.slot.activo{
+    border-color:var(--auth-accent);
+    background-color:rgba(27,90,158,.12);
+    box-shadow:0 0 0 3px rgba(27,90,158,.18);
+}
+[data-theme="dark"] .slot.activo{
+    background-color:rgba(107,166,224,.16);
+    box-shadow:0 0 0 3px rgba(107,166,224,.22);
+}
+.slot .slot-hora{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:1rem;
+}
+.slot .slot-emp{
+    font-size:.72rem;
+    color:var(--auth-text-soft);
+    max-width:130px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.resumen-cita{
+    background-color:var(--auth-input-bg);
+    border:1px dashed var(--auth-input-border);
+    border-radius:14px;
+    padding:14px 18px;
+    font-size:.92rem;
+    color:var(--auth-text);
 }
