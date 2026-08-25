@@ -7,16 +7,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * API REST del catálogo para el formulario de reserva (SCRUM-1).
- * Expone GET /api/servicios con los servicios activos.
+ * Controlador REST para consultar el catálogo de servicios disponibles.
+ * Expone GET /api/servicios para la reserva en el frontend (SCRUM-1).
  */
 @RestController
 @RequestMapping("/api/servicios")
+@CrossOrigin(origins = "*")
 public class ServicioRestController {
 
     private final ServicioRepository servicioRepository;
@@ -25,6 +27,9 @@ public class ServicioRestController {
         this.servicioRepository = servicioRepository;
     }
 
+    /**
+     * Devuelve la lista de servicios activos ordenados alfabéticamente.
+     */
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<List<ServicioResponseDTO>> listarServiciosActivos() {

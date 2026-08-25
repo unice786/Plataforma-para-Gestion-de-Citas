@@ -1,24 +1,46 @@
 package com.gestioncitas.plataformacitas.repositorios;
 
+import com.gestioncitas.plataformacitas.modelos.Empleado;
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-import com.gestioncitas.plataformacitas.modelos.Empleado;
-
+/**
+ * Repositorio JPA para la entidad {@link Empleado}.
+ */
+@Repository
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
 
-	boolean existsByCorreo(String correo);
+    /**
+     * Verifica si existe un empleado con el correo dado.
+     */
+    boolean existsByCorreo(String correo);
 
-	boolean existsByCorreoAndIdNot(String correo, Long id);
+    /**
+     * Verifica si existe un empleado con el correo dado, excluyendo un ID específico.
+     * Útil para validar unicidad al editar.
+     */
+    boolean existsByCorreoAndIdNot(String correo, Long id);
 
-	List<Empleado> findByActivoTrue();
+    /**
+     * Devuelve todos los empleados activos.
+     */
+    List<Empleado> findByActivoTrue();
 
-	@Query("""
-			SELECT e FROM Empleado e JOIN e.servicios s
-			WHERE s.id = :servicioId AND e.activo = true ORDER BY e.nombre ASC
-			""")
-	List<Empleado> findEmpleadosByServicioId(@Param("servicioId") Long servicioId);
+    /**
+     * Devuelve todos los empleados activos que ofrecen un servicio específico.
+     *
+     * @param servicioId ID del servicio
+     * @return Lista de empleados que ofrecen ese servicio
+     */
+    @Query("""
+            SELECT e FROM Empleado e
+            JOIN e.servicios s
+            WHERE s.id = :servicioId
+              AND e.activo = true
+            ORDER BY e.nombre ASC
+            """)
+    List<Empleado> findEmpleadosByServicioId(@Param("servicioId") Long servicioId);
 }

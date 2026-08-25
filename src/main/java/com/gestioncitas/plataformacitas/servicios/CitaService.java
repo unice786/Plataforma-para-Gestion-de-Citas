@@ -100,7 +100,7 @@ public class CitaService {
         int duracion = servicio.getDuracionMinutos();
 
         List<HorarioDisponibilidad> bloques = horarioRepository
-                .findDisponiblesByServicioAndFecha(servicioId, fecha, EstadoHorario.DISPONIBLE.name());
+                .findDisponiblesByServicioAndFecha(servicioId, fecha, EstadoHorario.DISPONIBLE);
 
         List<HorarioDisponibleDTO> slotsLibres = new ArrayList<>();
 
@@ -149,7 +149,7 @@ public class CitaService {
 
         List<HorarioDisponibilidad> bloques = horarioRepository
                 .findDisponiblesByServicioAndRangoFechas(
-                        servicioId, desde, hasta, EstadoHorario.DISPONIBLE.name());
+                        servicioId, desde, hasta, EstadoHorario.DISPONIBLE);
 
         List<HorarioDisponibleDTO> slotsLibres = new ArrayList<>();
 
@@ -256,7 +256,7 @@ public class CitaService {
 
     // ══════════════════════════════════════════════════════════════════════
     // MÉTODOS AUXILIARES PRIVADOS
-    // ══════════════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════════════
 
     private boolean haySolapamiento(LocalTime nuevoInicio, LocalTime nuevoFin,
                                     List<Cita> citasExistentes, int duracionMinutos) {

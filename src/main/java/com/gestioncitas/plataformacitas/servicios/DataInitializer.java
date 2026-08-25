@@ -7,16 +7,13 @@ import com.gestioncitas.plataformacitas.modelos.Especialidad;
 import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
 import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
-import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
 import com.gestioncitas.plataformacitas.repositorios.ClienteRepository;
 import com.gestioncitas.plataformacitas.repositorios.EmpleadoRepository;
 import com.gestioncitas.plataformacitas.repositorios.EspecialidadRepository;
 import com.gestioncitas.plataformacitas.repositorios.HorarioDisponibilidadRepository;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
-import com.gestioncitas.plataformacitas.repositorios.UsuarioRepository;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,19 +25,15 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**
  * Inicializador de datos de prueba (SCRUM-1).
- * Datos base y adaptacion al modelo actual: Sam Alonso.
- * Ampliacion (categoria Barberia y Estilo, servicios demo y
- * especialistas vinculados por rubro): May Menendez.
  * Garantiza que existan clientes demo, catálogo de servicios,
  * especialistas y bloques de disponibilidad para los próximos 60 días.
+ * Incluye auto-reparación de servicios inactivos y vínculos empleado-servicio.
  */
 @Component
-@Profile("!test")
 public class DataInitializer implements CommandLineRunner {
 
     private final ClienteRepository clienteRepository;
@@ -49,7 +42,6 @@ public class DataInitializer implements CommandLineRunner {
     private final EspecialidadRepository especialidadRepository;
     private final EmpleadoRepository empleadoRepository;
     private final HorarioDisponibilidadRepository horarioRepository;
-    private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(ClienteRepository clienteRepository,
@@ -58,7 +50,6 @@ public class DataInitializer implements CommandLineRunner {
                            EspecialidadRepository especialidadRepository,
                            EmpleadoRepository empleadoRepository,
                            HorarioDisponibilidadRepository horarioRepository,
-                           UsuarioRepository usuarioRepository,
                            PasswordEncoder passwordEncoder) {
         this.clienteRepository = clienteRepository;
         this.categoriaRepository = categoriaRepository;
@@ -66,7 +57,6 @@ public class DataInitializer implements CommandLineRunner {
         this.especialidadRepository = especialidadRepository;
         this.empleadoRepository = empleadoRepository;
         this.horarioRepository = horarioRepository;
-        this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -74,7 +64,6 @@ public class DataInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         inicializarClientes();
-        inicializarAdmin();
         inicializarCatalogoYEmpleados();
         inicializarHorariosDisponibilidad();
     }
@@ -88,42 +77,10 @@ public class DataInitializer implements CommandLineRunner {
         crearCliente("María González", "maria.gonzalez@ejemplo.com", "0987654321");
         crearCliente("José Rodríguez", "jose.rodriguez@ejemplo.com", "0955555555");
         crearCliente("Laura Martínez", "laura.martinez@ejemplo.com", "0933333333");
+        crearCliente("Ana López (Cliente Demo)", "ana.lopez@ejemplo.com", "0991234567");
+        crearCliente("Juan Pérez", "juan.perez@ejemplo.com", "0987654321");
 
         System.out.println("[DataInitializer] Clientes demo creados con BCrypt.");
-    }
-
-    private void inicializarAdmin() {
-        String correoAdmin = "unice891@gmail.com";
-
-        // Verificar si el usuario admin ya existe
-        Optional<Usuario> existingUser = usuarioRepository.findByCorreo(correoAdmin);
-
-        if (existingUser.isPresent()) {
-            // Usuario ya existe - actualizarlo a admin
-            Usuario usuario = existingUser.get();
-            usuario.setNombre("Administrador");
-            usuario.setActivo(true);
-            usuario.setVerificado(true);
-            usuario.setTokenVerificacion(null);
-            usuario.setTokenExpiracion(null);
-            usuario.setTokenRecuperacion(null);
-            usuario.setTokenRecuperacionExpiracion(null);
-            usuarioRepository.save(usuario);
-
-            System.out.println("[DataInitializer] Usuario " + correoAdmin + " actualizado a admin.");
-        } else {
-            // Usuario no existe - crear nuevo admin como Cliente (Usuario es abstracta)
-            Cliente admin = new Cliente();
-            admin.setNombre("Administrador");
-            admin.setCorreo(correoAdmin);
-            admin.setPassword(passwordEncoder.encode("123456"));
-            admin.setActivo(true);
-            admin.setVerificado(true);
-            admin.setTelefono("0999999999");
-            clienteRepository.save(admin);
-
-            System.out.println("[DataInitializer] Cuenta admin creada con correo " + correoAdmin + ".");
-        }
     }
 
     private void crearCliente(String nombre, String correo, String telefono) {
@@ -138,7 +95,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void inicializarCatalogoYEmpleados() {
-        // 1. Categorías (se crean solo si no existen por nombre)
+        // 1. Categorías
         CategoriaServicio categoriaSalud = obtenerOCrearCategoria(
                 "Salud y Bienestar",
                 "Servicios generales de atención, cuidado personal y bienestar.");
@@ -146,7 +103,7 @@ public class DataInitializer implements CommandLineRunner {
                 "Barbería y Estilo",
                 "Cortes de cabello, arreglo de barba y cuidado del estilo personal.");
 
-        // 2. Servicios demo (se crean solo si no existen por nombre)
+        // 2. Servicios demo
         List<Servicio> existentes = servicioRepository.findAll();
         Set<String> nombresExistentes = new HashSet<>();
         for (Servicio s : existentes) {
@@ -176,7 +133,7 @@ public class DataInitializer implements CommandLineRunner {
                 "Aplicación de color o tinte con productos profesionales.",
                 new BigDecimal("25.00"), 60, categoriaBarberia);
 
-        // Reparar servicios existentes con activo en NULL o retirados por versiones anteriores
+        // Reparar servicios existentes con activo en NULL o false
         for (Servicio s : servicioRepository.findAll()) {
             if (s.getActivo() == null || !s.getActivo()) {
                 s.setActivo(true);
@@ -193,7 +150,7 @@ public class DataInitializer implements CommandLineRunner {
                 "Barbero Profesional",
                 "Barbero y estilista certificado en cortes y cuidado personal.");
 
-        // 4. Empleados demo (se crean solo si no existe el correo)
+        // 4. Empleados demo
         crearEmpleadoSiNoExiste("Carlos Mendoza (Especialista)", "carlos.mendoza@empresa.com", especialidadAtencion);
         crearEmpleadoSiNoExiste("Dra. Sofía Herrera", "sofia.herrera@empresa.com", especialidadAtencion);
         crearEmpleadoSiNoExiste("Luis Ramírez (Barbero)", "luis.ramirez@empresa.com", especialidadBarberia);
@@ -315,7 +272,7 @@ public class DataInitializer implements CommandLineRunner {
 
             for (Empleado emp : empleados) {
                 List<HorarioDisponibilidad> existentes = horarioRepository
-                        .findByEmpleadoIdAndFechaAndEstado(emp.getId(), fecha, EstadoHorario.DISPONIBLE.name());
+                        .findByEmpleadoIdAndFechaAndEstado(emp.getId(), fecha, EstadoHorario.DISPONIBLE);
 
                 if (existentes.isEmpty()) {
                     HorarioDisponibilidad bloqueManana = new HorarioDisponibilidad();
@@ -323,7 +280,7 @@ public class DataInitializer implements CommandLineRunner {
                     bloqueManana.setFecha(fecha);
                     bloqueManana.setHoraInicio(LocalTime.of(8, 0));
                     bloqueManana.setHoraFin(LocalTime.of(12, 0));
-                    bloqueManana.setEstado(EstadoHorario.DISPONIBLE.name());
+                    bloqueManana.setEstado(EstadoHorario.DISPONIBLE);
                     horarioRepository.save(bloqueManana);
 
                     HorarioDisponibilidad bloqueTarde = new HorarioDisponibilidad();
@@ -331,7 +288,7 @@ public class DataInitializer implements CommandLineRunner {
                     bloqueTarde.setFecha(fecha);
                     bloqueTarde.setHoraInicio(LocalTime.of(13, 0));
                     bloqueTarde.setHoraFin(LocalTime.of(18, 0));
-                    bloqueTarde.setEstado(EstadoHorario.DISPONIBLE.name());
+                    bloqueTarde.setEstado(EstadoHorario.DISPONIBLE);
                     horarioRepository.save(bloqueTarde);
 
                     horariosCreados += 2;

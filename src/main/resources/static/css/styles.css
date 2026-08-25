@@ -1,3 +1,769 @@
+<<<<<<< HEAD
+/* ==========================================================================
+   PLATAFORMA DE GESTIÓN DE CITAS - SISTEMA DE DISEÑO GLOBAL
+   Soporte completo de temas Claro / Oscuro (Stitch Design)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ---------- Tokens de Tema Claro (Por defecto) ---------- */
+:root {
+    --auth-bg: #eef2f6;
+    --auth-line: rgba(15, 23, 42, 0.16);
+    --auth-dot: rgba(15, 23, 42, 0.30);
+    --auth-card-bg: #ffffff;
+    --auth-card-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.18);
+
+    --auth-text: #131b2e;
+    --auth-text-soft: #5b6472;
+
+    --auth-input-bg: #ffffff;
+    --auth-input-border: #d7dce4;
+    --auth-input-text: #131b2e;
+    --auth-input-ph: #8b93a3;
+    --auth-icon: #8b93a3;
+
+    --auth-accent: #1b5a9e;
+    --auth-accent-hover: #164a83;
+    --auth-link: #1b5a9e;
+
+    --auth-toggle-bg: #ffffff;
+    --auth-toggle-icon: #e08a1e;
+    --auth-checkbox-border: #b8c0cc;
+
+    --auth-alert-danger-bg: #fdecec;
+    --auth-alert-danger-text: #b3261e;
+    --auth-alert-success-bg: #e8f5ea;
+    --auth-alert-success-text: #1e7a34;
+
+    /* Estados de los Horarios (Slots) */
+    --slot-avail-bg: #f0f6fc;
+    --slot-avail-border: #bad5f0;
+    --slot-avail-text: #1b5a9e;
+    --slot-avail-hover: #dbeafe;
+
+    --slot-selected-bg: #1b5a9e;
+    --slot-selected-border: #164a83;
+    --slot-selected-text: #ffffff;
+
+    --slot-disabled-bg: #f1f5f9;
+    --slot-disabled-border: #e2e8f0;
+    --slot-disabled-text: #94a3b8;
+
+    --badge-bg: #e0edfb;
+    --badge-text: #1b5a9e;
+}
+
+/* ---------- Tokens de Tema Oscuro ---------- */
+[data-theme="dark"] {
+    --auth-bg: #14161f;
+    --auth-line: rgba(255, 255, 255, 0.14);
+    --auth-dot: rgba(255, 255, 255, 0.38);
+    --auth-card-bg: #232836;
+    --auth-card-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+
+    --auth-text: #ffffff;
+    --auth-text-soft: #a7afbd;
+
+    --auth-input-bg: rgba(255, 255, 255, 0.045);
+    --auth-input-border: rgba(255, 255, 255, 0.16);
+    --auth-input-text: #ffffff;
+    --auth-input-ph: #838da0;
+    --auth-icon: #838da0;
+
+    --auth-accent: #1e63aa;
+    --auth-accent-hover: #2a76c4;
+    --auth-link: #6ba6e0;
+
+    --auth-toggle-bg: #232836;
+    --auth-toggle-icon: #f4b942;
+    --auth-checkbox-border: #4a5164;
+
+    --auth-alert-danger-bg: rgba(179, 38, 30, 0.18);
+    --auth-alert-danger-text: #ff8a83;
+    --auth-alert-success-bg: rgba(30, 122, 52, 0.18);
+    --auth-alert-success-text: #7bd694;
+
+    /* Estados de los Horarios en Modo Oscuro */
+    --slot-avail-bg: rgba(30, 99, 170, 0.15);
+    --slot-avail-border: rgba(107, 166, 224, 0.35);
+    --slot-avail-text: #a8cdfc;
+    --slot-avail-hover: rgba(30, 99, 170, 0.3);
+
+    --slot-selected-bg: #1e63aa;
+    --slot-selected-border: #2a76c4;
+    --slot-selected-text: #ffffff;
+
+    --slot-disabled-bg: rgba(255, 255, 255, 0.03);
+    --slot-disabled-border: rgba(255, 255, 255, 0.08);
+    --slot-disabled-text: #545d6e;
+
+    --badge-bg: rgba(30, 99, 170, 0.28);
+    --badge-text: #a8cdfc;
+}
+
+/* ==========================================================================
+   RESET Y BASE
+   ========================================================================== */
+
+.auth-body,
+.auth-body *,
+.auth-body *::before,
+.auth-body *::after {
+    box-sizing: border-box;
+}
+
+.auth-body {
+    min-height: 100vh;
+    margin: 0;
+    background-color: var(--auth-bg);
+    color: var(--auth-text);
+    font-family: 'Inter', system-ui, sans-serif;
+    position: relative;
+    overflow-x: hidden;
+    transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 1080px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+}
+
+.auth-container.reverse {
+    flex-direction: row-reverse;
+}
+
+/* ==========================================================================
+   COLUMNA DE MARCA / TEXTO (HERO)
+   ========================================================================== */
+
+.auth-hero {
+    flex: 1 1 420px;
+    max-width: 480px;
+    padding: 0 40px;
+}
+
+.auth-container.reverse .auth-hero {
+    text-align: right;
+}
+
+.auth-hero h2 {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 2.6rem;
+    line-height: 1.15;
+    color: var(--auth-text);
+    margin: 0 0 14px;
+}
+
+.auth-hero p {
+    font-size: 1.05rem;
+    color: var(--auth-text-soft);
+    margin: 0;
+    max-width: 420px;
+}
+
+.auth-container.reverse .auth-hero p {
+    margin-left: auto;
+}
+
+/* ==========================================================================
+   TARJETA AUTH
+   ========================================================================== */
+
+.auth-card {
+    flex: 0 0 420px;
+    width: 420px;
+    max-width: 100%;
+    background-color: var(--auth-card-bg);
+    border: none;
+    border-radius: 24px;
+    box-shadow: var(--auth-card-shadow);
+    padding: 40px 36px;
+    transition: background-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* ==========================================================================
+   TIPOGRAFÍA Y ENCABEZADOS
+   ========================================================================== */
+
+.brand-title {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--auth-text);
+    margin-bottom: 4px;
+}
+
+.brand-subtitle {
+    color: var(--auth-text-soft);
+    font-size: 0.98rem;
+    margin-bottom: 26px;
+}
+
+.step-heading {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--auth-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+}
+
+.step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--auth-accent);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   BOTÓN FLOTANTE DE TEMA (DARK/LIGHT)
+   ========================================================================== */
+
+.auth-theme-toggle {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 20;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--auth-input-border);
+    background-color: var(--auth-toggle-bg);
+    color: var(--auth-toggle-icon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.auth-theme-toggle:hover {
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   INPUTS Y GRUPOS CON ICONO
+   ========================================================================== */
+
+.auth-card .input-icon-group {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.auth-card .input-icon-group .input-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--auth-icon);
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.auth-card .form-label {
+    display: none;
+}
+
+.auth-card .form-control {
+    width: 100%;
+    height: 54px;
+    background-color: var(--auth-input-bg);
+    border: 1px solid var(--auth-input-border);
+    border-radius: 100px;
+    color: var(--auth-input-text);
+    padding: 0 20px 0 50px;
+    font-size: 0.96rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s ease, background-color 0.35s ease, box-shadow 0.2s ease;
+    appearance: none;
+}
+
+.auth-card select.form-control {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%238b93a3' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 18px center;
+    background-size: 14px 10px;
+}
+
+.auth-card .form-control::placeholder {
+    color: var(--auth-input-ph);
+}
+
+.auth-card .form-control:focus {
+    background-color: var(--auth-input-bg);
+    border-color: var(--auth-accent);
+    color: var(--auth-input-text);
+    box-shadow: 0 0 0 3px rgba(27, 90, 158, 0.18);
+}
+
+[data-theme="dark"] .auth-card .form-control:focus {
+    box-shadow: 0 0 0 3px rgba(107, 166, 224, 0.22);
+}
+
+.auth-card .form-control.is-invalid {
+    border-color: #e0554b;
+}
+
+.auth-card .text-danger {
+    font-size: 0.8rem;
+    margin: 6px 0 0 6px;
+    display: block;
+}
+
+[data-theme="dark"] .auth-card select.form-control option {
+    background-color: #232836;
+    color: #ffffff;
+}
+
+[data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.85);
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   FILA RECORDARME / OLVIDÉ CONTRASEÑA
+   ========================================================================== */
+
+.auth-row-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2px 4px 22px;
+    font-size: 0.9rem;
+}
+
+.auth-remember {
+    display: flex;
+    align-items: center;
+    color: var(--auth-text-soft);
+}
+
+.auth-remember input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    margin-right: 8px;
+    border: 1.5px solid var(--auth-checkbox-border);
+    border-radius: 4px;
+    background-color: transparent;
+    accent-color: var(--auth-accent);
+    cursor: pointer;
+}
+
+.auth-row-options a {
+    color: var(--auth-link);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-row-options a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   TARJETA PREVIEW DE SERVICIO SELECCIONADO
+   ========================================================================== */
+
+.service-preview-card {
+    background-color: var(--slot-avail-bg);
+    border: 1px solid var(--slot-avail-border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-top: -6px;
+    margin-bottom: 16px;
+    display: none;
+    animation: fadeIn 0.25s ease;
+}
+
+.service-preview-card.active {
+    display: block;
+}
+
+.service-preview-desc {
+    font-size: 0.9rem;
+    color: var(--auth-text);
+    margin: 0 0 8px;
+}
+
+.service-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.service-badge {
+    background-color: var(--auth-card-bg);
+    color: var(--auth-accent);
+    border: 1px solid var(--auth-input-border);
+    border-radius: 100px;
+    padding: 4px 14px;
+    font-size: 0.82rem;
+    font-weight: 600;
+}
+
+.service-price {
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--auth-accent);
+}
+
+/* ==========================================================================
+   CHIPS DE FECHAS RÁPIDAS
+   ========================================================================== */
+
+.quick-dates {
+    display: flex;
+    gap: 8px;
+    margin-top: -6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.quick-date-chip {
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border-radius: 100px;
+    border: 1px solid var(--auth-input-border);
+    background-color: var(--auth-card-bg);
+    color: var(--auth-text-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.quick-date-chip:hover {
+    border-color: var(--auth-accent);
+    color: var(--auth-accent);
+}
+
+.quick-date-chip.active {
+    background-color: var(--auth-accent);
+    border-color: var(--auth-accent);
+    color: #ffffff;
+}
+
+/* ==========================================================================
+   MATRIZ DE HORARIOS (AGENDA DINÁMICA)
+   ========================================================================== */
+
+.slots-container {
+    background-color: var(--auth-input-bg);
+    border: 1px solid var(--auth-input-border);
+    border-radius: 18px;
+    padding: 16px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    width: 100%;
+}
+
+.slot-btn {
+    border-radius: 100px;
+    padding: 9px 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid var(--slot-avail-border);
+    background-color: var(--slot-avail-bg);
+    color: var(--slot-avail-text);
+    transition: all 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.slot-btn:hover:not(:disabled) {
+    background-color: var(--slot-avail-hover);
+    border-color: var(--auth-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.slot-btn.selected {
+    background-color: var(--slot-selected-bg) !important;
+    border-color: var(--slot-selected-border) !important;
+    color: var(--slot-selected-text) !important;
+    transform: scale(1.02);
+}
+
+.slot-btn.selected .slot-specialist {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.slot-btn:disabled, .slot-btn.disabled {
+    background-color: var(--slot-disabled-bg);
+    border-color: var(--slot-disabled-border);
+    color: var(--slot-disabled-text);
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none !important;
+}
+
+.slot-specialist {
+    font-size: 0.74rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+.slots-empty-state {
+    text-align: center;
+    color: var(--auth-text-soft);
+    font-size: 0.9rem;
+    padding: 12px;
+}
+
+.slots-empty-state i {
+    font-size: 2rem;
+    color: var(--auth-icon);
+    margin-bottom: 6px;
+    display: block;
+}
+
+/* ==========================================================================
+   RESUMEN DE RESERVA
+   ========================================================================== */
+
+.booking-summary {
+    background-color: var(--auth-input-bg);
+    border: 1px dashed var(--auth-input-border);
+    border-radius: 18px;
+    padding: 16px 20px;
+    margin-bottom: 22px;
+}
+
+.summary-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    color: var(--auth-text-soft);
+    margin-bottom: 10px;
+}
+
+.summary-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+}
+
+.summary-item strong {
+    display: block;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    color: var(--auth-text-soft);
+    margin-bottom: 2px;
+}
+
+.summary-item span {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--auth-text);
+}
+
+/* ==========================================================================
+   BOTÓN PRINCIPAL DE ACCIÓN
+   ========================================================================== */
+
+.auth-card .btn-auth-submit {
+    width: 100%;
+    height: 54px;
+    border: none;
+    border-radius: 100px;
+    background-color: var(--auth-accent);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.02rem;
+    letter-spacing: 0.2px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+}
+
+.auth-card .btn-auth-submit:hover {
+    background-color: var(--auth-accent-hover);
+    color: #fff;
+}
+
+.auth-card .btn-auth-submit:active {
+    transform: translateY(1px);
+}
+
+.auth-switch {
+    text-align: center;
+    margin: 22px 0 0;
+    color: var(--auth-text-soft);
+    font-size: 0.92rem;
+}
+
+.auth-switch a {
+    color: var(--auth-link);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   ALERTAS Y FEEDBACK
+   ========================================================================== */
+
+.auth-card .alert {
+    border: none;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    padding: 12px 16px;
+}
+
+.auth-card .alert-danger {
+    background-color: var(--auth-alert-danger-bg);
+    color: var(--auth-alert-danger-text);
+}
+
+.auth-card .alert-success {
+    background-color: var(--auth-alert-success-bg);
+    color: var(--auth-alert-success-text);
+}
+
+/* ==========================================================================
+   DECORACIÓN: LÍNEAS + PUNTOS
+   ========================================================================== */
+
+.auth-decor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.auth-decor svg path {
+    fill: none;
+    stroke: var(--auth-line);
+    stroke-width: 1.4;
+    transition: stroke 0.35s ease;
+}
+
+.auth-decor .decor-top {
+    position: absolute;
+    top: -60px;
+    left: -70px;
+    width: 440px;
+    height: 440px;
+}
+
+.auth-decor .decor-bottom {
+    position: absolute;
+    bottom: -40px;
+    right: -40px;
+    width: 70%;
+    min-width: 640px;
+    height: auto;
+}
+
+.auth-dot {
+    position: absolute;
+    border-radius: 50%;
+    background-color: var(--auth-dot);
+    transition: background-color 0.35s ease;
+}
+
+.auth-dot.dot-1 { width: 6px; height: 6px; top: 9%;  left: 8.5%; }
+.auth-dot.dot-2 { width: 5px; height: 5px; top: 20%; left: 39%; }
+.auth-dot.dot-3 { width: 6px; height: 6px; top: 12%; left: 53%; }
+.auth-dot.dot-4 { width: 7px; height: 7px; top: 68%; left: 30%; }
+.auth-dot.dot-5 { width: 5px; height: 5px; top: 82%; left: 7.5%; }
+.auth-dot.dot-6 { width: 6px; height: 6px; top: 88%; left: 11%; }
+
+/* ==========================================================================
+   UTILIDADES
+   ========================================================================== */
+
+.d-none {
+    display: none !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 991px) {
+    .auth-hero {
+        display: none;
+    }
+    .auth-container {
+        justify-content: center;
+    }
+    .auth-card {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 440px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 32px 22px;
+    }
+    .brand-title {
+        font-size: 1.7rem;
+    }
+=======
 /* ============================================================
    AUTH PAGES — Login / Registro / Recuperar contraseña
    Sistema de temas claro/oscuro (replica diseño Stitch)
@@ -845,4 +1611,5 @@ select option{
     padding:14px 18px;
     font-size:.92rem;
     color:var(--auth-text);
+>>>>>>> origin/develop
 }
