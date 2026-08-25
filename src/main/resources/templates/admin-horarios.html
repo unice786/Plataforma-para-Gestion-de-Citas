@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Citas - Administrar servicios</title>
+    <title>Plataforma Citas - Administrar horarios</title>
     <script>
         (function(){
             var saved = localStorage.getItem('auth-theme');
@@ -43,52 +43,50 @@
 <main class="app-shell">
     <header class="app-header">
         <div>
-            <h1>Administración de servicios</h1>
-            <p>Crea, edita o retira servicios del catálogo.</p>
+            <h1>Administración de horarios</h1>
+            <p>Crea, edita o elimina bloques de disponibilidad.</p>
         </div>
-        <a class="btn-pill" th:href="@{/admin/servicios/nuevo}">
-            <i class="bi bi-plus-lg"></i>Nuevo servicio
+        <a class="btn-pill" th:href="@{/admin/horarios/nuevo}">
+            <i class="bi bi-plus-lg"></i>Nuevo horario
         </a>
     </header>
 
     <div class="app-alert alert-success" role="status" th:if="${exito}" th:text="${exito}"></div>
     <div class="app-alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
 
-    <section class="app-card flush" th:if="${not #lists.isEmpty(servicios)}">
+    <section class="app-card flush" th:if="${not #lists.isEmpty(horarios)}">
         <div class="table-responsive">
             <table class="table-app">
                 <thead>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Precio</th>
-                    <th>Duración</th>
+                    <th>Empleado</th>
+                    <th>Fecha</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
                     <th>Estado</th>
                     <th class="text-end-cell">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="servicio : ${servicios}">
+                <tr th:each="horario : ${horarios}">
                     <td>
-                        <span class="cell-strong" th:text="${servicio.nombre}"></span>
-                        <small class="cell-muted" th:text="${servicio.descripcion}"></small>
+                        <span class="cell-strong" th:text="${horario.empleadoNombre}"></span>
                     </td>
-                    <td th:text="${servicio.categoria.nombre}"></td>
-                    <td th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}"></td>
-                    <td><span th:text="${servicio.duracionMinutos}"></span> min</td>
+                    <td th:text="${horario.fecha}"></td>
+                    <td th:text="${horario.horaInicio}"></td>
+                    <td th:text="${horario.horaFin}"></td>
                     <td>
-                        <span class="badge-soft" th:if="${servicio.activo}">Activo</span>
-                        <span class="badge-soft neutral" th:unless="${servicio.activo}">Retirado</span>
+                        <span class="badge-soft" th:text="${horario.estado}"></span>
                     </td>
                     <td class="text-end-cell">
                         <div class="d-inline-flex gap-2">
-                            <a class="btn-pill outline small" th:href="@{/admin/servicios/{id}/editar(id=${servicio.id})}">
+                            <a class="btn-pill outline small" th:href="@{/admin/horarios/{id}/editar(id=${horario.id})}">
                                 <i class="bi bi-pencil-square"></i>Editar
                             </a>
-                            <form class="d-inline" th:if="${servicio.activo}"
-                                  th:action="@{/admin/servicios/{id}/eliminar(id=${servicio.id})}" method="post">
+                            <form class="d-inline"
+                                  th:action="@{/admin/horarios/{id}/eliminar(id=${horario.id})}" method="post">
                                 <button class="btn-pill danger-outline small" type="submit"
-                                        onclick="return confirm('¿Quieres retirar este servicio del catálogo?');">
+                                        onclick="return confirm('¿Quieres eliminar este horario?');">
                                     <i class="bi bi-trash3"></i>Eliminar
                                 </button>
                             </form>
@@ -100,9 +98,9 @@
         </div>
     </section>
 
-    <div class="app-card empty-state" th:if="${#lists.isEmpty(servicios)}">
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(horarios)}">
         <i class="bi bi-inbox"></i>
-        Todavía no hay servicios registrados.
+        Todavía no hay horarios registrados.
     </div>
 </main>
 

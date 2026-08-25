@@ -15,6 +15,8 @@ import lombok.Setter;
 public class HorarioResponseDTO {
 
 	private Long id;
+	private Long empleadoId;
+	private String empleadoNombre;
 	private LocalDate fecha;
 	private LocalTime horaInicio;
 	private LocalTime horaFin;
