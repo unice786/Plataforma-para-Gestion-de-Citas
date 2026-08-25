@@ -9,11 +9,10 @@ Documentación de la entrega correspondiente a la capa de **Entidades de Negocio
 | Campo | Dato |
 |---|---|
 | Proyecto | Sugoi - Plataforma para Gestión de Citas |
-| Materia | *[Completar: nombre de la materia]* |
+| Materia |  Creación de Aplicaciones en Java Enterprise Edition  |
 | Grupo | Grupo 5 |
-| Docente | *[Completar]* |
-| Integrantes | Grupo 5 - Equipo de desarrollo |
-| Repositorio | https://github.com/unice786/Plataforma-para-Gestion-de-Citas |
+| Docente | Marvin Antonio Barrera Trigueros |
+| Integrantes | Michael Stanley Sanchez Menendez<br>Samuel Alonso Mendoza Calzadilla<br>Manuel Angel Carias Juarez<br>Kevin Ernesto Meza Garcia<br>Krisler David Galicia Dueñas |
 | Jira | https://grupo5software.atlassian.net/jira/software/projects/SCRUM/boards/1/backlog |
 | Tecnología | Java 21, Spring Boot 3.3.4, Spring Data JPA (Hibernate), MySQL 8 |
 | Fecha | 25/08/2026 |
