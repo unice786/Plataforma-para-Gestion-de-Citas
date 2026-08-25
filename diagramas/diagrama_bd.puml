@@ -1,5 +1,5 @@
-@startuml Diagrama_Entidad_Relacion_3FN
-title Diagrama Entidad-Relación Normalizado (3FN) - Plataforma Citas
+@startuml
+title Diagrama Entidad-Relación Normalizado (3FN) - Sugoi
 
 entity "usuarios" as usuarios {
   * id : BIGINT <<PK>>
@@ -29,20 +29,8 @@ entity "empleados" as empleados {
   * especialidad_id : BIGINT <<FK>>
 }
 
-entity "roles" as roles {
-  * id : BIGINT <<PK>>
-  --
-  * nombre : VARCHAR(50)
-  descripcion : VARCHAR(255)
-}
-
 entity "administradores" as administradores {
   * usuario_id : BIGINT <<PK, FK>>
-}
-
-entity "administrador_rol" as admin_rol {
-  * administrador_id : BIGINT <<PK, FK>>
-  * rol_id : BIGINT <<PK, FK>>
 }
 
 entity "categorias_servicio" as categorias {
@@ -70,7 +58,7 @@ entity "horarios_disponibilidad" as horarios {
   * fecha : DATE
   * hora_inicio : TIME
   * hora_fin : TIME
-  * estado : VARCHAR(20)
+  * estado : VARCHAR(20) DEFAULT 'DISPONIBLE'
 }
 
 entity "citas" as citas {
@@ -90,16 +78,14 @@ entity "empleado_servicio" as emp_serv {
   * servicio_id : BIGINT <<PK, FK>>
 }
 
-' Relaciones de Herencia Base
+' Herencia
 usuarios ||--|| clientes
 usuarios ||--|| empleados
 usuarios ||--|| administradores
 
-' Catálogos y Seguridad
+' Catálogos
 especialidades ||--o{ empleados
 categorias ||--o{ servicios
-administradores ||--o{ admin_rol
-roles ||--o{ admin_rol
 
 ' Operaciones
 empleados ||--o{ horarios
@@ -108,5 +94,4 @@ empleados ||--o{ citas
 servicios ||--o{ citas
 empleados ||--o{ emp_serv
 servicios ||--o{ emp_serv
-
 @enduml

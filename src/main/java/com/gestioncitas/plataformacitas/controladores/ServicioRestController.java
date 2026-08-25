@@ -6,6 +6,7 @@ import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controlador REST para consultar el catálogo de servicios disponibles.
- * Expone GET /api/servicios para la reserva en el frontend.
+ * Expone GET /api/servicios para la reserva en el frontend (SCRUM-1).
  */
 @RestController
 @RequestMapping("/api/servicios")
@@ -30,6 +31,7 @@ public class ServicioRestController {
      * Devuelve la lista de servicios activos ordenados alfabéticamente.
      */
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<ServicioResponseDTO>> listarServiciosActivos() {
         List<Servicio> servicios = servicioRepository.findByActivoTrueOrderByNombreAsc();
         List<ServicioResponseDTO> dtos = servicios.stream()

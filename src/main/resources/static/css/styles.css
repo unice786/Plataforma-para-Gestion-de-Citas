@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ==========================================================================
    PLATAFORMA DE GESTIÓN DE CITAS - SISTEMA DE DISEÑO GLOBAL
    Soporte completo de temas Claro / Oscuro (Stitch Design)
@@ -762,4 +763,853 @@
     .brand-title {
         font-size: 1.7rem;
     }
+=======
+/* ============================================================
+   AUTH PAGES — Login / Registro / Recuperar contraseña
+   Sistema de temas claro/oscuro (replica diseño Stitch)
+   Pega este bloque en tu styles.css global (static/css/styles.css)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ---------- Tokens: tema claro (por defecto) ---------- */
+:root{
+    --auth-bg:#eef2f6;
+    --auth-line:rgba(15,23,42,.16);
+    --auth-dot:rgba(15,23,42,.30);
+    --auth-card-bg:#ffffff;
+    --auth-card-shadow:0 25px 60px -15px rgba(15,23,42,.18);
+    --auth-text:#131b2e;
+    --auth-text-soft:#5b6472;
+    --auth-input-bg:#ffffff;
+    --auth-input-border:#d7dce4;
+    --auth-input-text:#131b2e;
+    --auth-input-ph:#8b93a3;
+    --auth-icon:#8b93a3;
+    --auth-accent:#1b5a9e;
+    --auth-accent-hover:#164a83;
+    --auth-link:#1b5a9e;
+    --auth-toggle-bg:#ffffff;
+    --auth-toggle-icon:#e08a1e;
+    --auth-checkbox-border:#b8c0cc;
+    --auth-alert-danger-bg:#fdecec;
+    --auth-alert-danger-text:#b3261e;
+    --auth-alert-success-bg:#e8f5ea;
+    --auth-alert-success-text:#1e7a34;
+}
+
+/* ---------- Tokens: tema oscuro ---------- */
+[data-theme="dark"]{
+    color-scheme:dark;
+    --auth-bg:#14161f;
+    --auth-line:rgba(255,255,255,.14);
+    --auth-dot:rgba(255,255,255,.38);
+    --auth-card-bg:#232836;
+    --auth-card-shadow:0 25px 60px -15px rgba(0,0,0,.6);
+    --auth-text:#ffffff;
+    --auth-text-soft:#a7afbd;
+    --auth-input-bg:rgba(255,255,255,.045);
+    --auth-input-border:rgba(255,255,255,.16);
+    --auth-input-text:#ffffff;
+    --auth-input-ph:#838da0;
+    --auth-icon:#838da0;
+    --auth-accent:#1e63aa;
+    --auth-accent-hover:#2a76c4;
+    --auth-link:#6ba6e0;
+    --auth-toggle-bg:#232836;
+    --auth-toggle-icon:#f4b942;
+    --auth-checkbox-border:#4a5164;
+    --auth-alert-danger-bg:rgba(179,38,30,.18);
+    --auth-alert-danger-text:#ff8a83;
+    --auth-alert-success-bg:rgba(30,122,52,.18);
+    --auth-alert-success-text:#7bd694;
+}
+
+/* ---------- Reset defensivo (por si esta hoja carga antes que Bootstrap) ---------- */
+.auth-body,
+.auth-body *,
+.auth-body *::before,
+.auth-body *::after{
+    box-sizing:border-box;
+}
+
+/* ---------- Base de la página ---------- */
+.auth-body{
+    min-height:100vh;
+    margin:0;
+    background-color:var(--auth-bg);
+    color:var(--auth-text);
+    font-family:'Inter',system-ui,sans-serif;
+    position:relative;
+    overflow-x:hidden;
+    transition:background-color .35s ease,color .35s ease;
+}
+
+.auth-page{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px 24px;
+    position:relative;
+    z-index:2;
+}
+
+.auth-container{
+    width:100%;
+    max-width:1080px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:relative;
+    z-index:2;
+}
+
+.auth-container.reverse{ flex-direction:row-reverse; }
+
+/* ---------- Columna de marca / texto ---------- */
+.auth-hero{
+    flex:1 1 420px;
+    max-width:480px;
+    padding:0 40px;
+}
+.auth-container.reverse .auth-hero{ text-align:right; }
+
+.auth-hero h2{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:2.6rem;
+    line-height:1.15;
+    color:var(--auth-text);
+    margin:0 0 14px;
+}
+.auth-hero p{
+    font-size:1.05rem;
+    color:var(--auth-text-soft);
+    margin:0;
+    max-width:420px;
+}
+.auth-container.reverse .auth-hero p{ margin-left:auto; }
+
+/* ---------- Tarjeta ---------- */
+.auth-card{
+    flex:0 0 420px;
+    width:420px;
+    max-width:100%;
+    background-color:var(--auth-card-bg);
+    border:none;
+    border-radius:24px;
+    box-shadow:var(--auth-card-shadow);
+    padding:40px 36px;
+    transition:background-color .35s ease,box-shadow .35s ease;
+}
+
+.brand-title{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:2rem;
+    color:var(--auth-text);
+    margin-bottom:4px;
+}
+.brand-subtitle{
+    color:var(--auth-text-soft);
+    font-size:.98rem;
+    margin-bottom:26px;
+}
+
+/* ---------- Inputs con icono ---------- */
+.auth-card .input-icon-group{
+    position:relative;
+    margin-bottom:16px;
+}
+.auth-card .input-icon-group .input-icon{
+    position:absolute;
+    left:20px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--auth-icon);
+    font-size:1rem;
+    pointer-events:none;
+    z-index:2;
+}
+.auth-card .form-label{
+    display:none; /* el diseño usa placeholder + icono en vez de label visible */
+}
+.auth-card .form-control{
+    width:100%;
+    height:54px;
+    background-color:var(--auth-input-bg);
+    border:1px solid var(--auth-input-border);
+    border-radius:100px;
+    color:var(--auth-input-text);
+    padding:0 20px 0 50px;
+    font-size:.96rem;
+    font-family:'Inter',sans-serif;
+    transition:border-color .2s ease,background-color .35s ease,box-shadow .2s ease;
+}
+.auth-card .form-control::placeholder{ color:var(--auth-input-ph); }
+.auth-card .form-control:focus{
+    background-color:var(--auth-input-bg);
+    border-color:var(--auth-accent);
+    color:var(--auth-input-text);
+    box-shadow:0 0 0 3px rgba(27,90,158,.18);
+}
+[data-theme="dark"] .auth-card .form-control:focus{
+    box-shadow:0 0 0 3px rgba(107,166,224,.22);
+}
+
+/* Ajuste fino cuando el input tiene errores de validación de Thymeleaf */
+.auth-card .form-control.is-invalid{ border-color:#e0554b; }
+.auth-card .text-danger{
+    font-size:.8rem;
+    margin:6px 0 0 6px;
+    display:block;
+}
+
+/* ---------- Fila remember me / forgot password ---------- */
+.auth-row-options{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:2px 4px 22px;
+    font-size:.9rem;
+}
+.auth-remember{
+    display:flex;
+    align-items:center;
+    color:var(--auth-text-soft);
+}
+.auth-remember input[type="checkbox"]{
+    width:17px;
+    height:17px;
+    margin-right:8px;
+    border:1.5px solid var(--auth-checkbox-border);
+    border-radius:4px;
+    background-color:transparent;
+    accent-color:var(--auth-accent);
+    cursor:pointer;
+}
+.auth-row-options a{
+    color:var(--auth-link);
+    text-decoration:none;
+    font-weight:500;
+}
+.auth-row-options a:hover{ text-decoration:underline; }
+
+/* ---------- Botón principal ---------- */
+.auth-card .btn-auth-submit{
+    width:100%;
+    height:54px;
+    border:none;
+    border-radius:100px;
+    background-color:var(--auth-accent);
+    color:#ffffff;
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:1.02rem;
+    letter-spacing:.2px;
+    transition:background-color .2s ease,transform .1s ease;
+}
+.auth-card .btn-auth-submit:hover{ background-color:var(--auth-accent-hover); color:#fff; }
+.auth-card .btn-auth-submit:active{ transform:translateY(1px); }
+
+.auth-switch{
+    text-align:center;
+    margin:22px 0 0;
+    color:var(--auth-text-soft);
+    font-size:.92rem;
+}
+.auth-switch a{
+    color:var(--auth-link);
+    font-weight:600;
+    text-decoration:none;
+}
+.auth-switch a:hover{ text-decoration:underline; }
+
+/* ---------- Alertas ---------- */
+.auth-card .alert{
+    border:none;
+    border-radius:14px;
+    font-size:.88rem;
+    padding:12px 16px;
+}
+.auth-card .alert-danger{
+    background-color:var(--auth-alert-danger-bg);
+    color:var(--auth-alert-danger-text);
+}
+.auth-card .alert-success{
+    background-color:var(--auth-alert-success-bg);
+    color:var(--auth-alert-success-text);
+}
+
+/* ---------- Botón de cambio de tema ---------- */
+.auth-theme-toggle{
+    position:fixed;
+    top:24px;
+    right:24px;
+    z-index:20;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:1px solid var(--auth-input-border);
+    background-color:var(--auth-toggle-bg);
+    color:var(--auth-toggle-icon);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.1rem;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+    transition:background-color .3s ease,transform .2s ease;
+}
+.auth-theme-toggle:hover{ transform:translateY(-2px); }
+
+/* ---------- Decoración: líneas + puntos ---------- */
+.auth-decor{
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    left:0;
+    overflow:hidden;
+    pointer-events:none;
+    z-index:1;
+}
+.auth-decor svg path{
+    fill:none;
+    stroke:var(--auth-line);
+    stroke-width:1.4;
+    transition:stroke .35s ease;
+}
+.auth-decor .decor-top{
+    position:absolute;
+    top:-60px;
+    left:-70px;
+    width:440px;
+    height:440px;
+}
+.auth-decor .decor-bottom{
+    position:absolute;
+    bottom:-40px;
+    right:-40px;
+    width:70%;
+    min-width:640px;
+    height:auto;
+}
+
+.auth-dot{
+    position:absolute;
+    border-radius:50%;
+    background-color:var(--auth-dot);
+    transition:background-color .35s ease;
+}
+
+/* Posiciones de los puntos decorativos dispersos */
+.auth-dot.dot-1{ width:6px; height:6px; top:9%;  left:8.5%; }
+.auth-dot.dot-2{ width:5px; height:5px; top:20%; left:39%; }
+.auth-dot.dot-3{ width:6px; height:6px; top:12%; left:53%; }
+.auth-dot.dot-4{ width:7px; height:7px; top:68%; left:30%; }
+.auth-dot.dot-5{ width:5px; height:5px; top:82%; left:7.5%; }
+.auth-dot.dot-6{ width:6px; height:6px; top:88%; left:11%; }
+
+/* ---------- Responsive ---------- */
+@media (max-width:991px){
+    .auth-hero{ display:none; }
+    .auth-container{ justify-content:center; }
+    .auth-card{ flex:0 0 auto; width:100%; max-width:440px; }
+}
+@media (max-width:480px){
+    .auth-card{ padding:32px 22px; }
+    .brand-title{ font-size:1.7rem; }
+}
+/* ============================================================
+   APP PAGES � Cat�logo / Admin de servicios / Mis citas
+   Reutiliza los tokens del tema claro/oscuro de las auth pages
+   ============================================================ */
+
+.app-body{
+    min-height:100vh;
+    margin:0;
+    background-color:var(--auth-bg);
+    color:var(--auth-text);
+    font-family:'Inter',system-ui,sans-serif;
+    position:relative;
+    overflow-x:hidden;
+    transition:background-color .35s ease,color .35s ease;
+}
+
+.app-shell{
+    position:relative;
+    z-index:2;
+    max-width:1080px;
+    margin:0 auto;
+    padding:88px 24px 64px;
+}
+.app-shell.narrow{ max-width:760px; }
+
+/* ---------- Encabezado de p�gina ---------- */
+.app-header{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:26px;
+}
+.app-header h1,
+.app-title{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:2.2rem;
+    line-height:1.15;
+    color:var(--auth-text);
+    margin:0;
+}
+.app-header p{
+    color:var(--auth-text-soft);
+    margin:6px 0 0;
+    font-size:1rem;
+}
+
+.app-back-link{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    color:var(--auth-link);
+    text-decoration:none;
+    font-weight:600;
+    font-size:.95rem;
+    margin-bottom:18px;
+}
+.app-back-link:hover{ text-decoration:underline; }
+
+/* ---------- Botones p�ldora (mismo lenguaje que btn-auth-submit) ---------- */
+.btn-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    height:46px;
+    padding:0 26px;
+    border-radius:100px;
+    border:1px solid transparent;
+    background-color:var(--auth-accent);
+    color:#ffffff;
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:.94rem;
+    text-decoration:none;
+    transition:background-color .2s ease,transform .1s ease,border-color .2s ease,color .2s ease;
+}
+.btn-pill:hover{ background-color:var(--auth-accent-hover); color:#fff; }
+.btn-pill:active{ transform:translateY(1px); }
+.btn-pill.outline{
+    background-color:transparent;
+    border-color:var(--auth-input-border);
+    color:var(--auth-text);
+}
+.btn-pill.outline:hover{
+    border-color:var(--auth-accent);
+    color:var(--auth-accent);
+    background-color:transparent;
+}
+.btn-pill.small{ height:38px; padding:0 18px; font-size:.86rem; }
+.btn-pill.danger-outline{
+    background-color:transparent;
+    border-color:rgba(224,85,75,.55);
+    color:var(--auth-alert-danger-text);
+}
+.btn-pill.danger-outline:hover{
+    background-color:var(--auth-alert-danger-bg);
+    color:var(--auth-alert-danger-text);
+    border-color:rgba(224,85,75,.8);
+}
+
+/* ---------- Tarjetas ---------- */
+.app-card{
+    background-color:var(--auth-card-bg);
+    border:none;
+    border-radius:24px;
+    box-shadow:var(--auth-card-shadow);
+    padding:28px;
+    transition:background-color .35s ease,box-shadow .35s ease;
+}
+.app-card.flush{ padding:0; overflow:hidden; }
+
+/* Grid del cat�logo */
+.app-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:22px;
+}
+.service-card{
+    display:flex;
+    flex-direction:column;
+    height:100%;
+}
+.service-card .service-category{
+    color:var(--auth-accent);
+    font-size:.82rem;
+    font-weight:700;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+    margin-bottom:8px;
+}
+[data-theme="dark"] .service-card .service-category{ color:var(--auth-link); }
+.service-card .service-name{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:1.3rem;
+    color:var(--auth-text);
+    margin:0 0 8px;
+}
+.service-card .service-desc{
+    color:var(--auth-text-soft);
+    font-size:.93rem;
+    flex-grow:1;
+    margin:0 0 16px;
+}
+.service-card .service-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-top:1px solid var(--auth-input-border);
+    padding-top:14px;
+    font-size:.95rem;
+}
+.service-card .service-price{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:1.15rem;
+    color:var(--auth-text);
+}
+.service-card .service-duration{ color:var(--auth-text-soft); }
+
+/* ---------- Tablas ---------- */
+.table-app{
+    width:100%;
+    border-collapse:collapse;
+    color:var(--auth-text);
+    margin:0;
+}
+.table-app th{
+    font-size:.78rem;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+    color:var(--auth-text-soft);
+    font-weight:600;
+    padding:16px 18px;
+    border-bottom:1px solid var(--auth-input-border);
+    white-space:nowrap;
+}
+.table-app td{
+    padding:16px 18px;
+    vertical-align:middle;
+    border-bottom:1px solid var(--auth-input-border);
+}
+.table-app tbody tr:last-child td{ border-bottom:none; }
+.table-app tbody tr{ transition:background-color .15s ease; }
+.table-app tbody tr:hover{ background-color:var(--auth-input-bg); }
+.table-app .cell-strong{ font-weight:600; }
+.table-app .cell-muted{
+    color:var(--auth-text-soft);
+    font-size:.85rem;
+    display:block;
+    margin-top:2px;
+}
+.table-app .text-end-cell{ text-align:right; }
+
+/* ---------- Badges suaves ---------- */
+.badge-soft{
+    display:inline-block;
+    padding:5px 14px;
+    border-radius:100px;
+    font-size:.8rem;
+    font-weight:600;
+    background-color:var(--auth-alert-success-bg);
+    color:var(--auth-alert-success-text);
+}
+.badge-soft.neutral{
+    background-color:var(--auth-input-bg);
+    color:var(--auth-text-soft);
+}
+.badge-soft.info{
+    background-color:rgba(27,90,158,.12);
+    color:var(--auth-accent);
+}
+[data-theme="dark"] .badge-soft.info{ color:var(--auth-link); }
+
+/* ---------- Alertas dentro de app pages ---------- */
+.app-alert{
+    border:none;
+    border-radius:14px;
+    font-size:.9rem;
+    padding:13px 18px;
+    margin-bottom:20px;
+}
+.app-alert.alert-success{
+    background-color:var(--auth-alert-success-bg);
+    color:var(--auth-alert-success-text);
+}
+.app-alert.alert-danger{
+    background-color:var(--auth-alert-danger-bg);
+    color:var(--auth-alert-danger-text);
+}
+.app-alert.alert-warning{
+    background-color:rgba(224,138,30,.14);
+    color:var(--auth-toggle-icon);
+}
+
+/* ---------- Formularios (formulario servicio) ---------- */
+.app-card .form-label{
+    font-size:.86rem;
+    font-weight:600;
+    color:var(--auth-text-soft);
+    margin-bottom:7px;
+}
+.app-card .form-control,
+.app-card .form-select{
+    height:50px;
+    background-color:var(--auth-input-bg);
+    border:1px solid var(--auth-input-border);
+    border-radius:100px;
+    color:var(--auth-input-text);
+    padding:0 20px;
+    font-size:.95rem;
+    transition:border-color .2s ease,box-shadow .2s ease;
+}
+.app-card textarea.form-control{
+    height:auto;
+    min-height:110px;
+    border-radius:18px;
+    padding:14px 20px;
+    resize:vertical;
+}
+.app-card select.form-control,
+.app-card .form-select{ appearance:none; }
+select option{
+    background-color:var(--auth-card-bg);
+    color:var(--auth-text);
+}
+.app-card .form-control::placeholder{ color:var(--auth-input-ph); }
+.app-card .form-control:focus,
+.app-card .form-select:focus{
+    background-color:var(--auth-input-bg);
+    border-color:var(--auth-accent);
+    color:var(--auth-input-text);
+    box-shadow:0 0 0 3px rgba(27,90,158,.18);
+}
+[data-theme="dark"] .app-card .form-control:focus,
+[data-theme="dark"] .app-card .form-select:focus{
+    box-shadow:0 0 0 3px rgba(107,166,224,.22);
+}
+.app-card .form-control.is-invalid,
+.app-card .form-select.is-invalid{ border-color:#e0554b; }
+.app-card .invalid-feedback{
+    color:var(--auth-alert-danger-text);
+    font-size:.82rem;
+    margin:6px 0 0 8px;
+}
+.app-actions{
+    display:flex;
+    gap:12px;
+    justify-content:flex-end;
+    margin-top:8px;
+}
+
+/* ---------- Estado vac�o ---------- */
+.empty-state{
+    text-align:center;
+    color:var(--auth-text-soft);
+    padding:48px 24px;
+    font-size:1rem;
+}
+.empty-state .bi{
+    font-size:2rem;
+    display:block;
+    margin-bottom:10px;
+    opacity:.6;
+}
+
+@media (max-width:576px){
+    .app-shell{ padding:118px 16px 48px; }
+    .app-header h1{ font-size:1.7rem; }
+    .app-card{ padding:20px; }
+    .table-app th,.table-app td{ padding:12px 14px; }
+}
+
+/* ---------- Barra de navegaci�n de la app ---------- */
+.app-nav{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    z-index:15;
+    width:100%;
+    background-color:var(--auth-card-bg);
+    border-radius:0;
+    box-shadow:0 10px 30px -18px rgba(15,23,42,.35);
+    transition:background-color .35s ease;
+}
+.app-nav-inner{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    max-width:1080px;
+    margin:0 auto;
+    padding:12px 24px;
+}
+.app-nav-brand{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:800;
+    font-size:1.05rem;
+    color:var(--auth-text);
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    white-space:nowrap;
+}
+.app-nav-brand i{ color:var(--auth-accent); }
+[data-theme="dark"] .app-nav-brand i{ color:var(--auth-toggle-icon); }
+.app-nav-links{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    flex-wrap:wrap;
+}
+.app-nav-links a{
+    color:var(--auth-text-soft);
+    text-decoration:none;
+    font-weight:600;
+    font-size:.9rem;
+    padding:9px 15px;
+    border-radius:100px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:background-color .2s ease,color .2s ease;
+}
+.app-nav-links a:hover{
+    color:var(--auth-accent);
+    background-color:var(--auth-input-bg);
+}
+[data-theme="dark"] .app-nav-links a:hover{ color:var(--auth-link); }
+.app-nav-user{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:var(--auth-text-soft);
+    font-size:.88rem;
+}
+.app-nav-user span{
+    max-width:160px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.app-nav-user a{
+    color:var(--auth-alert-danger-text);
+    text-decoration:none;
+    font-size:1.1rem;
+    display:inline-flex;
+    transition:transform .2s ease;
+}
+.app-nav-user a:hover{ transform:translateY(-2px); }
+
+/* Accesos r�pidos del inicio */
+.quick-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:14px;
+    margin-top:22px;
+}
+.quick-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    gap:8px;
+    padding:22px 16px;
+    background-color:var(--auth-input-bg);
+    border:1px solid var(--auth-input-border);
+    border-radius:18px;
+    color:var(--auth-text);
+    text-decoration:none;
+    transition:border-color .2s ease,transform .15s ease;
+}
+.quick-card:hover{
+    border-color:var(--auth-accent);
+    transform:translateY(-3px);
+}
+.quick-card i{
+    font-size:1.6rem;
+    color:var(--auth-accent);
+}
+[data-theme="dark"] .quick-card i{ color:var(--auth-link); }
+.quick-card strong{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:1rem;
+}
+
+@media (max-width:900px){
+    .app-shell{ padding-top:118px; }
+    .app-nav-inner{ flex-wrap:wrap; justify-content:center; padding:12px 16px; }
+}
+
+/* ---------- Slots de horario (reserva de citas) ---------- */
+.slots-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+.slot{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width:110px;
+    padding:10px 14px;
+    background-color:var(--auth-input-bg);
+    border:1px solid var(--auth-input-border);
+    border-radius:14px;
+    color:var(--auth-text);
+    transition:border-color .15s ease,transform .1s ease;
+}
+.slot:hover{
+    border-color:var(--auth-accent);
+    transform:translateY(-2px);
+}
+.slot.activo{
+    border-color:var(--auth-accent);
+    background-color:rgba(27,90,158,.12);
+    box-shadow:0 0 0 3px rgba(27,90,158,.18);
+}
+[data-theme="dark"] .slot.activo{
+    background-color:rgba(107,166,224,.16);
+    box-shadow:0 0 0 3px rgba(107,166,224,.22);
+}
+.slot .slot-hora{
+    font-family:'Baloo 2',sans-serif;
+    font-weight:700;
+    font-size:1rem;
+}
+.slot .slot-emp{
+    font-size:.72rem;
+    color:var(--auth-text-soft);
+    max-width:130px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.resumen-cita{
+    background-color:var(--auth-input-bg);
+    border:1px dashed var(--auth-input-border);
+    border-radius:14px;
+    padding:14px 18px;
+    font-size:.92rem;
+    color:var(--auth-text);
+>>>>>>> origin/develop
 }

@@ -5,9 +5,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+<<<<<<< HEAD
 /**
  * DTO de respuesta devuelto tras reservar o consultar una cita (SCRUM-1).
  */
+=======
+>>>>>>> origin/develop
 public class CitaResponseDTO {
 
     private Long id;
@@ -20,12 +23,17 @@ public class CitaResponseDTO {
     private LocalDateTime fechaRegistro;
     private String mensaje;
 
+<<<<<<< HEAD
     // ── Constructor vacío ──────────────────────────────────────────────────
 
     public CitaResponseDTO() {}
 
     // ── Constructor completo ───────────────────────────────────────────────
 
+=======
+    public CitaResponseDTO() {}
+
+>>>>>>> origin/develop
     public CitaResponseDTO(Long id, String clienteNombre, String empleadoNombre,
                            String servicioNombre, LocalDate fecha, LocalTime hora,
                            EstadoCita estado, LocalDateTime fechaRegistro, String mensaje) {
@@ -40,8 +48,11 @@ public class CitaResponseDTO {
         this.mensaje = mensaje;
     }
 
+<<<<<<< HEAD
     // ── Getters y Setters ──────────────────────────────────────────────────
 
+=======
+>>>>>>> origin/develop
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

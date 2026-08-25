@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -59,7 +60,7 @@ class ServicioControllerTests {
         categoria.setNombre("Bienestar");
         categoria = categoriaServicioRepository.save(categoria);
 
-        mockMvc.perform(post("/admin/servicios")
+        mockMvc.perform(post("/admin/servicios").with(SecurityMockMvcRequestPostProcessors.csrf())
                         .param("nombre", "Masaje relajante")
                         .param("categoria.id", categoria.getId().toString())
                         .param("descripcion", "Masaje de cuerpo completo")
@@ -72,7 +73,7 @@ class ServicioControllerTests {
         assertThat(servicio.getNombre()).isEqualTo("Masaje relajante");
         assertThat(servicio.getPrecio()).isEqualByComparingTo(new BigDecimal("25.00"));
 
-        mockMvc.perform(post("/admin/servicios/{id}/editar", servicio.getId())
+        mockMvc.perform(post("/admin/servicios/{id}/editar", servicio.getId()).with(SecurityMockMvcRequestPostProcessors.csrf())
                         .param("nombre", "Masaje terapéutico")
                         .param("categoria.id", categoria.getId().toString())
                         .param("descripcion", "Masaje especializado")
@@ -85,7 +86,7 @@ class ServicioControllerTests {
         assertThat(actualizado.getNombre()).isEqualTo("Masaje terapéutico");
         assertThat(actualizado.getDuracionMinutos()).isEqualTo(75);
 
-        mockMvc.perform(post("/admin/servicios/{id}/eliminar", servicio.getId()))
+        mockMvc.perform(post("/admin/servicios/{id}/eliminar", servicio.getId()).with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/servicios"));
 

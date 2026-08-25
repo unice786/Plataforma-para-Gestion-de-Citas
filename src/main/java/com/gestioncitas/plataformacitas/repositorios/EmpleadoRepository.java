@@ -14,6 +14,22 @@ import org.springframework.stereotype.Repository;
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
 
     /**
+     * Verifica si existe un empleado con el correo dado.
+     */
+    boolean existsByCorreo(String correo);
+
+    /**
+     * Verifica si existe un empleado con el correo dado, excluyendo un ID específico.
+     * Útil para validar unicidad al editar.
+     */
+    boolean existsByCorreoAndIdNot(String correo, Long id);
+
+    /**
+     * Devuelve todos los empleados activos.
+     */
+    List<Empleado> findByActivoTrue();
+
+    /**
      * Devuelve todos los empleados activos que ofrecen un servicio específico.
      *
      * @param servicioId ID del servicio

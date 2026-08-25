@@ -256,7 +256,7 @@ public class CitaService {
 
     // ══════════════════════════════════════════════════════════════════════
     // MÉTODOS AUXILIARES PRIVADOS
-    // ══════════════════════════════════════════════════════════════════════
+    // ═════════════════════════════════════════════════════════════════════
 
     private boolean haySolapamiento(LocalTime nuevoInicio, LocalTime nuevoFin,
                                     List<Cita> citasExistentes, int duracionMinutos) {

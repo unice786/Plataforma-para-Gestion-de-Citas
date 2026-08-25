@@ -19,6 +19,16 @@ import org.springframework.stereotype.Repository;
 public interface HorarioDisponibilidadRepository extends JpaRepository<HorarioDisponibilidad, Long> {
 
     /**
+     * Busca bloques por empleado, fecha y estado.
+     */
+    List<HorarioDisponibilidad> findByEmpleadoIdAndFechaAndEstado(Long empleadoId, LocalDate fecha, EstadoHorario estado);
+
+    /**
+     * Busca bloques por empleado y estado.
+     */
+    List<HorarioDisponibilidad> findByEmpleadoIdAndEstado(Long empleadoId, EstadoHorario estado);
+
+    /**
      * Devuelve todos los bloques de horario DISPONIBLE de los empleados
      * que ofrecen el servicio indicado en una fecha exacta.
      *

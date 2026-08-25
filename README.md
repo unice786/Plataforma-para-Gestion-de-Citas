@@ -7,10 +7,10 @@ Plataforma backend construida con **Java 21** y **Spring Boot 3.3.4** para la ad
 ## Diagramas del Sistema
 
 ### Diagrama de Clases
-![Diagrama de Clases](https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_clases.puml&v=3)
+![Diagrama de Clases](https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_clases.puml&v=5)
 
 ### Diagrama Entidad-Relación (DER)
-![Diagrama DER](https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_bd.puml&v=3)
+![Diagrama DER](https://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/unice786/Plataforma-para-Gestion-de-Citas/develop/diagramas/diagrama_bd.puml&v=4)
 
 ---
 

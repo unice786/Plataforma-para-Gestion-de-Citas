@@ -4,6 +4,7 @@ import com.gestioncitas.plataformacitas.modelos.Cita;
 import com.gestioncitas.plataformacitas.modelos.EstadoCita;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +20,15 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CitaRepository extends JpaRepository<Cita, Long> {
+
+    /**
+     * Devuelve todas las citas de un cliente ordenadas por fecha y hora descendente.
+     *
+     * @param clienteId ID del cliente
+     * @return Lista de citas del cliente
+     */
+    @EntityGraph(attributePaths = "servicio")
+    List<Cita> findByClienteIdOrderByFechaDescHoraDesc(Long clienteId);
 
     /**
      * Devuelve todas las citas activas (no canceladas) de un empleado en una

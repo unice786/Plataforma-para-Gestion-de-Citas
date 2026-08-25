@@ -1,20 +1,37 @@
 package com.gestioncitas.plataformacitas.servicios;
 
-import com.gestioncitas.plataformacitas.modelos.*;
-import com.gestioncitas.plataformacitas.repositorios.*;
+import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
+import com.gestioncitas.plataformacitas.modelos.Cliente;
+import com.gestioncitas.plataformacitas.modelos.Empleado;
+import com.gestioncitas.plataformacitas.modelos.Especialidad;
+import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
+import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
+import com.gestioncitas.plataformacitas.modelos.Servicio;
+import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
+import com.gestioncitas.plataformacitas.repositorios.ClienteRepository;
+import com.gestioncitas.plataformacitas.repositorios.EmpleadoRepository;
+import com.gestioncitas.plataformacitas.repositorios.EspecialidadRepository;
+import com.gestioncitas.plataformacitas.repositorios.HorarioDisponibilidadRepository;
+import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Inicializador de datos de prueba completo.
- * Garantiza que siempre existan Clientes, Categorías, Servicios, Especialistas y
- * Bloques de Horarios de Disponibilidad (para los próximos 60 días).
+ * Inicializador de datos de prueba (SCRUM-1).
+ * Garantiza que existan clientes demo, catálogo de servicios,
+ * especialistas y bloques de disponibilidad para los próximos 60 días.
+ * Incluye auto-reparación de servicios inactivos y vínculos empleado-servicio.
  */
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -25,19 +42,22 @@ public class DataInitializer implements CommandLineRunner {
     private final EspecialidadRepository especialidadRepository;
     private final EmpleadoRepository empleadoRepository;
     private final HorarioDisponibilidadRepository horarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public DataInitializer(ClienteRepository clienteRepository,
                            CategoriaServicioRepository categoriaRepository,
                            ServicioRepository servicioRepository,
                            EspecialidadRepository especialidadRepository,
                            EmpleadoRepository empleadoRepository,
-                           HorarioDisponibilidadRepository horarioRepository) {
+                           HorarioDisponibilidadRepository horarioRepository,
+                           PasswordEncoder passwordEncoder) {
         this.clienteRepository = clienteRepository;
         this.categoriaRepository = categoriaRepository;
         this.servicioRepository = servicioRepository;
         this.especialidadRepository = especialidadRepository;
         this.empleadoRepository = empleadoRepository;
         this.horarioRepository = horarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -49,133 +69,194 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void inicializarClientes() {
-        if (clienteRepository.count() == 0) {
-            Cliente clienteDemo = new Cliente();
-            clienteDemo.setNombre("Ana López (Cliente Demo)");
-            clienteDemo.setCorreo("ana.lopez@ejemplo.com");
-            clienteDemo.setContrasena("123456");
-            clienteDemo.setTelefono("0991234567");
-            clienteDemo.setActivo(true);
-            clienteRepository.save(clienteDemo);
-
-            Cliente cliente2 = new Cliente();
-            cliente2.setNombre("Juan Pérez");
-            cliente2.setCorreo("juan.perez@ejemplo.com");
-            cliente2.setContrasena("123456");
-            cliente2.setTelefono("0987654321");
-            cliente2.setActivo(true);
-            clienteRepository.save(cliente2);
-
-            System.out.println("✅ [DataInitializer] Clientes demo creados.");
+        if (clienteRepository.count() > 0) {
+            System.out.println("[DataInitializer] Clientes ya existentes, saltando inicialización.");
+            return;
         }
+
+        crearCliente("María González", "maria.gonzalez@ejemplo.com", "0987654321");
+        crearCliente("José Rodríguez", "jose.rodriguez@ejemplo.com", "0955555555");
+        crearCliente("Laura Martínez", "laura.martinez@ejemplo.com", "0933333333");
+        crearCliente("Ana López (Cliente Demo)", "ana.lopez@ejemplo.com", "0991234567");
+        crearCliente("Juan Pérez", "juan.perez@ejemplo.com", "0987654321");
+
+        System.out.println("[DataInitializer] Clientes demo creados con BCrypt.");
+    }
+
+    private void crearCliente(String nombre, String correo, String telefono) {
+        Cliente cliente = new Cliente();
+        cliente.setNombre(nombre);
+        cliente.setCorreo(correo);
+        cliente.setTelefono(telefono);
+        cliente.setPassword(passwordEncoder.encode("123456"));
+        cliente.setActivo(true);
+        cliente.setVerificado(true);
+        clienteRepository.save(cliente);
     }
 
     private void inicializarCatalogoYEmpleados() {
-        // 1. Categoría
-        CategoriaServicio categoria;
-        if (categoriaRepository.count() == 0) {
-            categoria = new CategoriaServicio();
-            categoria.setNombre("Salud y Bienestar");
-            categoria.setDescripcion("Servicios generales de atención, cuidado personal y bienestar.");
-            categoria = categoriaRepository.save(categoria);
-        } else {
-            categoria = categoriaRepository.findAll().get(0);
+        // 1. Categorías
+        CategoriaServicio categoriaSalud = obtenerOCrearCategoria(
+                "Salud y Bienestar",
+                "Servicios generales de atención, cuidado personal y bienestar.");
+        CategoriaServicio categoriaBarberia = obtenerOCrearCategoria(
+                "Barbería y Estilo",
+                "Cortes de cabello, arreglo de barba y cuidado del estilo personal.");
+
+        // 2. Servicios demo
+        List<Servicio> existentes = servicioRepository.findAll();
+        Set<String> nombresExistentes = new HashSet<>();
+        for (Servicio s : existentes) {
+            nombresExistentes.add(s.getNombre().toLowerCase());
         }
 
-        // 2. Servicios
-        List<Servicio> servicios = servicioRepository.findAll();
-        if (servicios.isEmpty()) {
-            Servicio s1 = new Servicio();
-            s1.setNombre("Consulta General y Diagnóstico");
-            s1.setDescripcion("Evaluación completa personalizada con recomendaciones profesionales.");
-            s1.setPrecio(new BigDecimal("25.00"));
-            s1.setDuracionMinutos(30);
-            s1.setActivo(true);
-            s1.setCategoria(categoria);
-            s1 = servicioRepository.save(s1);
+        List<Servicio> servicios = new ArrayList<>(existentes);
+        crearServicioSiNoExiste(servicios, nombresExistentes, "Consulta General y Diagnóstico",
+                "Evaluación completa personalizada con recomendaciones profesionales.",
+                new BigDecimal("25.00"), 30, categoriaSalud);
+        crearServicioSiNoExiste(servicios, nombresExistentes, "Sesión Terapéutica Integral",
+                "Tratamiento especializado integral de relajación y cuidado.",
+                new BigDecimal("40.00"), 45, categoriaSalud);
+        crearServicioSiNoExiste(servicios, nombresExistentes, "Revisión y Seguimiento Premium",
+                "Control detallado de progreso con plan de acción.",
+                new BigDecimal("30.00"), 30, categoriaSalud);
+        crearServicioSiNoExiste(servicios, nombresExistentes, "Corte Clásico",
+                "Corte de cabello a tijera y máquina con lavado incluido.",
+                new BigDecimal("12.00"), 30, categoriaBarberia);
+        crearServicioSiNoExiste(servicios, nombresExistentes, "Corte + Perfilado de Barba",
+                "Paquete completo de corte de cabello y arreglo de barba.",
+                new BigDecimal("18.00"), 45, categoriaBarberia);
+        crearServicioSiNoExiste(servicios, nombresExistentes, "Arreglo de Barba",
+                "Perfilado y recorte de barba con toalla caliente.",
+                new BigDecimal("8.00"), 20, categoriaBarberia);
+        crearServicioSiNoExiste(servicios, nombresExistentes, "Tinte o Color",
+                "Aplicación de color o tinte con productos profesionales.",
+                new BigDecimal("25.00"), 60, categoriaBarberia);
 
-            Servicio s2 = new Servicio();
-            s2.setNombre("Sesión Terapéutica Integral");
-            s2.setDescripcion("Tratamiento especializado integral de relajación y cuidado.");
-            s2.setPrecio(new BigDecimal("40.00"));
-            s2.setDuracionMinutos(45);
-            s2.setActivo(true);
-            s2.setCategoria(categoria);
-            s2 = servicioRepository.save(s2);
-
-            Servicio s3 = new Servicio();
-            s3.setNombre("Revisión y Seguimiento Premium");
-            s3.setDescripcion("Control detallado de progreso con plan de acción.");
-            s3.setPrecio(new BigDecimal("30.00"));
-            s3.setDuracionMinutos(30);
-            s3.setActivo(true);
-            s3.setCategoria(categoria);
-            s3 = servicioRepository.save(s3);
-
-            servicios = List.of(s1, s2, s3);
-            System.out.println("✅ [DataInitializer] Servicios creados.");
-        } else {
-            // Reparar servicios existentes (p.ej. columna `activo` recién agregada
-            // quedó en NULL en tablas creadas por versiones anteriores).
-            for (Servicio s : servicios) {
-                if (s.getActivo() == null || !s.getActivo()) {
-                    s.setActivo(true);
-                    servicioRepository.save(s);
-                }
-            }
-            System.out.println("✅ [DataInitializer] Servicios existentes verificados (activos).");
-        }
-
-        // 3. Especialidad
-        Especialidad especialidad;
-        if (especialidadRepository.count() == 0) {
-            especialidad = new Especialidad();
-            especialidad.setNombre("Especialista en Atención");
-            especialidad.setDescripcion("Profesional certificado con experiencia en atención al cliente.");
-            especialidad = especialidadRepository.save(especialidad);
-        } else {
-            especialidad = especialidadRepository.findAll().get(0);
-        }
-
-        // 4. Empleados y vinculación con servicios
-        List<Empleado> empleados = empleadoRepository.findAll();
-        if (empleados.isEmpty()) {
-            Empleado emp1 = new Empleado();
-            emp1.setNombre("Carlos Mendoza (Especialista)");
-            emp1.setCorreo("carlos.mendoza@empresa.com");
-            emp1.setContrasena("123456");
-            emp1.setActivo(true);
-            emp1.setEspecialidad(especialidad);
-            emp1.setServicios(new ArrayList<>(servicios));
-            empleadoRepository.save(emp1);
-
-            Empleado emp2 = new Empleado();
-            emp2.setNombre("Dra. Sofía Herrera");
-            emp2.setCorreo("sofia.herrera@empresa.com");
-            emp2.setContrasena("123456");
-            emp2.setActivo(true);
-            emp2.setEspecialidad(especialidad);
-            emp2.setServicios(new ArrayList<>(servicios));
-            empleadoRepository.save(emp2);
-
-            System.out.println("✅ [DataInitializer] Especialistas creados y vinculados a los servicios.");
-        } else {
-            // Asegurar que los empleados existentes tengan asignados todos los servicios.
-            // Se reasigna SIEMPRE para reparar tablas join `empleado_servicio` vacías o
-            // desactualizadas en bases de datos creadas por versiones anteriores.
-            for (Empleado emp : empleados) {
-                List<Servicio> actuales = emp.getServicios();
-                boolean incompleto = actuales == null || actuales.isEmpty();
-                if (!incompleto) {
-                    List<Long> idsActuales = actuales.stream().map(Servicio::getId).toList();
-                    incompleto = servicios.stream().anyMatch(s -> !idsActuales.contains(s.getId()));
-                }
-                if (incompleto) {
-                    emp.setServicios(new ArrayList<>(servicios));
-                    empleadoRepository.save(emp);
-                }
+        // Reparar servicios existentes con activo en NULL o false
+        for (Servicio s : servicioRepository.findAll()) {
+            if (s.getActivo() == null || !s.getActivo()) {
+                s.setActivo(true);
+                servicioRepository.save(s);
             }
         }
+        System.out.println("[DataInitializer] Catálogo de servicios verificado (" + servicios.size() + " servicios).");
+
+        // 3. Especialidades
+        Especialidad especialidadAtencion = obtenerOCrearEspecialidad(
+                "Especialista en Atención",
+                "Profesional certificado con experiencia en atención al cliente.");
+        Especialidad especialidadBarberia = obtenerOCrearEspecialidad(
+                "Barbero Profesional",
+                "Barbero y estilista certificado en cortes y cuidado personal.");
+
+        // 4. Empleados demo
+        crearEmpleadoSiNoExiste("Carlos Mendoza (Especialista)", "carlos.mendoza@empresa.com", especialidadAtencion);
+        crearEmpleadoSiNoExiste("Dra. Sofía Herrera", "sofia.herrera@empresa.com", especialidadAtencion);
+        crearEmpleadoSiNoExiste("Luis Ramírez (Barbero)", "luis.ramirez@empresa.com", especialidadBarberia);
+        crearEmpleadoSiNoExiste("Valentina Cruz (Estilista)", "valentina.cruz@empresa.com", especialidadBarberia);
+
+        // 5. Servicios agrupados por rubro
+        List<Servicio> serviciosSalud = servicios.stream()
+                .filter(s -> s.getCategoria().getId().equals(categoriaSalud.getId()))
+                .toList();
+        List<Servicio> serviciosBarberia = servicios.stream()
+                .filter(s -> s.getCategoria().getId().equals(categoriaBarberia.getId()))
+                .toList();
+
+        Map<String, List<Servicio>> serviciosPorCorreo = Map.of(
+                "carlos.mendoza@empresa.com", serviciosSalud,
+                "sofia.herrera@empresa.com", serviciosSalud,
+                "luis.ramirez@empresa.com", serviciosBarberia,
+                "valentina.cruz@empresa.com", serviciosBarberia
+        );
+
+        // 6. Vincular cada especialista solo con los servicios de su rubro
+        //    (repara también vínculos incorrectos de versiones anteriores)
+        for (Empleado emp : empleadoRepository.findAll()) {
+            List<Servicio> correctos = serviciosPorCorreo.get(emp.getCorreo());
+            if (correctos == null) {
+                continue;
+            }
+
+            Set<Long> idsCorrectos = new HashSet<>();
+            for (Servicio s : correctos) {
+                idsCorrectos.add(s.getId());
+            }
+
+            boolean difiere = emp.getServicios() == null
+                    || emp.getServicios().size() != idsCorrectos.size()
+                    || emp.getServicios().stream()
+                            .map(Servicio::getId)
+                            .anyMatch(id -> !idsCorrectos.contains(id));
+
+            if (difiere) {
+                emp.setServicios(new ArrayList<>(correctos));
+                empleadoRepository.save(emp);
+            }
+        }
+        System.out.println("[DataInitializer] Especialistas verificados y vinculados a los servicios de su rubro.");
+    }
+
+    private CategoriaServicio obtenerOCrearCategoria(String nombre, String descripcion) {
+        return categoriaRepository.findAll().stream()
+                .filter(c -> c.getNombre().equalsIgnoreCase(nombre))
+                .findFirst()
+                .orElseGet(() -> {
+                    CategoriaServicio categoria = new CategoriaServicio();
+                    categoria.setNombre(nombre);
+                    categoria.setDescripcion(descripcion);
+                    return categoriaRepository.save(categoria);
+                });
+    }
+
+    private Especialidad obtenerOCrearEspecialidad(String nombre, String descripcion) {
+        return especialidadRepository.findAll().stream()
+                .filter(e -> e.getNombre().equalsIgnoreCase(nombre))
+                .findFirst()
+                .orElseGet(() -> {
+                    Especialidad especialidad = new Especialidad();
+                    especialidad.setNombre(nombre);
+                    especialidad.setDescripcion(descripcion);
+                    return especialidadRepository.save(especialidad);
+                });
+    }
+
+    private void crearServicioSiNoExiste(List<Servicio> servicios, Set<String> nombresExistentes,
+                                         String nombre, String descripcion, BigDecimal precio,
+                                         int duracionMinutos, CategoriaServicio categoria) {
+        if (nombresExistentes.contains(nombre.toLowerCase())) {
+            return;
+        }
+
+        Servicio servicio = new Servicio();
+        servicio.setNombre(nombre);
+        servicio.setDescripcion(descripcion);
+        servicio.setPrecio(precio);
+        servicio.setDuracionMinutos(duracionMinutos);
+        servicio.setActivo(true);
+        servicio.setCategoria(categoria);
+        servicio = servicioRepository.save(servicio);
+
+        servicios.add(servicio);
+        nombresExistentes.add(nombre.toLowerCase());
+        System.out.println("[DataInitializer] Servicio demo creado: " + nombre + ".");
+    }
+
+    private void crearEmpleadoSiNoExiste(String nombre, String correo, Especialidad especialidad) {
+        if (empleadoRepository.existsByCorreo(correo)) {
+            return;
+        }
+
+        Empleado empleado = new Empleado();
+        empleado.setNombre(nombre);
+        empleado.setCorreo(correo);
+        empleado.setPassword(passwordEncoder.encode("123456"));
+        empleado.setActivo(true);
+        empleado.setVerificado(true);
+        empleado.setEspecialidad(especialidad);
+        empleadoRepository.save(empleado);
+        System.out.println("[DataInitializer] Especialista creado: " + nombre + ".");
     }
 
     private void inicializarHorariosDisponibilidad() {
@@ -183,39 +264,32 @@ public class DataInitializer implements CommandLineRunner {
         if (empleados.isEmpty()) return;
 
         LocalDate hoy = LocalDate.now();
-        int diasAGenerar = 60; // Generar disponibilidad para los próximos 60 días
+        int diasAGenerar = 60;
 
         int horariosCreados = 0;
         for (int i = 0; i <= diasAGenerar; i++) {
             LocalDate fecha = hoy.plusDays(i);
 
             for (Empleado emp : empleados) {
-                // Verificar si ya tiene bloques en esa fecha
                 List<HorarioDisponibilidad> existentes = horarioRepository
-                        .findDisponiblesByServicioAndFecha(
-                                emp.getServicios().isEmpty() ? 1L : emp.getServicios().get(0).getId(),
-                                fecha,
-                                EstadoHorario.DISPONIBLE
-                        );
+                        .findByEmpleadoIdAndFechaAndEstado(emp.getId(), fecha, EstadoHorario.DISPONIBLE);
 
                 if (existentes.isEmpty()) {
-                    // Turno Mañana: 08:00 - 12:00
-                    HorarioDisponibilidad bloque1 = new HorarioDisponibilidad();
-                    bloque1.setEmpleado(emp);
-                    bloque1.setFecha(fecha);
-                    bloque1.setHoraInicio(LocalTime.of(8, 0));
-                    bloque1.setHoraFin(LocalTime.of(12, 0));
-                    bloque1.setEstado(EstadoHorario.DISPONIBLE);
-                    horarioRepository.save(bloque1);
+                    HorarioDisponibilidad bloqueManana = new HorarioDisponibilidad();
+                    bloqueManana.setEmpleado(emp);
+                    bloqueManana.setFecha(fecha);
+                    bloqueManana.setHoraInicio(LocalTime.of(8, 0));
+                    bloqueManana.setHoraFin(LocalTime.of(12, 0));
+                    bloqueManana.setEstado(EstadoHorario.DISPONIBLE);
+                    horarioRepository.save(bloqueManana);
 
-                    // Turno Tarde: 13:00 - 18:00
-                    HorarioDisponibilidad bloque2 = new HorarioDisponibilidad();
-                    bloque2.setEmpleado(emp);
-                    bloque2.setFecha(fecha);
-                    bloque2.setHoraInicio(LocalTime.of(13, 0));
-                    bloque2.setHoraFin(LocalTime.of(18, 0));
-                    bloque2.setEstado(EstadoHorario.DISPONIBLE);
-                    horarioRepository.save(bloque2);
+                    HorarioDisponibilidad bloqueTarde = new HorarioDisponibilidad();
+                    bloqueTarde.setEmpleado(emp);
+                    bloqueTarde.setFecha(fecha);
+                    bloqueTarde.setHoraInicio(LocalTime.of(13, 0));
+                    bloqueTarde.setHoraFin(LocalTime.of(18, 0));
+                    bloqueTarde.setEstado(EstadoHorario.DISPONIBLE);
+                    horarioRepository.save(bloqueTarde);
 
                     horariosCreados += 2;
                 }
@@ -223,7 +297,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         if (horariosCreados > 0) {
-            System.out.println("✅ [DataInitializer] Se generaron " + horariosCreados + " bloques de disponibilidad para los próximos 60 días.");
+            System.out.println("[DataInitializer] Se generaron " + horariosCreados + " bloques de disponibilidad para los próximos 60 días.");
         }
     }
 }

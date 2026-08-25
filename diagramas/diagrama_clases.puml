@@ -1,23 +1,8 @@
 @startuml Diagrama_Clases_JPA
 
-package "com.gestioncitas" {
+package com.gestioncitas {
 
-    ' Enumeraciones
-    enum EstadoCita <<Enumerated>> {
-        PENDIENTE
-        CONFIRMADA
-        CANCELADA
-        COMPLETADA
-    }
-
-    enum EstadoHorario <<Enumerated>> {
-        DISPONIBLE
-        RESERVADO
-        BLOQUEADO
-    }
-
-    ' Clase Base Mapeada
-    abstract class Usuario <<MappedSuperclass>> {
+    abstract class Usuario {
         - id : Long
         - nombre : String
         - correo : String
@@ -25,36 +10,36 @@ package "com.gestioncitas" {
         - activo : Boolean
     }
 
-    class Administrador <<Entity>> {
+    class Administrador {
     }
 
-    class Cliente <<Entity>> {
+    class Cliente {
         - telefono : String
         - citas : List<Cita>
     }
 
-    class Empleado <<Entity>> {
+    class Empleado {
         - especialidad : Especialidad
         - servicios : List<Servicio>
         - horarios : List<HorarioDisponibilidad>
         - citas : List<Cita>
     }
 
-    class Especialidad <<Entity>> {
+    class Especialidad {
         - id : Long
         - nombre : String
         - descripcion : String
         - empleados : List<Empleado>
     }
 
-    class CategoriaServicio <<Entity>> {
+    class CategoriaServicio {
         - id : Long
         - nombre : String
         - descripcion : String
         - servicios : List<Servicio>
     }
 
-    class Servicio <<Entity>> {
+    class Servicio {
         - id : Long
         - nombre : String
         - descripcion : String
@@ -65,24 +50,79 @@ package "com.gestioncitas" {
         - empleados : List<Empleado>
     }
 
-    class HorarioDisponibilidad <<Entity>> {
+    class HorarioDisponibilidad {
         - id : Long
         - fecha : LocalDate
         - horaInicio : LocalTime
         - horaFin : LocalTime
-        - estado : EstadoHorario
+        - estado : String
         - empleado : Empleado
     }
 
-    class Cita <<Entity>> {
+    class Cita {
         - id : Long
         - fecha : LocalDate
         - hora : LocalTime
-        - estado : EstadoCita
+        - estado : String
         - fechaRegistro : LocalDateTime
         - cliente : Cliente
         - empleado : Empleado
         - servicio : Servicio
+    }
+
+    ' ===== Capa de Lógica de Negocio (Servicios) =====
+    ' Define los requerimientos de acceso a datos (repositorios)
+
+    class UsuarioService <<service>> {
+        + autenticar(correo, password) : Optional<Usuario>
+        + registrar(ClienteRegistroDTO) : Optional<Cliente>
+        + verificar(token) : Optional<Usuario>
+        + solicitarRecuperacion(correo) : Optional<Usuario>
+        + tokenRecuperacionExiste(token) : boolean
+        + tokenRecuperacionValido(token) : boolean
+        + restablecerPassword(RestablecerPasswordDTO) : Optional<Usuario>
+    }
+
+    class EmpleadoService <<service>> {
+        + crear(EmpleadoRequestDTO) : EmpleadoResponseDTO
+        + actualizar(id : Long, EmpleadoRequestDTO) : EmpleadoResponseDTO
+        + darDeBaja(id : Long) : EmpleadoResponseDTO
+        + listarActivos() : List<EmpleadoResponseDTO>
+    }
+
+    class HorarioDisponibilidadService <<service>> {
+        + asignar(HorarioRequestDTO) : HorarioResponseDTO
+        + consultarDisponibilidad(empleadoId : Long, fecha : LocalDate) : List<HorarioResponseDTO>
+    }
+
+    ' ===== Capa de Acceso a Datos (Repositorios) =====
+    ' Métodos específicos declarados además de los heredados de JpaRepository
+
+    class UsuarioRepository <<repository>> {
+        + findByCorreo(correo : String) : Optional<Usuario>
+        + findByTokenVerificacion(token : String) : Optional<Usuario>
+        + findByTokenRecuperacion(token : String) : Optional<Usuario>
+        + existsByCorreo(correo : String) : boolean
+    }
+
+    class ClienteRepository <<repository>> {
+    }
+
+    class AdministradorRepository <<repository>> {
+    }
+
+    class EmpleadoRepository <<repository>> {
+        + existsByCorreo(correo : String) : boolean
+        + existsByCorreoAndIdNot(correo : String, id : Long) : boolean
+        + findByActivoTrue() : List<Empleado>
+    }
+
+    class EspecialidadRepository <<repository>> {
+    }
+
+    class HorarioDisponibilidadRepository <<repository>> {
+        + findByEmpleadoIdAndFechaAndEstado(empleadoId : Long, fecha : LocalDate, estado : String) : List<HorarioDisponibilidad>
+        + findByEmpleadoIdAndEstado(empleadoId : Long, estado : String) : List<HorarioDisponibilidad>
     }
 
     ' Relaciones de herencia Java
@@ -101,8 +141,14 @@ package "com.gestioncitas" {
 
     Empleado "*" -- "*" Servicio : "asociados"
     Cita "*" --> "1" Servicio : "reserva"
-    Cita --> EstadoCita
-    HorarioDisponibilidad --> EstadoHorario
+
+    ' Dependencias de la capa de servicios sobre los repositorios
+    UsuarioService ..> UsuarioRepository : usa
+    UsuarioService ..> ClienteRepository : usa
+    EmpleadoService ..> EmpleadoRepository : usa
+    EmpleadoService ..> EspecialidadRepository : usa
+    HorarioDisponibilidadService ..> HorarioDisponibilidadRepository : usa
+    HorarioDisponibilidadService ..> EmpleadoRepository : usa
 }
 
 @enduml
