@@ -1,7 +1,5 @@
 # Sincronización develop → main (Release Estable)
 
-*Informe del trabajo realizado para revisión del docente/coordinador.*
-
 Documentación del proceso de sincronización entre las ramas `develop` y `main`, la resolución de conflictos del PR #16 y el estado final de la release.
 
 ## Resumen Ejecutivo
