@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * API REST de citas (SCRUM-1, autor: SamAlonsopp).
+ * API REST de citas (SCRUM-1, autor: Sam Alonso).
  * GET  /api/citas/disponibilidad -> bloques horarios libres
  * POST /api/citas/reservar       -> registra la reserva con anti-double booking
  */

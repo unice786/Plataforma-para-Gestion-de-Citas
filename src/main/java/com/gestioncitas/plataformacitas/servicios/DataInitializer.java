@@ -32,8 +32,10 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Inicializador de datos de prueba (SCRUM-1, autor: SamAlonsopp).
- * Adaptado al modelo actual: contraseñas encriptadas con BCrypt.
+ * Inicializador de datos de prueba (SCRUM-1).
+ * Datos base y adaptacion al modelo actual: Sam Alonso.
+ * Ampliacion (categoria Barberia y Estilo, servicios demo y
+ * especialistas vinculados por rubro): May Menendez.
  * Garantiza que existan clientes demo, catálogo de servicios,
  * especialistas y bloques de disponibilidad para los próximos 60 días.
  */
