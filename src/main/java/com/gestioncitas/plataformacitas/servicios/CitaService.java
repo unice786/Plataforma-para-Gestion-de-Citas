@@ -1,6 +1,7 @@
 package com.gestioncitas.plataformacitas.servicios;
 
 import com.gestioncitas.plataformacitas.dto.CitaResponseDTO;
+import com.gestioncitas.plataformacitas.dto.EdicionCitaRequestDTO;
 import com.gestioncitas.plataformacitas.dto.HorarioDisponibleDTO;
 import com.gestioncitas.plataformacitas.dto.ReservaCitaRequestDTO;
 import com.gestioncitas.plataformacitas.excepciones.HorarioNoDisponibleException;
@@ -254,6 +255,55 @@ public class CitaService {
         );
     }
 
+    /** Modifica una cita existente y evita que el nuevo horario se solape con otra cita activa. */
+    @Transactional
+    public void editarCita(Long citaId, EdicionCitaRequestDTO request) {
+        Cita cita = citaRepository.buscarPorIdParaAdministrador(citaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cita", citaId));
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            throw new IllegalStateException("No se puede modificar una cita cancelada.");
+        }
+
+        Servicio nuevoServicio = buscarServicio(request.getServicioId());
+        if (!Boolean.TRUE.equals(nuevoServicio.getActivo())) {
+            throw new IllegalArgumentException("No se puede asignar un servicio inactivo.");
+        }
+
+        LocalTime nuevoFin = request.getHora().plusMinutes(nuevoServicio.getDuracionMinutos());
+        List<Cita> citasExistentes = citaRepository.findCitasActivasByEmpleadoAndFecha(
+                cita.getEmpleado().getId(), request.getFecha(), ESTADOS_ACTIVOS);
+        boolean hayConflicto = citasExistentes.stream()
+                .filter(otraCita -> !otraCita.getId().equals(citaId))
+                .anyMatch(otraCita -> seSolapa(request.getHora(), nuevoFin, otraCita,
+                        nuevoServicio.getDuracionMinutos()));
+        if (hayConflicto) {
+            throw new HorarioNoDisponibleException("El horario seleccionado se solapa con otra cita activa del empleado.");
+        }
+
+        String detalle = String.format("Cita modificada: %s %s, servicio %s.",
+                request.getFecha(), request.getHora(), nuevoServicio.getNombre());
+        cita.setFecha(request.getFecha());
+        cita.setHora(request.getHora());
+        cita.setServicio(nuevoServicio);
+        cita.setFechaUltimaModificacion(LocalDateTime.now());
+        cita.setDetalleUltimoCambio(detalle);
+        citaRepository.save(cita);
+    }
+
+    /** Conserva la cita como historial y cambia su estado a CANCELADA. */
+    @Transactional
+    public void cancelarCita(Long citaId) {
+        Cita cita = citaRepository.buscarPorIdParaAdministrador(citaId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cita", citaId));
+        if (cita.getEstado() == EstadoCita.CANCELADA) {
+            throw new IllegalStateException("La cita ya se encontraba cancelada.");
+        }
+        cita.setEstado(EstadoCita.CANCELADA);
+        cita.setFechaUltimaModificacion(LocalDateTime.now());
+        cita.setDetalleUltimoCambio("Cita cancelada por el administrador.");
+        citaRepository.save(cita);
+    }
+
     // ══════════════════════════════════════════════════════════════════════
     // MÉTODOS AUXILIARES PRIVADOS
     // ══════════════════════════════════════════════════════════════════════
@@ -272,6 +322,13 @@ public class CitaService {
             }
         }
         return false;
+    }
+
+    private boolean seSolapa(LocalTime nuevoInicio, LocalTime nuevoFin, Cita cita,
+                              int duracionAlternativa) {
+        LocalTime finExistente = cita.getHora().plusMinutes(cita.getServicio() != null
+                ? cita.getServicio().getDuracionMinutos() : duracionAlternativa);
+        return cita.getHora().isBefore(nuevoFin) && nuevoInicio.isBefore(finExistente);
     }
 
     private Cliente buscarCliente(Long id) {

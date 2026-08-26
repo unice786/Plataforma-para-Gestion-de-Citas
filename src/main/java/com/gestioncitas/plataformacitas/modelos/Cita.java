@@ -26,7 +26,6 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 public class Cita {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -62,4 +61,10 @@ public class Cita {
 	@NotNull(message = "La fecha de registro es obligatoria")
 	@Column(name = "fecha_registro", nullable = false)
 	private LocalDateTime fechaRegistro = LocalDateTime.now();
+
+	@Column(name = "fecha_ultima_modificacion")
+	private LocalDateTime fechaUltimaModificacion;
+
+	@Column(name = "detalle_ultimo_cambio", length = 500)
+	private String detalleUltimoCambio;
 }
