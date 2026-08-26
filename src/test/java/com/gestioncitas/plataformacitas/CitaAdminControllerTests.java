@@ -2,9 +2,12 @@ package com.gestioncitas.plataformacitas;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
 import com.gestioncitas.plataformacitas.modelos.Cita;
@@ -46,6 +49,7 @@ class CitaAdminControllerTests {
 
     private LocalDate fechaPrimera;
     private LocalDate fechaSegunda;
+    private Cita citaAna;
 
     @BeforeEach
     void prepararDatos() {
@@ -85,7 +89,7 @@ class CitaAdminControllerTests {
         Cliente bruno = crearCliente("Bruno Díaz", "bruno@ejemplo.com");
         fechaPrimera = LocalDate.now().plusDays(2);
         fechaSegunda = LocalDate.now().plusDays(4);
-        crearCita(ana, empleado, servicio, fechaPrimera, LocalTime.of(9, 0));
+        citaAna = crearCita(ana, empleado, servicio, fechaPrimera, LocalTime.of(9, 0));
         crearCita(bruno, empleado, servicio, fechaSegunda, LocalTime.of(11, 30));
     }
 
@@ -116,6 +120,61 @@ class CitaAdminControllerTests {
                 .andExpect(content().string(org.hamcrest.Matchers.not(containsString("Ana López"))));
     }
 
+    @Test
+    void administradorPuedeModificarFechaHoraYServicioDeUnaCita() throws Exception {
+        LocalDate nuevaFecha = fechaPrimera.plusDays(1);
+
+        mockMvc.perform(post("/admin/citas/{id}/editar", citaAna.getId())
+                        .with(csrf())
+                        .param("fecha", nuevaFecha.toString())
+                        .param("hora", "10:15")
+                        .param("servicioId", citaAna.getServicio().getId().toString()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/citas"));
+
+        Cita actualizada = citaRepository.findById(citaAna.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertEquals(nuevaFecha, actualizada.getFecha());
+        org.junit.jupiter.api.Assertions.assertEquals(LocalTime.of(10, 15), actualizada.getHora());
+        org.junit.jupiter.api.Assertions.assertNotNull(actualizada.getFechaUltimaModificacion());
+        org.junit.jupiter.api.Assertions.assertTrue(actualizada.getDetalleUltimoCambio().contains("Cita modificada"));
+    }
+
+    @Test
+    void muestraElFormularioParaModificarUnaCita() throws Exception {
+        mockMvc.perform(get("/admin/citas/{id}/editar", citaAna.getId()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/citas/formulario"))
+                .andExpect(content().string(containsString("Modificar cita")));
+    }
+
+    @Test
+    void rechazaUnaModificacionQueSeSolapaConOtraCita() throws Exception {
+        mockMvc.perform(post("/admin/citas/{id}/editar", citaAna.getId())
+                        .with(csrf())
+                        .param("fecha", fechaSegunda.toString())
+                        .param("hora", "11:30")
+                        .param("servicioId", citaAna.getServicio().getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/citas/formulario"))
+                .andExpect(content().string(containsString("solapa")));
+
+        Cita sinCambios = citaRepository.findById(citaAna.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertEquals(fechaPrimera, sinCambios.getFecha());
+        org.junit.jupiter.api.Assertions.assertEquals(LocalTime.of(9, 0), sinCambios.getHora());
+    }
+
+    @Test
+    void administradorPuedeCancelarUnaCitaSinEliminarSuHistorial() throws Exception {
+        mockMvc.perform(post("/admin/citas/{id}/cancelar", citaAna.getId()).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/admin/citas"));
+
+        Cita cancelada = citaRepository.findById(citaAna.getId()).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertEquals(com.gestioncitas.plataformacitas.modelos.EstadoCita.CANCELADA,
+                cancelada.getEstado());
+        org.junit.jupiter.api.Assertions.assertTrue(cancelada.getDetalleUltimoCambio().contains("cancelada"));
+    }
+
     private Cliente crearCliente(String nombre, String correo) {
         Cliente cliente = new Cliente();
         cliente.setNombre(nombre);
@@ -125,13 +184,13 @@ class CitaAdminControllerTests {
         return clienteRepository.save(cliente);
     }
 
-    private void crearCita(Cliente cliente, Empleado empleado, Servicio servicio, LocalDate fecha, LocalTime hora) {
+    private Cita crearCita(Cliente cliente, Empleado empleado, Servicio servicio, LocalDate fecha, LocalTime hora) {
         Cita cita = new Cita();
         cita.setCliente(cliente);
         cita.setEmpleado(empleado);
         cita.setServicio(servicio);
         cita.setFecha(fecha);
         cita.setHora(hora);
-        citaRepository.save(cita);
+        return citaRepository.save(cita);
     }
 }

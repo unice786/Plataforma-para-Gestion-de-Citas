@@ -35,6 +35,10 @@ public class Cita {
     private EstadoCita estado = EstadoCita.PENDIENTE;
     @jakarta.persistence.Column(name = "fecha_registro")
     private LocalDateTime fechaRegistro;
+    @jakarta.persistence.Column(name = "fecha_ultima_modificacion")
+    private LocalDateTime fechaUltimaModificacion;
+    @jakarta.persistence.Column(name = "detalle_ultimo_cambio", length = 500)
+    private String detalleUltimoCambio;
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Cliente getCliente() { return cliente; }
@@ -51,4 +55,8 @@ public class Cita {
     public void setEstado(EstadoCita estado) { this.estado = estado; }
     public LocalDateTime getFechaRegistro() { return fechaRegistro; }
     public void setFechaRegistro(LocalDateTime fechaRegistro) { this.fechaRegistro = fechaRegistro; }
+    public LocalDateTime getFechaUltimaModificacion() { return fechaUltimaModificacion; }
+    public void setFechaUltimaModificacion(LocalDateTime fechaUltimaModificacion) { this.fechaUltimaModificacion = fechaUltimaModificacion; }
+    public String getDetalleUltimoCambio() { return detalleUltimoCambio; }
+    public void setDetalleUltimoCambio(String detalleUltimoCambio) { this.detalleUltimoCambio = detalleUltimoCambio; }
 }
