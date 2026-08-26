@@ -1,13 +1,13 @@
 package com.gestioncitas.plataformacitas.repositorios;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
 import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 
 public interface HorarioDisponibilidadRepository extends JpaRepository<HorarioDisponibilidad, Long> {
@@ -15,6 +15,21 @@ public interface HorarioDisponibilidadRepository extends JpaRepository<HorarioDi
 	List<HorarioDisponibilidad> findByEmpleadoIdAndFechaAndEstado(Long empleadoId, LocalDate fecha, String estado);
 
 	List<HorarioDisponibilidad> findByEmpleadoIdAndEstado(Long empleadoId, String estado);
+
+	List<HorarioDisponibilidad> findByEstadoOrderByFechaAscHoraInicioAsc(String estado);
+
+	boolean existsByEmpleadoIdAndFechaAndHoraInicioAndHoraFin(
+			Long empleadoId, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin);
+
+	boolean existsByEmpleadoIdAndFechaAndHoraInicioAndHoraFinAndIdNot(
+			Long empleadoId, LocalDate fecha, LocalTime horaInicio, LocalTime horaFin, Long id);
+
+	@Query("""
+			SELECT h FROM HorarioDisponibilidad h
+			JOIN FETCH h.empleado
+			ORDER BY h.fecha ASC, h.horaInicio ASC
+			""")
+	List<HorarioDisponibilidad> findAllConEmpleadoOrderByFechaAsc();
 
 	@Query("""
 			SELECT h FROM HorarioDisponibilidad h

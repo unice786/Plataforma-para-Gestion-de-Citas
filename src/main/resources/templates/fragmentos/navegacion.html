@@ -16,10 +16,14 @@
             <a th:href="@{/reservar}"><i class="bi bi-calendar-plus"></i>Reservar</a>
             <a th:href="@{/mis-citas}"><i class="bi bi-calendar-check"></i>Mis citas</a>
             <a th:href="@{/admin/servicios}"><i class="bi bi-gear"></i>Administraci&oacute;n</a>
+            <a th:href="@{/admin/horarios}"><i class="bi bi-clock"></i>Horarios</a>
         </div>
         <div class="app-nav-user">
             <span><i class="bi bi-person-circle me-1"></i><th:block th:if="${session.usuario != null}" th:text="${session.usuario.nombre}"></th:block></span>
             <a th:href="@{/logout}" title="Cerrar sesion"><i class="bi bi-box-arrow-right"></i></a>
+            <button type="button" class="auth-theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+                <i class="bi bi-sun-fill" id="themeIcon"></i>
+            </button>
         </div>
     </div>
 </nav>

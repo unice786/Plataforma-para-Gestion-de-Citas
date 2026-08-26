@@ -297,6 +297,15 @@
     transition:background-color .3s ease,transform .2s ease;
 }
 .auth-theme-toggle:hover{ transform:translateY(-2px); }
+.app-nav .auth-theme-toggle{
+    position:static;
+    top:auto;
+    right:auto;
+    width:38px;
+    height:38px;
+    box-shadow:none;
+    flex-shrink:0;
+}
 
 /* ---------- Decoración: líneas + puntos ---------- */
 .auth-decor{
@@ -379,7 +388,11 @@
     margin:0 auto;
     padding:88px 24px 64px;
 }
-.app-shell.narrow{ max-width:760px; }
+.app-shell.narrow{
+    max-width:760px;
+    margin-left:auto;
+    margin-right:auto;
+}
 
 /* ---------- Encabezado de p�gina ---------- */
 .app-header{
@@ -678,7 +691,7 @@ select option{
     top:0;
     left:0;
     right:0;
-    z-index:15;
+    z-index:30;
     width:100%;
     background-color:var(--auth-card-bg);
     border-radius:0;
@@ -798,6 +811,9 @@ select option{
     display:flex;
     flex-wrap:wrap;
     gap:10px;
+    max-height:280px;
+    overflow-y:auto;
+    padding:4px 2px;
 }
 .slot{
     display:inline-flex;

@@ -1,0 +1,126 @@
+package com.gestioncitas.plataformacitas.controladores;
+
+import com.gestioncitas.plataformacitas.dto.HorarioRequestDTO;
+import com.gestioncitas.plataformacitas.dto.HorarioResponseDTO;
+import com.gestioncitas.plataformacitas.excepciones.HorarioNoDisponibleException;
+import com.gestioncitas.plataformacitas.excepciones.RecursoNoEncontradoException;
+import com.gestioncitas.plataformacitas.servicios.EmpleadoService;
+import com.gestioncitas.plataformacitas.servicios.HorarioDisponibilidadService;
+import jakarta.validation.Valid;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/admin/horarios")
+public class HorarioController {
+
+	private final HorarioDisponibilidadService horarioService;
+	private final EmpleadoService empleadoService;
+
+	public HorarioController(HorarioDisponibilidadService horarioService, EmpleadoService empleadoService) {
+		this.horarioService = horarioService;
+		this.empleadoService = empleadoService;
+	}
+
+	@GetMapping
+	public String listar(Model model) {
+		model.addAttribute("horarios", horarioService.listarTodos());
+		return "admin-horarios";
+	}
+
+	@GetMapping("/nuevo")
+	public String mostrarFormularioNuevo(Model model) {
+		prepararFormulario(model, new HorarioRequestDTO());
+		return "admin-horario-formulario";
+	}
+
+	@PostMapping
+	public String crear(@Valid @ModelAttribute("horario") HorarioRequestDTO horario,
+						BindingResult resultado,
+						Model model,
+						RedirectAttributes atributos) {
+		if (resultado.hasErrors()) {
+			prepararFormulario(model, horario);
+			return "admin-horario-formulario";
+		}
+
+		try {
+			horarioService.crear(horario);
+			atributos.addFlashAttribute("exito", "Horario creado correctamente.");
+			return "redirect:/admin/horarios";
+		} catch (HorarioNoDisponibleException | RecursoNoEncontradoException ex) {
+			model.addAttribute("error", ex.getMessage());
+			prepararFormulario(model, horario);
+			return "admin-horario-formulario";
+		}
+	}
+
+	@GetMapping("/{id}/editar")
+	public String mostrarFormularioEdicion(@PathVariable Long id, Model model,
+										   RedirectAttributes atributos) {
+		try {
+			HorarioResponseDTO existente = horarioService.buscarPorId(id);
+			HorarioRequestDTO horario = new HorarioRequestDTO();
+			horario.setEmpleadoId(existente.getEmpleadoId());
+			horario.setFecha(existente.getFecha());
+			horario.setHoraInicio(existente.getHoraInicio());
+			horario.setHoraFin(existente.getHoraFin());
+			model.addAttribute("horarioId", id);
+			prepararFormulario(model, horario);
+			return "admin-horario-formulario";
+		} catch (RecursoNoEncontradoException ex) {
+			atributos.addFlashAttribute("error", "El horario solicitado no existe.");
+			return "redirect:/admin/horarios";
+		}
+	}
+
+	@PostMapping("/{id}/editar")
+	public String editar(@PathVariable Long id,
+						 @Valid @ModelAttribute("horario") HorarioRequestDTO horario,
+						 BindingResult resultado,
+						 Model model,
+						 RedirectAttributes atributos) {
+		if (resultado.hasErrors()) {
+			model.addAttribute("horarioId", id);
+			prepararFormulario(model, horario);
+			return "admin-horario-formulario";
+		}
+
+		try {
+			horarioService.actualizar(id, horario);
+			atributos.addFlashAttribute("exito", "Horario actualizado correctamente.");
+			return "redirect:/admin/horarios";
+		} catch (RecursoNoEncontradoException ex) {
+			atributos.addFlashAttribute("error", "El horario solicitado no existe.");
+			return "redirect:/admin/horarios";
+		} catch (HorarioNoDisponibleException ex) {
+			model.addAttribute("horarioId", id);
+			model.addAttribute("error", ex.getMessage());
+			prepararFormulario(model, horario);
+			return "admin-horario-formulario";
+		}
+	}
+
+	@PostMapping("/{id}/eliminar")
+	public String eliminar(@PathVariable Long id, RedirectAttributes atributos) {
+		try {
+			horarioService.eliminar(id);
+			atributos.addFlashAttribute("exito", "Horario eliminado correctamente.");
+		} catch (RecursoNoEncontradoException ex) {
+			atributos.addFlashAttribute("error", "El horario solicitado no existe.");
+		}
+		return "redirect:/admin/horarios";
+	}
+
+	private void prepararFormulario(Model model, HorarioRequestDTO horario) {
+		model.addAttribute("horario", horario);
+		model.addAttribute("empleados", empleadoService.listarActivos());
+	}
+}

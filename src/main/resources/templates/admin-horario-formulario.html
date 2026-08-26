@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Citas - Administrar servicios</title>
+    <title th:text="${horarioId == null ? 'Nuevo horario' : 'Editar horario'}">Plataforma Citas - Horario</title>
     <script>
         (function(){
             var saved = localStorage.getItem('auth-theme');
@@ -40,70 +40,56 @@
 
 <nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
 
-<main class="app-shell">
+<main class="app-shell narrow">
+    <a class="app-back-link" th:href="@{/admin/horarios}"><i class="bi bi-arrow-left"></i>Volver al listado</a>
+
     <header class="app-header">
-        <div>
-            <h1>Administración de servicios</h1>
-            <p>Crea, edita o retira servicios del catálogo.</p>
-        </div>
-        <a class="btn-pill" th:href="@{/admin/servicios/nuevo}">
-            <i class="bi bi-plus-lg"></i>Nuevo servicio
-        </a>
+        <h1 th:text="${horarioId == null ? 'Nuevo horario' : 'Editar horario'}"></h1>
     </header>
 
-    <div class="app-alert alert-success" role="status" th:if="${exito}" th:text="${exito}"></div>
     <div class="app-alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
 
-    <section class="app-card flush" th:if="${not #lists.isEmpty(servicios)}">
-        <div class="table-responsive">
-            <table class="table-app">
-                <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Categoría</th>
-                    <th>Precio</th>
-                    <th>Duración</th>
-                    <th>Estado</th>
-                    <th class="text-end-cell">Acciones</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="servicio : ${servicios}">
-                    <td>
-                        <span class="cell-strong" th:text="${servicio.nombre}"></span>
-                        <small class="cell-muted" th:text="${servicio.descripcion}"></small>
-                    </td>
-                    <td th:text="${servicio.categoria.nombre}"></td>
-                    <td th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}"></td>
-                    <td><span th:text="${servicio.duracionMinutos}"></span> min</td>
-                    <td>
-                        <span class="badge-soft" th:if="${servicio.activo}">Activo</span>
-                        <span class="badge-soft neutral" th:unless="${servicio.activo}">Retirado</span>
-                    </td>
-                    <td class="text-end-cell">
-                        <div class="d-inline-flex gap-2">
-                            <a class="btn-pill outline small" th:href="@{/admin/servicios/{id}/editar(id=${servicio.id})}">
-                                <i class="bi bi-pencil-square"></i>Editar
-                            </a>
-                            <form class="d-inline" th:if="${servicio.activo}"
-                                  th:action="@{/admin/servicios/{id}/eliminar(id=${servicio.id})}" method="post">
-                                <button class="btn-pill danger-outline small" type="submit"
-                                        onclick="return confirm('¿Quieres retirar este servicio del catálogo?');">
-                                    <i class="bi bi-trash3"></i>Eliminar
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <div class="app-card empty-state" th:if="${#lists.isEmpty(servicios)}">
-        <i class="bi bi-inbox"></i>
-        Todavía no hay servicios registrados.
+    <div class="app-alert alert-warning" role="alert" th:if="${#lists.isEmpty(empleados)}">
+        No hay empleados activos. Debes registrar al menos un empleado antes de guardar un horario.
     </div>
+
+    <form class="app-card" th:object="${horario}"
+          th:action="${horarioId == null} ? @{/admin/horarios} : @{/admin/horarios/{id}/editar(id=${horarioId})}"
+          method="post">
+        <div class="mb-3">
+            <label class="form-label" for="empleadoId">Empleado</label>
+            <select id="empleadoId" class="form-select" th:field="*{empleadoId}" required>
+                <option value="">Selecciona un empleado</option>
+                <option th:each="empleado : ${empleados}" th:value="${empleado.id}" th:text="${empleado.nombre}"></option>
+            </select>
+            <div class="invalid-feedback d-block" th:errors="*{empleadoId}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="fecha">Fecha</label>
+            <input id="fecha" class="form-control" type="date" th:field="*{fecha}" required>
+            <div class="invalid-feedback d-block" th:errors="*{fecha}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="horaInicio">Hora inicio</label>
+                <input id="horaInicio" class="form-control" type="time" step="60" th:field="*{horaInicio}" required>
+                <div class="invalid-feedback d-block" th:errors="*{horaInicio}"></div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="horaFin">Hora fin</label>
+                <input id="horaFin" class="form-control" type="time" step="60" th:field="*{horaFin}" required>
+                <div class="invalid-feedback d-block" th:errors="*{horaFin}"></div>
+            </div>
+        </div>
+        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('rangoHorarioValido')}" th:errors="*{rangoHorarioValido}"></div>
+
+        <div class="app-actions">
+            <a class="btn-pill outline" th:href="@{/admin/horarios}">Cancelar</a>
+            <button class="btn-pill" type="submit" th:disabled="${#lists.isEmpty(empleados)}">Guardar horario</button>
+        </div>
+    </form>
 </main>
 
 <script>
