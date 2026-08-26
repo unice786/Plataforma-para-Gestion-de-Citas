@@ -15,7 +15,8 @@
             <a th:href="@{/servicios}"><i class="bi bi-spa"></i>Servicios</a>
             <a th:href="@{/reservar}"><i class="bi bi-calendar-plus"></i>Reservar</a>
             <a th:href="@{/mis-citas}"><i class="bi bi-calendar-check"></i>Mis citas</a>
-            <a th:href="@{/admin/servicios}"><i class="bi bi-gear"></i>Administraci&oacute;n</a>
+            <a th:if="${@autorizacionAdministrador.tieneAcceso(session.usuario)}" th:href="@{/admin/citas}"><i class="bi bi-calendar2-week"></i>Gestionar citas</a>
+            <a th:if="${@autorizacionAdministrador.tieneAcceso(session.usuario)}" th:href="@{/admin/servicios}"><i class="bi bi-gear"></i>Administraci&oacute;n</a>
         </div>
         <div class="app-nav-user">
             <span><i class="bi bi-person-circle me-1"></i><th:block th:if="${session.usuario != null}" th:text="${session.usuario.nombre}"></th:block></span>

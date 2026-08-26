@@ -14,6 +14,9 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     @EntityGraph(attributePaths = "servicio")
     List<Cita> findByClienteIdOrderByFechaDescHoraDesc(Long clienteId);
 
+    @EntityGraph(attributePaths = "servicio")
+    List<Cita> findByClienteIdOrderByFechaAscHoraAsc(Long clienteId);
+
     @Query("""
             SELECT c FROM Cita c
             JOIN FETCH c.servicio

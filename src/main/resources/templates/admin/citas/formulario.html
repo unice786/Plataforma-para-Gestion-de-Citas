@@ -14,7 +14,7 @@
 <main class="service-page admin-page">
     <nav class="service-nav"><a class="service-brand" th:href="@{/admin/citas}"><i class="bi bi-calendar2-check-fill"></i> Plataforma de Citas</a><a class="service-nav-back" th:href="@{/admin/citas}"><i class="bi bi-arrow-left"></i> Volver a citas</a></nav>
     <section class="service-form-shell">
-        <header><span class="service-eyebrow"><i class="bi bi-pencil-square"></i> AdministraciÃ³n</span><h1>Modificar cita</h1><p>Actualiza la fecha, hora o servicio solicitado por <strong th:text="${cita.cliente.nombre}"></strong>.</p></header>
+        <header><span class="service-eyebrow"><i class="bi bi-pencil-square"></i> Administración</span><h1>Modificar cita</h1><p>Actualiza la fecha, hora o servicio solicitado por <strong th:text="${cita.cliente.nombre}"></strong>.</p></header>
         <form class="service-form" th:object="${edicionCita}" th:action="@{/admin/citas/{id}/editar(id=${cita.id})}" method="post">
             <div class="service-alert danger service-form-field full" th:if="${#fields.hasGlobalErrors()}" th:errors="*{global}"></div>
             <div class="service-form-field"><label for="fecha">Fecha</label><div><i class="bi bi-calendar-event"></i><input id="fecha" name="fecha" type="date" th:value="${edicionCita.fecha == null ? '' : #temporals.format(edicionCita.fecha, 'yyyy-MM-dd')}" required></div><small th:errors="*{fecha}"></small></div>

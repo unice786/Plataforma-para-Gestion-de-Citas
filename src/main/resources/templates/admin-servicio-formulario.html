@@ -70,7 +70,7 @@
                 <option value="">Selecciona una categoría</option>
                 <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
             </select>
-            <div class="invalid-feedback d-block" th:errors="*{categoria}"></div>
+            <div class="invalid-feedback d-block" th:errors="*{categoria.id}"></div>
         </div>
 
         <div class="mb-3">

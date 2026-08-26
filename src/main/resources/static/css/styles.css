@@ -437,6 +437,11 @@
 }
 .btn-pill:hover{ background-color:var(--auth-accent-hover); color:#fff; }
 .btn-pill:active{ transform:translateY(1px); }
+.btn-pill:disabled{
+    opacity:.65;
+    cursor:wait;
+    transform:none;
+}
 .btn-pill.outline{
     background-color:transparent;
     border-color:var(--auth-input-border);
@@ -572,6 +577,23 @@
     color:var(--auth-accent);
 }
 [data-theme="dark"] .badge-soft.info{ color:var(--auth-link); }
+.badge-soft.pending{
+    background-color:rgba(224,138,30,.14);
+    color:var(--auth-toggle-icon);
+}
+.badge-soft.confirmed{
+    background-color:var(--auth-alert-success-bg);
+    color:var(--auth-alert-success-text);
+}
+.badge-soft.cancelled{
+    background-color:var(--auth-alert-danger-bg);
+    color:var(--auth-alert-danger-text);
+}
+.badge-soft.completed{
+    background-color:rgba(27,90,158,.12);
+    color:var(--auth-accent);
+}
+[data-theme="dark"] .badge-soft.completed{ color:var(--auth-link); }
 
 /* ---------- Alertas dentro de app pages ---------- */
 .app-alert{
@@ -663,6 +685,40 @@ select option{
     display:block;
     margin-bottom:10px;
     opacity:.6;
+}
+.empty-state strong,
+.empty-state span{
+    display:block;
+}
+.empty-state strong{
+    color:var(--auth-text);
+    margin-bottom:5px;
+}
+.empty-state .btn-pill{
+    display:inline-flex;
+    margin-top:18px;
+}
+.error-state .bi{ color:var(--auth-alert-danger-text); }
+
+.loading-state{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    color:var(--auth-text-soft);
+    padding:48px 24px;
+}
+.loading-spinner{
+    width:22px;
+    height:22px;
+    border:3px solid var(--auth-input-border);
+    border-top-color:var(--auth-accent);
+    border-radius:50%;
+    animation:citas-spin .8s linear infinite;
+}
+@keyframes citas-spin{ to{ transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce){
+    .loading-spinner{ animation-duration:1.8s; }
 }
 
 @media (max-width:576px){

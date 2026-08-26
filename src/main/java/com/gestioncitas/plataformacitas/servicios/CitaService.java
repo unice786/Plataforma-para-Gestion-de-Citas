@@ -1,5 +1,6 @@
 package com.gestioncitas.plataformacitas.servicios;
 
+import com.gestioncitas.plataformacitas.dto.CitaClienteResponseDTO;
 import com.gestioncitas.plataformacitas.dto.CitaResponseDTO;
 import com.gestioncitas.plataformacitas.dto.EdicionCitaRequestDTO;
 import com.gestioncitas.plataformacitas.dto.HorarioDisponibleDTO;
@@ -180,6 +181,22 @@ public class CitaService {
         }
 
         return slotsLibres;
+    }
+
+    /**
+     * Obtiene las citas de un cliente ordenadas cronológicamente. El ID recibido
+     * debe provenir de la sesión autenticada y nunca de un parámetro del cliente.
+     */
+    public List<CitaClienteResponseDTO> listarCitasDelCliente(Long clienteId) {
+        return citaRepository.findByClienteIdOrderByFechaAscHoraAsc(clienteId).stream()
+                .map(cita -> new CitaClienteResponseDTO(
+                        cita.getId(),
+                        cita.getFecha(),
+                        cita.getHora(),
+                        cita.getServicio().getNombre(),
+                        cita.getEstado()
+                ))
+                .toList();
     }
 
     // ══════════════════════════════════════════════════════════════════════

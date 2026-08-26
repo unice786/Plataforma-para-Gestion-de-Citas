@@ -1,13 +1,17 @@
 package com.gestioncitas.plataformacitas.controladores;
 
+import com.gestioncitas.plataformacitas.dto.CitaClienteResponseDTO;
 import com.gestioncitas.plataformacitas.dto.CitaResponseDTO;
 import com.gestioncitas.plataformacitas.dto.HorarioDisponibleDTO;
 import com.gestioncitas.plataformacitas.dto.ReservaCitaRequestDTO;
+import com.gestioncitas.plataformacitas.modelos.Cliente;
+import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.servicios.CitaService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * API REST de citas (SCRUM-1, autor: Sam Alonso).
@@ -30,6 +36,22 @@ public class CitaController {
 
     public CitaController(CitaService citaService) {
         this.citaService = citaService;
+    }
+
+    @GetMapping("/usuario")
+    public ResponseEntity<List<CitaClienteResponseDTO>> listarCitasDelUsuario(
+            @SessionAttribute(name = "usuario", required = false) Usuario usuario) {
+
+        if (usuario == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Debes iniciar sesión");
+        }
+        if (!(usuario instanceof Cliente)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso exclusivo para clientes");
+        }
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(citaService.listarCitasDelCliente(usuario.getId()));
     }
 
     @GetMapping("/disponibilidad")

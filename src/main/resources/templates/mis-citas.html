@@ -52,42 +52,49 @@
             <h1>Mis citas</h1>
             <p>Citas programadas de <span th:text="${cliente.nombre}"></span>.</p>
         </div>
-        <a class="btn-pill outline" th:href="@{/mis-citas}">
-            <i class="bi bi-arrow-clockwise"></i>Actualizar
-        </a>
+        <button class="btn-pill outline" id="btnActualizarCitas" type="button">
+            <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+            <span>Actualizar</span>
+        </button>
     </header>
 
-    <section class="app-card flush" th:if="${not #lists.isEmpty(citas)}">
+    <div class="app-card loading-state" id="citasLoading" role="status" aria-live="polite">
+        <span class="loading-spinner" aria-hidden="true"></span>
+        <span>Cargando tus citas...</span>
+    </div>
+
+    <section class="app-card flush" id="citasContenido" aria-busy="true" hidden>
         <div class="table-responsive">
             <table class="table-app">
+                <caption class="visually-hidden">Listado de citas del cliente</caption>
                 <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Servicio</th>
-                    <th>Estado</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Hora</th>
+                    <th scope="col">Servicio</th>
+                    <th scope="col">Estado</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="cita : ${citas}">
-                    <td th:text="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"></td>
-                    <td th:text="${#temporals.format(cita.hora, 'HH:mm')}"></td>
-                    <td class="cell-strong" th:text="${cita.servicio.nombre}"></td>
-                    <td>
-                        <span class="badge-soft info" th:text="${cita.estado}"></span>
-                    </td>
-                </tr>
-                </tbody>
+                <tbody id="citasTablaBody"></tbody>
             </table>
         </div>
     </section>
 
-    <div class="app-card empty-state" th:if="${#lists.isEmpty(citas)}">
-        <i class="bi bi-calendar-x"></i>
-        Aún no tienes citas programadas.
+    <div class="app-card empty-state" id="citasVacio" role="status" hidden>
+        <i class="bi bi-calendar-x" aria-hidden="true"></i>
+        <strong>Aún no tienes citas registradas.</strong>
+        <span>Cuando reserves una cita, aparecerá en esta sección.</span>
+    </div>
+
+    <div class="app-card empty-state error-state" id="citasError" role="alert" hidden>
+        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+        <strong>No pudimos cargar tus citas.</strong>
+        <span>Verifica tu conexión e inténtalo nuevamente.</span>
+        <button class="btn-pill outline small" id="btnReintentarCitas" type="button">Reintentar</button>
     </div>
 </main>
 
+<script th:src="@{/js/mis-citas.js}" defer></script>
 <script>
     (function(){
         var htmlEl = document.documentElement;

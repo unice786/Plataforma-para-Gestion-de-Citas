@@ -1,11 +1,14 @@
 package com.gestioncitas.plataformacitas;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
+import com.gestioncitas.plataformacitas.modelos.Administrador;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
@@ -33,10 +36,16 @@ class ServicioControllerTests {
     @Autowired
     private CategoriaServicioRepository categoriaServicioRepository;
 
+    private Administrador administrador;
+
     @BeforeEach
     void prepararBaseDeDatos() {
         servicioRepository.deleteAll();
         categoriaServicioRepository.deleteAll();
+        administrador = new Administrador();
+        administrador.setNombre("Administrador");
+        administrador.setCorreo("unice891@gmail.com");
+        administrador.setPassword("123456");
     }
 
     @Test
@@ -45,7 +54,8 @@ class ServicioControllerTests {
         categoria.setNombre("Bienestar");
         categoria = categoriaServicioRepository.save(categoria);
 
-        mockMvc.perform(post("/admin/servicios").with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/admin/servicios").sessionAttr("usuario", administrador)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .param("nombre", "Masaje relajante")
                         .param("categoria.id", categoria.getId().toString())
                         .param("descripcion", "Masaje de cuerpo completo")
@@ -58,7 +68,9 @@ class ServicioControllerTests {
         assertThat(servicio.getNombre()).isEqualTo("Masaje relajante");
         assertThat(servicio.getPrecio()).isEqualByComparingTo(new BigDecimal("25.00"));
 
-        mockMvc.perform(post("/admin/servicios/{id}/editar", servicio.getId()).with(SecurityMockMvcRequestPostProcessors.csrf())
+        mockMvc.perform(post("/admin/servicios/{id}/editar", servicio.getId())
+                        .sessionAttr("usuario", administrador)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .param("nombre", "Masaje terapéutico")
                         .param("categoria.id", categoria.getId().toString())
                         .param("descripcion", "Masaje especializado")
@@ -71,11 +83,38 @@ class ServicioControllerTests {
         assertThat(actualizado.getNombre()).isEqualTo("Masaje terapéutico");
         assertThat(actualizado.getDuracionMinutos()).isEqualTo(75);
 
-        mockMvc.perform(post("/admin/servicios/{id}/eliminar", servicio.getId()).with(SecurityMockMvcRequestPostProcessors.csrf()))
+        mockMvc.perform(post("/admin/servicios/{id}/eliminar", servicio.getId())
+                        .sessionAttr("usuario", administrador)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/servicios"));
 
         assertThat(servicioRepository.findByActivoTrueOrderByNombreAsc()).isEmpty();
         assertThat(servicioRepository.findById(servicio.getId()).orElseThrow().getActivo()).isFalse();
+    }
+
+    @Test
+    void formulariosNuevoYEditarServicioSeRenderizanCorrectamente() throws Exception {
+        CategoriaServicio categoria = new CategoriaServicio();
+        categoria.setNombre("Bienestar");
+        categoria = categoriaServicioRepository.save(categoria);
+
+        Servicio servicio = new Servicio();
+        servicio.setNombre("Consulta general");
+        servicio.setCategoria(categoria);
+        servicio.setDescripcion("Consulta de prueba");
+        servicio.setPrecio(new BigDecimal("20.00"));
+        servicio.setDuracionMinutos(30);
+        servicio.setActivo(true);
+        servicio = servicioRepository.save(servicio);
+
+        mockMvc.perform(get("/admin/servicios/nuevo").sessionAttr("usuario", administrador))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin-servicio-formulario"));
+
+        mockMvc.perform(get("/admin/servicios/{id}/editar", servicio.getId())
+                        .sessionAttr("usuario", administrador))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin-servicio-formulario"));
     }
 }

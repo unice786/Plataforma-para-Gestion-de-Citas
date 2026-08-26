@@ -73,7 +73,7 @@
                         <div class="appointment-actions">
                             <a th:if="${cita.estado.name() != 'CANCELADA'}" th:href="@{/admin/citas/{id}/editar(id=${cita.id})}" aria-label="Modificar cita"><i class="bi bi-pencil-square"></i> Editar</a>
                             <form th:if="${cita.estado.name() != 'CANCELADA'}" th:action="@{/admin/citas/{id}/cancelar(id=${cita.id})}" method="post">
-                                <button type="submit" onclick="return confirm('Â¿Deseas cancelar esta cita?');"><i class="bi bi-x-circle"></i> Cancelar</button>
+                                <button type="submit" onclick="return confirm('¿Deseas cancelar esta cita?');"><i class="bi bi-x-circle"></i> Cancelar</button>
                             </form>
                             <small th:if="${cita.detalleUltimoCambio}" th:text="${cita.detalleUltimoCambio}"></small>
                         </div>

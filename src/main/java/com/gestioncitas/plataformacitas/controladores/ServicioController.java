@@ -121,7 +121,7 @@ public class ServicioController {
 
     private void validarCategoria(Servicio servicio, BindingResult resultado) {
         if (servicio.getCategoria() == null || servicio.getCategoria().getId() == null) {
-            resultado.rejectValue("categoria", "categoria.requerida", "Debes seleccionar una categoría.");
+            resultado.rejectValue("categoria.id", "categoria.requerida", "Debes seleccionar una categoría.");
             return;
         }
 
@@ -129,7 +129,7 @@ public class ServicioController {
                 .findById(servicio.getCategoria().getId())
                 .orElse(null);
         if (categoria == null) {
-            resultado.rejectValue("categoria", "categoria.invalida", "La categoría seleccionada no existe.");
+            resultado.rejectValue("categoria.id", "categoria.invalida", "La categoría seleccionada no existe.");
         } else {
             servicio.setCategoria(categoria);
         }
