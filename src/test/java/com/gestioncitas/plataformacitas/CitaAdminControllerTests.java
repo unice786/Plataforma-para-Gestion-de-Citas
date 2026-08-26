@@ -81,7 +81,7 @@ class CitaAdminControllerTests {
         Empleado empleado = new Empleado();
         empleado.setNombre("Profesional de prueba");
         empleado.setCorreo("profesional@ejemplo.com");
-        empleado.setContrasena("123456");
+        empleado.setPassword("123456");
         empleado.setEspecialidad(especialidad);
         empleado = empleadoRepository.save(empleado);
 
@@ -179,7 +179,7 @@ class CitaAdminControllerTests {
         Cliente cliente = new Cliente();
         cliente.setNombre(nombre);
         cliente.setCorreo(correo);
-        cliente.setContrasena("123456");
+        cliente.setPassword("123456");
         cliente.setTelefono("70000000");
         return clienteRepository.save(cliente);
     }

@@ -10,6 +10,7 @@ import com.gestioncitas.plataformacitas.modelos.Cita;
 import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.EstadoCita;
+import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
 import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
@@ -100,7 +101,7 @@ public class CitaService {
         int duracion = servicio.getDuracionMinutos();
 
         List<HorarioDisponibilidad> bloques = horarioRepository
-                .findDisponiblesByServicioAndFecha(servicioId, fecha, "DISPONIBLE");
+                .findDisponiblesByServicioAndFecha(servicioId, fecha, EstadoHorario.DISPONIBLE.name());
 
         List<HorarioDisponibleDTO> slotsLibres = new ArrayList<>();
 
@@ -149,7 +150,7 @@ public class CitaService {
 
         List<HorarioDisponibilidad> bloques = horarioRepository
                 .findDisponiblesByServicioAndRangoFechas(
-                        servicioId, desde, hasta, "DISPONIBLE");
+                        servicioId, desde, hasta, EstadoHorario.DISPONIBLE.name());
 
         List<HorarioDisponibleDTO> slotsLibres = new ArrayList<>();
 

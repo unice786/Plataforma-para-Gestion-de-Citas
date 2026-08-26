@@ -15,8 +15,11 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     List<Cita> findByClienteIdOrderByFechaDescHoraDesc(Long clienteId);
 
     @Query("""
-            SELECT c FROM Cita c JOIN FETCH c.servicio
-            WHERE c.empleado.id = :empleadoId AND c.fecha = :fecha AND c.estado IN :estados
+            SELECT c FROM Cita c
+            JOIN FETCH c.servicio
+            WHERE c.empleado.id = :empleadoId
+              AND c.fecha = :fecha
+              AND c.estado IN :estados
             ORDER BY c.hora ASC
             """)
     List<Cita> findCitasActivasByEmpleadoAndFecha(

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragmento de navegacion</title>
+</head>
+<body>
+<nav class="app-nav" th:fragment="navegacion">
+    <div class="app-nav-inner">
+        <a class="app-nav-brand" th:href="@{/inicio}">
+            <i class="bi bi-heart-fill"></i>Plataforma de Citas
+        </a>
+        <div class="app-nav-links">
+            <a th:href="@{/inicio}"><i class="bi bi-house-door"></i>Inicio</a>
+            <a th:href="@{/servicios}"><i class="bi bi-spa"></i>Servicios</a>
+            <a th:href="@{/reservar}"><i class="bi bi-calendar-plus"></i>Reservar</a>
+            <a th:href="@{/mis-citas}"><i class="bi bi-calendar-check"></i>Mis citas</a>
+            <a th:href="@{/admin/servicios}"><i class="bi bi-gear"></i>Administraci&oacute;n</a>
+        </div>
+        <div class="app-nav-user">
+            <span><i class="bi bi-person-circle me-1"></i><th:block th:if="${session.usuario != null}" th:text="${session.usuario.nombre}"></th:block></span>
+            <a th:href="@{/logout}" title="Cerrar sesion"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

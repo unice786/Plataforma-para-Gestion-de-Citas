@@ -85,7 +85,7 @@ class DisponibilidadEndpointTests {
         Empleado empleado = new Empleado();
         empleado.setNombre("Carlos Mendoza (Especialista)");
         empleado.setCorreo("carlos.mendoza@empresa.com");
-        empleado.setContrasena("123456");
+        empleado.setPassword("123456");
         empleado.setActivo(true);
         empleado.setEspecialidad(especialidad);
         empleado.setServicios(List.of(servicio));
@@ -96,7 +96,7 @@ class DisponibilidadEndpointTests {
         bloque.setFecha(LocalDate.now().plusDays(1));
         bloque.setHoraInicio(LocalTime.of(9, 0));
         bloque.setHoraFin(LocalTime.of(10, 0));
-        bloque.setEstado(EstadoHorario.DISPONIBLE);
+        bloque.setEstado(EstadoHorario.DISPONIBLE.name());
         horarioDisponibilidadRepository.save(bloque);
     }
 

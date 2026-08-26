@@ -1,55 +1,52 @@
-
 package com.gestioncitas.plataformacitas.modelos;
 
-  import java.time.LocalDate;
-  import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
-  import jakarta.persistence.Column;
-  import jakarta.persistence.Entity;
-  import jakarta.persistence.FetchType;
-  import jakarta.persistence.GeneratedValue;
-  import jakarta.persistence.GenerationType;
-  import jakarta.persistence.Id;
-  import jakarta.persistence.JoinColumn;
-  import jakarta.persistence.ManyToOne;
-  import jakarta.persistence.Table;
-  import lombok.Getter;
-  import lombok.NoArgsConstructor;
-  import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-  @Entity
-  @Table(name = "horarios_disponibilidad")
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  public class HorarioDisponibilidad {
+@Entity
+@Table(name = "horarios_disponibilidad")
+@Getter
+@Setter
+@NoArgsConstructor
+public class HorarioDisponibilidad {
 
-      @Id
-      @GeneratedValue(strategy = GenerationType.IDENTITY)
-      private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-      @ManyToOne(optional = false, fetch = FetchType.LAZY)
-      @JoinColumn(name = "empleado_id", nullable = false)
-      private Empleado empleado;
+	@NotNull(message = "El empleado del horario es obligatorio")
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@JoinColumn(name = "empleado_id", nullable = false)
+	private Empleado empleado;
 
-      @Column(nullable = false)
-      private LocalDate fecha;
+	@NotNull(message = "La fecha del horario es obligatoria")
+	@Column(nullable = false)
+	private LocalDate fecha;
 
-      @Column(name = "hora_inicio", nullable = false)
-      private LocalTime horaInicio;
+	@NotNull(message = "La hora de inicio es obligatoria")
+	@Column(name = "hora_inicio", nullable = false)
+	private LocalTime horaInicio;
 
-      @Column(name = "hora_fin", nullable = false)
-      private LocalTime horaFin;
+	@NotNull(message = "La hora de fin es obligatoria")
+	@Column(name = "hora_fin", nullable = false)
+	private LocalTime horaFin;
 
-      @Column(nullable = false, length = 20)
-      private String estado = "DISPONIBLE";
-
-      public void setEstado(String estado) {
-          this.estado = estado;
-      }
-
-      public void setEstado(EstadoHorario estado) {
-          this.estado = estado == null ? null : estado.name();
-      }
-  }
-
+	@NotBlank(message = "El estado del horario es obligatorio")
+	@Column(nullable = false, length = 20)
+	private String estado = "DISPONIBLE";
+}

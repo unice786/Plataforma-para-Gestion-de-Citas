@@ -3,10 +3,6 @@ package com.gestioncitas.plataformacitas.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * DTO que representa un bloque de horario libre disponible para reservar (SCRUM-1).
- * Devuelto por el endpoint GET /api/citas/disponibilidad.
- */
 public class HorarioDisponibleDTO {
 
     private Long empleadoId;
@@ -15,11 +11,7 @@ public class HorarioDisponibleDTO {
     private LocalTime horaInicio;
     private LocalTime horaFin;
 
-    // ── Constructor vacío ──────────────────────────────────────────────────
-
     public HorarioDisponibleDTO() {}
-
-    // ── Constructor completo ───────────────────────────────────────────────
 
     public HorarioDisponibleDTO(Long empleadoId, String empleadoNombre,
                                 LocalDate fecha, LocalTime horaInicio, LocalTime horaFin) {
@@ -29,8 +21,6 @@ public class HorarioDisponibleDTO {
         this.horaInicio = horaInicio;
         this.horaFin = horaFin;
     }
-
-    // ── Getters y Setters ──────────────────────────────────────────────────
 
     public Long getEmpleadoId() { return empleadoId; }
     public void setEmpleadoId(Long empleadoId) { this.empleadoId = empleadoId; }

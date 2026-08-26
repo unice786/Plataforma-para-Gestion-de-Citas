@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Citas - Inicio</title>
+    <title>Plataforma Citas - Mis citas</title>
     <script>
         (function(){
             var saved = localStorage.getItem('auth-theme');
@@ -14,9 +14,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
-<body class="auth-body">
+<body class="app-body">
 
-<!-- Decoración de fondo (líneas + puntos) -->
 <div class="auth-decor">
     <svg class="decor-top" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
         <path d="M260,0 C180,60 220,140 120,190 C40,230 70,300 0,360" stroke-opacity="0.9"/>
@@ -45,44 +44,49 @@
 
 <nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
 
-<div class="auth-page">
-    <div class="auth-container" style="flex-direction:column;justify-content:flex-start;gap:24px;max-width:760px;">
+<main class="app-shell">
+    <a class="app-back-link" th:href="@{/servicios}"><i class="bi bi-arrow-left"></i>Ir al catálogo</a>
 
-        <div class="auth-card" style="flex:none;width:100%;">
-            <div th:if="${param.bienvenido}" class="alert alert-success">
-                ¡Registro exitoso! Bienvenido/a, <strong th:text="${usuario.nombre}"></strong>.
-            </div>
-
-            <h2 class="brand-title" style="font-size:1.5rem;margin-bottom:6px;">Bienvenido a la Plataforma de Citas</h2>
-            <p class="brand-subtitle" th:text="'Tu cuenta: ' + ${usuario.correo}"></p>
-
-            <p style="color:var(--auth-text-soft);margin:0 0 4px;">¿Qué quieres hacer hoy?</p>
-            <div class="quick-grid">
-                <a class="quick-card" th:href="@{/reservar}">
-                    <i class="bi bi-calendar-plus"></i>
-                    <strong>Reservar cita</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Agenda en línea</span>
-                </a>
-                <a class="quick-card" th:href="@{/servicios}">
-                    <i class="bi bi-spa"></i>
-                    <strong>Servicios</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Explora el catálogo</span>
-                </a>
-                <a class="quick-card" th:href="@{/mis-citas}">
-                    <i class="bi bi-calendar-check"></i>
-                    <strong>Mis citas</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Revisa tus reservas</span>
-                </a>
-                <a class="quick-card" th:href="@{/admin/servicios}">
-                    <i class="bi bi-gear"></i>
-                    <strong>Administración</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Gestiona servicios</span>
-                </a>
-            </div>
+    <header class="app-header">
+        <div>
+            <h1>Mis citas</h1>
+            <p>Citas programadas de <span th:text="${cliente.nombre}"></span>.</p>
         </div>
+        <a class="btn-pill outline" th:href="@{/mis-citas}">
+            <i class="bi bi-arrow-clockwise"></i>Actualizar
+        </a>
+    </header>
 
+    <section class="app-card flush" th:if="${not #lists.isEmpty(citas)}">
+        <div class="table-responsive">
+            <table class="table-app">
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Servicio</th>
+                    <th>Estado</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cita : ${citas}">
+                    <td th:text="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(cita.hora, 'HH:mm')}"></td>
+                    <td class="cell-strong" th:text="${cita.servicio.nombre}"></td>
+                    <td>
+                        <span class="badge-soft info" th:text="${cita.estado}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(citas)}">
+        <i class="bi bi-calendar-x"></i>
+        Aún no tienes citas programadas.
     </div>
-</div>
+</main>
 
 <script>
     (function(){

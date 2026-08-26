@@ -1,6 +1,7 @@
 package com.gestioncitas.plataformacitas;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -95,7 +96,7 @@ class CitaReservaTests {
         empleado = new Empleado();
         empleado.setNombre("Carlos Mendoza (Especialista)");
         empleado.setCorreo("carlos.mendoza@empresa.com");
-        empleado.setContrasena("123456");
+        empleado.setPassword("123456");
         empleado.setActivo(true);
         empleado.setEspecialidad(especialidad);
         empleado.setServicios(List.of(servicio));
@@ -104,7 +105,7 @@ class CitaReservaTests {
         cliente = new Cliente();
         cliente.setNombre("Ana López");
         cliente.setCorreo("ana.lopez@ejemplo.com");
-        cliente.setContrasena("123456");
+        cliente.setPassword("123456");
         cliente.setTelefono("0991234567");
         cliente.setActivo(true);
         cliente = clienteRepository.save(cliente);
@@ -114,7 +115,7 @@ class CitaReservaTests {
     void reservarCitaRegistraLaCitaYDevuelveMensajeDeConfirmacion() throws Exception {
         LocalDate fecha = LocalDate.now().plusDays(1);
 
-        mockMvc.perform(post("/api/citas/reservar")
+        mockMvc.perform(post("/api/citas/reservar").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -161,13 +162,13 @@ class CitaReservaTests {
                 """.formatted(cliente.getId(), empleado.getId(), servicio.getId(), fecha);
 
         // Primera reserva: debe tener éxito (201)
-        mockMvc.perform(post("/api/citas/reservar")
+        mockMvc.perform(post("/api/citas/reservar").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated());
 
         // Segunda reserva en el mismo horario y empleado: debe rechazarse (409)
-        mockMvc.perform(post("/api/citas/reservar")
+        mockMvc.perform(post("/api/citas/reservar").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isConflict());
@@ -180,7 +181,7 @@ class CitaReservaTests {
     void reservarConFechaEnElPasadoDevuelveErrorDeValidacion() throws Exception {
         LocalDate fechaPasada = LocalDate.now().minusDays(1);
 
-        mockMvc.perform(post("/api/citas/reservar")
+        mockMvc.perform(post("/api/citas/reservar").with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {

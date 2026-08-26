@@ -2,10 +2,6 @@ package com.gestioncitas.plataformacitas.dto;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO de error estándar devuelto por {@code GlobalExceptionHandler} en todos
- * los casos de error de la API REST (SCRUM-1).
- */
 public class ErrorResponseDTO {
 
     private LocalDateTime timestamp;
@@ -13,11 +9,7 @@ public class ErrorResponseDTO {
     private String error;
     private String mensaje;
 
-    // ── Constructor vacío ──────────────────────────────────────────────────
-
     public ErrorResponseDTO() {}
-
-    // ── Constructor completo ───────────────────────────────────────────────
 
     public ErrorResponseDTO(LocalDateTime timestamp, int status, String error, String mensaje) {
         this.timestamp = timestamp;
@@ -25,8 +17,6 @@ public class ErrorResponseDTO {
         this.error = error;
         this.mensaje = mensaje;
     }
-
-    // ── Getters y Setters ──────────────────────────────────────────────────
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }

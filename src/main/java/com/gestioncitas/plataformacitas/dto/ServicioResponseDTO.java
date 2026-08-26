@@ -3,7 +3,7 @@ package com.gestioncitas.plataformacitas.dto;
 import java.math.BigDecimal;
 
 /**
- * DTO para la transferencia de datos del catálogo de servicios a la API REST.
+ * DTO para la transferencia de datos del cat├ílogo de servicios a la API REST.
  */
 public class ServicioResponseDTO {
 

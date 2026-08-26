@@ -5,10 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-/**
- * DTO de solicitud para reservar una cita en línea (SCRUM-1).
- * Todos los campos son obligatorios y se validan con Bean Validation.
- */
 public class ReservaCitaRequestDTO {
 
     @NotNull(message = "El ID del cliente es obligatorio")
@@ -26,8 +22,6 @@ public class ReservaCitaRequestDTO {
 
     @NotNull(message = "La hora es obligatoria")
     private LocalTime hora;
-
-    // ── Getters y Setters ──────────────────────────────────────────────────
 
     public Long getClienteId() { return clienteId; }
     public void setClienteId(Long clienteId) { this.clienteId = clienteId; }

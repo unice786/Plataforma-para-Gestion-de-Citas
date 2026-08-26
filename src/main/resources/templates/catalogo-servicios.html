@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plataforma Citas - Inicio</title>
+    <title>Plataforma Citas - Catálogo de servicios</title>
     <script>
         (function(){
             var saved = localStorage.getItem('auth-theme');
@@ -14,9 +14,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
-<body class="auth-body">
+<body class="app-body">
 
-<!-- Decoración de fondo (líneas + puntos) -->
 <div class="auth-decor">
     <svg class="decor-top" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
         <path d="M260,0 C180,60 220,140 120,190 C40,230 70,300 0,360" stroke-opacity="0.9"/>
@@ -45,44 +44,33 @@
 
 <nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
 
-<div class="auth-page">
-    <div class="auth-container" style="flex-direction:column;justify-content:flex-start;gap:24px;max-width:760px;">
-
-        <div class="auth-card" style="flex:none;width:100%;">
-            <div th:if="${param.bienvenido}" class="alert alert-success">
-                ¡Registro exitoso! Bienvenido/a, <strong th:text="${usuario.nombre}"></strong>.
-            </div>
-
-            <h2 class="brand-title" style="font-size:1.5rem;margin-bottom:6px;">Bienvenido a la Plataforma de Citas</h2>
-            <p class="brand-subtitle" th:text="'Tu cuenta: ' + ${usuario.correo}"></p>
-
-            <p style="color:var(--auth-text-soft);margin:0 0 4px;">¿Qué quieres hacer hoy?</p>
-            <div class="quick-grid">
-                <a class="quick-card" th:href="@{/reservar}">
-                    <i class="bi bi-calendar-plus"></i>
-                    <strong>Reservar cita</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Agenda en línea</span>
-                </a>
-                <a class="quick-card" th:href="@{/servicios}">
-                    <i class="bi bi-spa"></i>
-                    <strong>Servicios</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Explora el catálogo</span>
-                </a>
-                <a class="quick-card" th:href="@{/mis-citas}">
-                    <i class="bi bi-calendar-check"></i>
-                    <strong>Mis citas</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Revisa tus reservas</span>
-                </a>
-                <a class="quick-card" th:href="@{/admin/servicios}">
-                    <i class="bi bi-gear"></i>
-                    <strong>Administración</strong>
-                    <span style="color:var(--auth-text-soft);font-size:.85rem;">Gestiona servicios</span>
-                </a>
-            </div>
+<main class="app-shell">
+    <header class="app-header text-center justify-content-center">
+        <div>
+            <h1>Servicios disponibles</h1>
+            <p>Elige el servicio que mejor se adapte a ti.</p>
         </div>
+    </header>
 
+    <section class="app-grid" th:if="${not #lists.isEmpty(servicios)}">
+        <article class="app-card service-card" th:each="servicio : ${servicios}">
+            <span class="service-category" th:text="${servicio.categoria.nombre}"></span>
+            <h2 class="service-name" th:text="${servicio.nombre}"></h2>
+            <p class="service-desc" th:text="${servicio.descripcion}"></p>
+            <div class="service-footer">
+                <span class="service-price" th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}"></span>
+                <span class="service-duration">
+                    <i class="bi bi-clock me-1"></i><span th:text="${servicio.duracionMinutos}"></span> min
+                </span>
+            </div>
+        </article>
+    </section>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(servicios)}">
+        <i class="bi bi-spa"></i>
+        No hay servicios disponibles por el momento.
     </div>
-</div>
+</main>
 
 <script>
     (function(){
