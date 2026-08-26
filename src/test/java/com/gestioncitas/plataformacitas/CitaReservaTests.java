@@ -1,11 +1,17 @@
 package com.gestioncitas.plataformacitas;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gestioncitas.plataformacitas.dto.CitaResponseDTO;
 import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
 import com.gestioncitas.plataformacitas.modelos.Cita;
 import com.gestioncitas.plataformacitas.modelos.Cliente;
@@ -32,6 +38,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,6 +68,9 @@ class CitaReservaTests {
 
     @Autowired
     private HorarioDisponibilidadRepository horarioDisponibilidadRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Cliente cliente;
     private Empleado empleado;
@@ -115,17 +125,18 @@ class CitaReservaTests {
     void reservarCitaRegistraLaCitaYDevuelveMensajeDeConfirmacion() throws Exception {
         LocalDate fecha = LocalDate.now().plusDays(1);
 
-        mockMvc.perform(post("/api/citas/reservar").with(csrf())
+        MvcResult resultadoHttp = mockMvc.perform(post("/api/citas/reservar")
+                        .sessionAttr("usuario", cliente)
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "clienteId": %d,
                                   "empleadoId": %d,
                                   "servicioId": %d,
                                   "fecha": "%s",
                                   "hora": "09:00:00"
                                 }
-                                """.formatted(cliente.getId(), empleado.getId(), servicio.getId(), fecha)))
+                                """.formatted(empleado.getId(), servicio.getId(), fecha)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.clienteNombre").value("Ana López"))
@@ -134,12 +145,24 @@ class CitaReservaTests {
                 .andExpect(jsonPath("$.fecha").value(fecha.toString()))
                 .andExpect(jsonPath("$.hora").value("09:00:00"))
                 .andExpect(jsonPath("$.estado").value("PENDIENTE"))
-                .andExpect(jsonPath("$.mensaje").value(org.hamcrest.Matchers.containsString("¡Cita reservada exitosamente!")));
+                .andExpect(jsonPath("$.mensaje").value(containsString("¡Cita reservada exitosamente!")))
+                .andReturn();
 
-        // Verificar persistencia en BD con su estado
+        CitaResponseDTO confirmacion = objectMapper.readValue(
+                resultadoHttp.getResponse().getContentAsByteArray(), CitaResponseDTO.class);
+
+        // Verificar que cada dato confirmado coincide con el registro persistido.
         List<Cita> citas = citaRepository.findAll();
         assertThat(citas).hasSize(1);
-        Cita cita = citas.get(0);
+        Cita cita = citaRepository.buscarConfirmacionPorId(confirmacion.getId()).orElseThrow();
+        assertThat(confirmacion.getId()).isEqualTo(cita.getId());
+        assertThat(confirmacion.getClienteNombre()).isEqualTo(cita.getCliente().getNombre());
+        assertThat(confirmacion.getEmpleadoNombre()).isEqualTo(cita.getEmpleado().getNombre());
+        assertThat(confirmacion.getServicioNombre()).isEqualTo(cita.getServicio().getNombre());
+        assertThat(confirmacion.getFecha()).isEqualTo(cita.getFecha());
+        assertThat(confirmacion.getHora()).isEqualTo(cita.getHora());
+        assertThat(confirmacion.getEstado()).isEqualTo(cita.getEstado());
+        assertThat(confirmacion.getFechaRegistro()).isEqualTo(cita.getFechaRegistro());
         assertThat(cita.getEstado()).isEqualTo(EstadoCita.PENDIENTE);
         assertThat(cita.getFecha()).isEqualTo(fecha);
         assertThat(cita.getHora()).isEqualTo(LocalTime.of(9, 0));
@@ -153,22 +176,21 @@ class CitaReservaTests {
         LocalDate fecha = LocalDate.now().plusDays(1);
         String body = """
                 {
-                  "clienteId": %d,
                   "empleadoId": %d,
                   "servicioId": %d,
                   "fecha": "%s",
                   "hora": "09:00:00"
                 }
-                """.formatted(cliente.getId(), empleado.getId(), servicio.getId(), fecha);
+                """.formatted(empleado.getId(), servicio.getId(), fecha);
 
         // Primera reserva: debe tener éxito (201)
-        mockMvc.perform(post("/api/citas/reservar").with(csrf())
+        mockMvc.perform(post("/api/citas/reservar").sessionAttr("usuario", cliente).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isCreated());
 
         // Segunda reserva en el mismo horario y empleado: debe rechazarse (409)
-        mockMvc.perform(post("/api/citas/reservar").with(csrf())
+        mockMvc.perform(post("/api/citas/reservar").sessionAttr("usuario", cliente).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isConflict());
@@ -181,19 +203,51 @@ class CitaReservaTests {
     void reservarConFechaEnElPasadoDevuelveErrorDeValidacion() throws Exception {
         LocalDate fechaPasada = LocalDate.now().minusDays(1);
 
-        mockMvc.perform(post("/api/citas/reservar").with(csrf())
+        mockMvc.perform(post("/api/citas/reservar").sessionAttr("usuario", cliente).with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                  "clienteId": %d,
                                   "empleadoId": %d,
                                   "servicioId": %d,
                                   "fecha": "%s",
                                   "hora": "09:00:00"
                                 }
-                                """.formatted(cliente.getId(), empleado.getId(), servicio.getId(), fechaPasada)))
+                                """.formatted(empleado.getId(), servicio.getId(), fechaPasada)))
                 .andExpect(status().isBadRequest());
 
         assertThat(citaRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void reservarCitaRequiereUnaSesionDeCliente() throws Exception {
+        LocalDate fecha = LocalDate.now().plusDays(1);
+
+        mockMvc.perform(post("/api/citas").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "empleadoId": %d,
+                                  "servicioId": %d,
+                                  "fecha": "%s",
+                                  "hora": "09:00:00"
+                                }
+                                """.formatted(empleado.getId(), servicio.getId(), fecha)))
+                .andExpect(status().isUnauthorized());
+
+        assertThat(citaRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void vistaReservaIncluyeElModalConDatosYAccionesDeConfirmacion() throws Exception {
+        mockMvc.perform(get("/reservar").sessionAttr("usuario", cliente))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reservar-cita"))
+                .andExpect(content().string(containsString("id=\"confirmacionCita\"")))
+                .andExpect(content().string(containsString("id=\"confirmacionFecha\"")))
+                .andExpect(content().string(containsString("id=\"confirmacionHora\"")))
+                .andExpect(content().string(containsString("id=\"confirmacionServicio\"")))
+                .andExpect(content().string(containsString("href=\"/mis-citas\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        containsString("data-cliente-id"))));
     }
 }

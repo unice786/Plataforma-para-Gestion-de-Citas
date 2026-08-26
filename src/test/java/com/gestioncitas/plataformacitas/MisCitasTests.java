@@ -1,7 +1,12 @@
 package com.gestioncitas.plataformacitas;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -15,6 +20,7 @@ import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.Especialidad;
 import com.gestioncitas.plataformacitas.modelos.EstadoCita;
+import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
 import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
@@ -55,6 +61,8 @@ class MisCitasTests {
     private Servicio servicioPropio;
     private Servicio servicioAjeno;
     private LocalDate fechaProxima;
+    private Cita citaEditable;
+    private Cita citaAjena;
 
     @BeforeEach
     void prepararDatos() {
@@ -90,13 +98,13 @@ class MisCitasTests {
         otroCliente = crearCliente("Bruno Cliente", "bruno@ejemplo.com");
 
         fechaProxima = LocalDate.now().plusDays(1);
-        crearCita(clienteAutenticado, servicioPropio, fechaProxima,
+        citaEditable = crearCita(clienteAutenticado, servicioPropio, fechaProxima,
                 LocalTime.of(11, 0), EstadoCita.CONFIRMADA);
         crearCita(clienteAutenticado, servicioPropio, fechaProxima,
                 LocalTime.of(9, 0), EstadoCita.PENDIENTE);
         crearCita(clienteAutenticado, servicioPropio, fechaProxima.plusDays(2),
                 LocalTime.of(15, 30), EstadoCita.CANCELADA);
-        crearCita(otroCliente, servicioAjeno, fechaProxima.plusDays(1),
+        citaAjena = crearCita(otroCliente, servicioAjeno, fechaProxima.plusDays(1),
                 LocalTime.of(10, 0), EstadoCita.CONFIRMADA);
     }
 
@@ -148,7 +156,61 @@ class MisCitasTests {
                 .andExpect(content().string(containsString("Cargando tus citas...")))
                 .andExpect(content().string(containsString("Aún no tienes citas registradas.")))
                 .andExpect(content().string(containsString("citasTablaBody")))
-                .andExpect(content().string(containsString("/js/mis-citas.js")));
+                .andExpect(content().string(containsString("Acciones")))
+                .andExpect(content().string(containsString("/js/mis-citas.js?v=2")));
+    }
+
+    @Test
+    void clientePuedeAbrirLaEdicionDeUnaCitaPropia() throws Exception {
+        mockMvc.perform(get("/mis-citas/{id}/editar", citaEditable.getId())
+                        .sessionAttr("usuario", clienteAutenticado))
+                .andExpect(status().isOk())
+                .andExpect(view().name("editar-cita-cliente"))
+                .andExpect(content().string(containsString("Editar cita")))
+                .andExpect(content().string(containsString("Consulta propia")));
+    }
+
+    @Test
+    void clientePuedeEditarFechaYHoraDeUnaCitaPropiaDisponible() throws Exception {
+        LocalDate nuevaFecha = fechaProxima.plusDays(4);
+        crearHorarioDisponible(nuevaFecha, LocalTime.of(8, 0), LocalTime.of(12, 0));
+
+        mockMvc.perform(post("/mis-citas/{id}/editar", citaEditable.getId())
+                        .sessionAttr("usuario", clienteAutenticado)
+                        .with(csrf())
+                        .param("fecha", nuevaFecha.toString())
+                        .param("hora", "10:00"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/mis-citas"));
+
+        Cita actualizada = citaRepository.findById(citaEditable.getId()).orElseThrow();
+        assertEquals(nuevaFecha, actualizada.getFecha());
+        assertEquals(LocalTime.of(10, 0), actualizada.getHora());
+    }
+
+    @Test
+    void clientePuedeEliminarUnaCitaPropia() throws Exception {
+        mockMvc.perform(post("/mis-citas/{id}/eliminar", citaEditable.getId())
+                        .sessionAttr("usuario", clienteAutenticado)
+                        .with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/mis-citas"));
+
+        assertFalse(citaRepository.existsById(citaEditable.getId()));
+    }
+
+    @Test
+    void clienteNoPuedeEditarNiEliminarCitasAjenas() throws Exception {
+        mockMvc.perform(get("/mis-citas/{id}/editar", citaAjena.getId())
+                        .sessionAttr("usuario", clienteAutenticado))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(post("/mis-citas/{id}/eliminar", citaAjena.getId())
+                        .sessionAttr("usuario", clienteAutenticado)
+                        .with(csrf()))
+                .andExpect(status().isNotFound());
+
+        assertTrue(citaRepository.existsById(citaAjena.getId()));
     }
 
     @Test
@@ -179,7 +241,7 @@ class MisCitasTests {
         return clienteRepository.save(cliente);
     }
 
-    private void crearCita(Cliente cliente, Servicio servicio, LocalDate fecha,
+    private Cita crearCita(Cliente cliente, Servicio servicio, LocalDate fecha,
                            LocalTime hora, EstadoCita estado) {
         Cita cita = new Cita();
         cita.setCliente(cliente);
@@ -188,6 +250,16 @@ class MisCitasTests {
         cita.setFecha(fecha);
         cita.setHora(hora);
         cita.setEstado(estado);
-        citaRepository.save(cita);
+        return citaRepository.save(cita);
+    }
+
+    private void crearHorarioDisponible(LocalDate fecha, LocalTime inicio, LocalTime fin) {
+        HorarioDisponibilidad horario = new HorarioDisponibilidad();
+        horario.setEmpleado(empleado);
+        horario.setFecha(fecha);
+        horario.setHoraInicio(inicio);
+        horario.setHoraFin(fin);
+        horario.setEstado("DISPONIBLE");
+        horarioDisponibilidadRepository.save(horario);
     }
 }

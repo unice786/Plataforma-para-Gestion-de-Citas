@@ -8,6 +8,8 @@
     var tablaBody = document.getElementById('citasTablaBody');
     var btnActualizar = document.getElementById('btnActualizarCitas');
     var btnReintentar = document.getElementById('btnReintentarCitas');
+    var csrfToken = document.body.getAttribute('data-csrf') || '';
+    var csrfName = document.body.getAttribute('data-csrf-name') || '_csrf';
 
     var estados = {
         PENDIENTE: { etiqueta: 'Pendiente', clase: 'pending' },
@@ -77,6 +79,46 @@
         insignia.textContent = estado.etiqueta;
         celdaEstado.appendChild(insignia);
         fila.appendChild(celdaEstado);
+
+        var celdaAcciones = document.createElement('td');
+        var acciones = document.createElement('div');
+        acciones.className = 'cita-actions';
+
+        if (cita.estado === 'PENDIENTE' || cita.estado === 'CONFIRMADA') {
+            var editar = document.createElement('a');
+            editar.className = 'cita-action edit';
+            editar.href = '/mis-citas/' + encodeURIComponent(cita.id) + '/editar';
+            editar.setAttribute('aria-label', 'Editar cita de ' + cita.servicioNombre);
+            editar.innerHTML = '<i class="bi bi-pencil-square" aria-hidden="true"></i> Editar';
+            acciones.appendChild(editar);
+        }
+
+        var formularioEliminar = document.createElement('form');
+        formularioEliminar.method = 'post';
+        formularioEliminar.action = '/mis-citas/' + encodeURIComponent(cita.id) + '/eliminar';
+        formularioEliminar.addEventListener('submit', function (evento) {
+            if (!window.confirm('¿Deseas eliminar esta cita? Esta acción no se puede deshacer.')) {
+                evento.preventDefault();
+            }
+        });
+
+        if (csrfToken) {
+            var csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = csrfName;
+            csrf.value = csrfToken;
+            formularioEliminar.appendChild(csrf);
+        }
+
+        var eliminar = document.createElement('button');
+        eliminar.type = 'submit';
+        eliminar.className = 'cita-action delete';
+        eliminar.setAttribute('aria-label', 'Eliminar cita de ' + cita.servicioNombre);
+        eliminar.innerHTML = '<i class="bi bi-trash3" aria-hidden="true"></i> Eliminar';
+        formularioEliminar.appendChild(eliminar);
+        acciones.appendChild(formularioEliminar);
+        celdaAcciones.appendChild(acciones);
+        fila.appendChild(celdaAcciones);
 
         return fila;
     }

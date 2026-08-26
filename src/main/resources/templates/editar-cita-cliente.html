@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma Citas - Editar cita</title>
+    <script>
+        (function(){
+            var saved = localStorage.getItem('auth-theme');
+            if(saved){ document.documentElement.setAttribute('data-theme', saved); }
+        })();
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="app-body">
+
+<div class="auth-decor" aria-hidden="true">
+    <svg class="decor-top" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
+        <path d="M260,0 C180,60 220,140 120,190 C40,230 70,300 0,360" stroke-opacity="0.9"/>
+    </svg>
+    <svg class="decor-bottom" viewBox="0 0 900 380" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,260 C90,190 140,320 230,270 C320,220 360,340 460,300 C560,260 590,150 690,190 C760,220 800,130 900,160" stroke-opacity="0.85"/>
+    </svg>
+</div>
+
+<button type="button" class="auth-theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+    <i class="bi bi-sun-fill" id="themeIcon"></i>
+</button>
+
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell edit-appointment-shell">
+    <a class="app-back-link" th:href="@{/mis-citas}"><i class="bi bi-arrow-left"></i>Volver a Mis Citas</a>
+
+    <header class="app-header">
+        <div>
+            <h1>Editar cita</h1>
+            <p>Reprograma la fecha y hora de tu cita.</p>
+        </div>
+    </header>
+
+    <section class="app-card edit-appointment-card">
+        <div class="appointment-service-summary">
+            <i class="bi bi-briefcase" aria-hidden="true"></i>
+            <div>
+                <span>Servicio</span>
+                <strong th:text="${cita.servicio.nombre}"></strong>
+            </div>
+        </div>
+
+        <form class="edit-appointment-form" th:object="${edicionCita}"
+              th:action="@{/mis-citas/{id}/editar(id=${cita.id})}" method="post">
+            <div class="app-alert alert-danger" role="alert"
+                 th:if="${#fields.hasGlobalErrors()}" th:errors="*{global}"></div>
+
+            <div>
+                <label class="form-label" for="fecha">Nueva fecha</label>
+                <input class="form-control" id="fecha" type="date" th:field="*{fecha}" required>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></div>
+            </div>
+
+            <div>
+                <label class="form-label" for="hora">Nueva hora</label>
+                <input class="form-control" id="hora" type="time" th:field="*{hora}" required>
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></div>
+            </div>
+
+            <p class="edit-appointment-help">
+                <i class="bi bi-info-circle" aria-hidden="true"></i>
+                La hora debe estar dentro del horario disponible del especialista.
+            </p>
+
+            <div class="app-actions">
+                <a class="btn-pill outline" th:href="@{/mis-citas}">Cancelar</a>
+                <button class="btn-pill" type="submit"><i class="bi bi-check-lg"></i>Guardar cambios</button>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script>
+    (function(){
+        var htmlEl = document.documentElement;
+        var toggle = document.getElementById('themeToggle');
+        var icon = document.getElementById('themeIcon');
+        var fecha = document.getElementById('fecha');
+        var hoy = new Date();
+        var limite = new Date();
+        limite.setDate(limite.getDate() + 60);
+
+        function fechaIso(valor){
+            var mes = String(valor.getMonth() + 1).padStart(2, '0');
+            var dia = String(valor.getDate()).padStart(2, '0');
+            return valor.getFullYear() + '-' + mes + '-' + dia;
+        }
+        fecha.min = fechaIso(hoy);
+        fecha.max = fechaIso(limite);
+
+        function applyIcon(){
+            icon.className = htmlEl.getAttribute('data-theme') === 'dark'
+                ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill';
+        }
+        applyIcon();
+        toggle.addEventListener('click', function(){
+            var next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            htmlEl.setAttribute('data-theme', next);
+            localStorage.setItem('auth-theme', next);
+            applyIcon();
+        });
+    })();
+</script>
+</body>
+</html>

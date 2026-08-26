@@ -15,7 +15,7 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body class="app-body"
-      th:attr="data-cliente-id=${clienteId}, data-csrf=${_csrf != null ? _csrf.token : ''}">
+      th:attr="data-csrf=${_csrf != null ? _csrf.token : ''}">
 
 <div class="auth-decor">
     <svg class="decor-top" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +78,7 @@
 
         <div class="mb-3">
             <label class="form-label">Horarios disponibles</label>
-            <div id="slots" class="slots-grid">
+            <div id="slots" class="slots-grid" role="status" aria-live="polite">
                 <p class="text-secondary-emphasis small mb-0" style="color:var(--auth-text-soft);">
                     Selecciona un servicio y una fecha para ver los horarios.
                 </p>
@@ -99,7 +99,49 @@
     </form>
 </main>
 
-<script th:inline="javascript" th:src="@{/js/reserva.js}"></script>
+<section id="confirmacionCita" class="confirmation-overlay d-none" role="dialog" aria-modal="true"
+         aria-hidden="true" aria-labelledby="confirmacionTitulo" aria-describedby="confirmacionMensaje">
+    <div class="confirmation-dialog">
+        <div class="confirmation-icon" aria-hidden="true">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        <p class="confirmation-eyebrow">Reserva completada</p>
+        <h2 id="confirmacionTitulo">¡Tu cita fue registrada!</h2>
+        <p id="confirmacionMensaje">Guardamos correctamente tu cita. Revisa los datos de confirmación:</p>
+
+        <dl class="confirmation-details">
+            <div>
+                <dt><i class="bi bi-hash"></i>Cita</dt>
+                <dd id="confirmacionId"></dd>
+            </div>
+            <div>
+                <dt><i class="bi bi-calendar3"></i>Fecha</dt>
+                <dd id="confirmacionFecha"></dd>
+            </div>
+            <div>
+                <dt><i class="bi bi-clock"></i>Hora</dt>
+                <dd id="confirmacionHora"></dd>
+            </div>
+            <div>
+                <dt><i class="bi bi-heart-pulse"></i>Servicio</dt>
+                <dd id="confirmacionServicio"></dd>
+            </div>
+            <div>
+                <dt><i class="bi bi-info-circle"></i>Estado</dt>
+                <dd><span id="confirmacionEstado" class="badge-soft"></span></dd>
+            </div>
+        </dl>
+
+        <div class="confirmation-actions">
+            <a id="confirmacionAccionPrincipal" class="btn-pill" th:href="@{/mis-citas}">
+                <i class="bi bi-calendar-check"></i>Ver Mis Citas
+            </a>
+            <a class="btn-pill outline" th:href="@{/inicio}">Volver al inicio</a>
+        </div>
+    </div>
+</section>
+
+<script th:src="@{/js/reserva.js(v='3')}"></script>
 <script>
     (function(){
         var htmlEl = document.documentElement;

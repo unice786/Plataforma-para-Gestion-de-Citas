@@ -557,6 +557,70 @@
     margin-top:2px;
 }
 .table-app .text-end-cell{ text-align:right; }
+.cita-actions{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px;
+}
+.cita-actions form{ margin:0; }
+.cita-action{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    border:1px solid var(--auth-input-border);
+    border-radius:9px;
+    background:var(--auth-input-bg);
+    padding:8px 10px;
+    color:var(--auth-link);
+    font:inherit;
+    font-size:.8rem;
+    font-weight:700;
+    line-height:1;
+    text-decoration:none;
+    cursor:pointer;
+}
+.cita-action:hover{ border-color:var(--auth-accent); }
+.cita-action.delete{ color:var(--auth-alert-danger-text); }
+.edit-appointment-shell{ max-width:760px; }
+.edit-appointment-card{ padding:28px; }
+.appointment-service-summary{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:24px;
+    padding:16px 18px;
+    border-radius:16px;
+    background:var(--auth-input-bg);
+    color:var(--auth-text);
+}
+.appointment-service-summary>i{ color:var(--auth-link); font-size:1.35rem; }
+.appointment-service-summary span{
+    display:block;
+    color:var(--auth-text-soft);
+    font-size:.78rem;
+    font-weight:700;
+}
+.appointment-service-summary strong{ display:block; margin-top:2px; }
+.edit-appointment-form{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.edit-appointment-form>.app-alert,
+.edit-appointment-form>.edit-appointment-help,
+.edit-appointment-form>.app-actions{ grid-column:1/-1; }
+.edit-appointment-help{
+    display:flex;
+    gap:8px;
+    margin:0;
+    color:var(--auth-text-soft);
+    font-size:.86rem;
+}
+@media (max-width:600px){
+    .edit-appointment-form{ grid-template-columns:1fr; }
+    .edit-appointment-form>.app-alert,
+    .edit-appointment-form>.edit-appointment-help,
+    .edit-appointment-form>.app-actions{ grid-column:auto; }
+    .edit-appointment-form>.app-actions{ flex-direction:column-reverse; }
+    .edit-appointment-form>.app-actions .btn-pill{ justify-content:center; width:100%; }
+}
 
 /* ---------- Badges suaves ---------- */
 .badge-soft{
@@ -855,6 +919,13 @@ select option{
     flex-wrap:wrap;
     gap:10px;
 }
+.slots-result-meta{
+    flex-basis:100%;
+    margin:0 0 2px;
+    color:var(--auth-text-soft);
+    font-size:.82rem;
+    font-weight:700;
+}
 .slot{
     display:inline-flex;
     flex-direction:column;
@@ -901,6 +972,83 @@ select option{
     padding:14px 18px;
     font-size:.92rem;
     color:var(--auth-text);
+}
+
+/* ---------- Confirmación de reserva ---------- */
+body.confirmation-open{overflow:hidden}
+.confirmation-overlay{
+    position:fixed;
+    inset:0;
+    z-index:1500;
+    display:grid;
+    place-items:center;
+    padding:24px;
+    background:rgba(5,15,28,.72);
+    backdrop-filter:blur(7px);
+}
+.confirmation-dialog{
+    width:min(560px,100%);
+    max-height:calc(100vh - 48px);
+    overflow-y:auto;
+    padding:34px;
+    border:1px solid var(--auth-input-border);
+    border-radius:26px;
+    background:var(--auth-card-bg);
+    box-shadow:0 30px 80px rgba(0,0,0,.32);
+    color:var(--auth-text);
+    text-align:center;
+}
+.confirmation-icon{
+    display:grid;
+    place-items:center;
+    width:68px;
+    height:68px;
+    margin:0 auto 16px;
+    border-radius:50%;
+    background:rgba(31,157,103,.16);
+    color:#27a96f;
+    font-size:2rem;
+}
+.confirmation-eyebrow{
+    margin:0 0 5px;
+    color:#27966a;
+    font-size:.78rem;
+    font-weight:800;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+.confirmation-dialog h2{margin:0 0 8px;font-family:'Baloo 2',sans-serif;font-weight:800}
+.confirmation-dialog>p:not(.confirmation-eyebrow){margin:0;color:var(--auth-text-soft)}
+.confirmation-details{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin:24px 0;
+    text-align:left;
+}
+.confirmation-details>div{
+    padding:13px 15px;
+    border:1px solid var(--auth-input-border);
+    border-radius:14px;
+    background:var(--auth-input-bg);
+}
+.confirmation-details>div:nth-child(4){grid-column:1/-1}
+.confirmation-details dt{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:4px;
+    color:var(--auth-text-soft);
+    font-size:.75rem;
+    font-weight:700;
+}
+.confirmation-details dd{margin:0;color:var(--auth-text);font-weight:800}
+.confirmation-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+@media (max-width:520px){
+    .confirmation-dialog{padding:26px 20px}
+    .confirmation-details{grid-template-columns:1fr}
+    .confirmation-details>div:nth-child(4){grid-column:auto}
+    .confirmation-actions .btn-pill{width:100%;justify-content:center}
 }
 
 /* SCRUM-8/9: consulta, edición y cancelación administrativa de citas */

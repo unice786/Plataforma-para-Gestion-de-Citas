@@ -1,5 +1,6 @@
 package com.gestioncitas.plataformacitas.controladores;
 
+import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
 import jakarta.servlet.http.HttpSession;
@@ -28,8 +29,10 @@ public class CatalogoServicioController {
         if (usuario == null) {
             return "redirect:/login";
         }
+        if (!(usuario instanceof Cliente)) {
+            return "redirect:/inicio";
+        }
 
-        model.addAttribute("clienteId", usuario.getId());
         model.addAttribute("clienteNombre", usuario.getNombre());
         return "reservar-cita";
     }

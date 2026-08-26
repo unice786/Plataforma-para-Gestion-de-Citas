@@ -7,9 +7,6 @@ import java.time.LocalTime;
 
 public class ReservaCitaRequestDTO {
 
-    @NotNull(message = "El ID del cliente es obligatorio")
-    private Long clienteId;
-
     @NotNull(message = "El ID del empleado es obligatorio")
     private Long empleadoId;
 
@@ -22,9 +19,6 @@ public class ReservaCitaRequestDTO {
 
     @NotNull(message = "La hora es obligatoria")
     private LocalTime hora;
-
-    public Long getClienteId() { return clienteId; }
-    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
 
     public Long getEmpleadoId() { return empleadoId; }
     public void setEmpleadoId(Long empleadoId) { this.empleadoId = empleadoId; }

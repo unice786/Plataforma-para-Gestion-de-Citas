@@ -2,6 +2,7 @@ package com.gestioncitas.plataformacitas.servicios;
 
 import com.gestioncitas.plataformacitas.dto.CitaClienteResponseDTO;
 import com.gestioncitas.plataformacitas.dto.CitaResponseDTO;
+import com.gestioncitas.plataformacitas.dto.EdicionCitaClienteRequestDTO;
 import com.gestioncitas.plataformacitas.dto.EdicionCitaRequestDTO;
 import com.gestioncitas.plataformacitas.dto.HorarioDisponibleDTO;
 import com.gestioncitas.plataformacitas.dto.ReservaCitaRequestDTO;
@@ -19,6 +20,7 @@ import com.gestioncitas.plataformacitas.repositorios.ClienteRepository;
 import com.gestioncitas.plataformacitas.repositorios.EmpleadoRepository;
 import com.gestioncitas.plataformacitas.repositorios.HorarioDisponibilidadRepository;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * intervalos {@code [hora, horaFin)} de cada cita existente con el intervalo
  * de la nueva cita. Esto garantiza portabilidad total entre H2 y MySQL.</p>
  *
- * <p>El método {@link #reservarCita} está anotado con {@code @Transactional}
+ * <p>El método {@link #reservarCita(Long, ReservaCitaRequestDTO)} está anotado con {@code @Transactional}
  * para que la validación y el INSERT ocurran en la misma transacción de base de
  * datos, evitando condiciones de carrera en entornos concurrentes.</p>
  */
@@ -60,6 +62,7 @@ public class CitaService {
     private final EmpleadoRepository empleadoRepository;
     private final ServicioRepository servicioRepository;
     private final HorarioDisponibilidadRepository horarioRepository;
+    private final EntityManager entityManager;
 
     // ── Constructor (inyección por constructor) ───────────────────────────
 
@@ -67,12 +70,14 @@ public class CitaService {
                        ClienteRepository clienteRepository,
                        EmpleadoRepository empleadoRepository,
                        ServicioRepository servicioRepository,
-                       HorarioDisponibilidadRepository horarioRepository) {
+                       HorarioDisponibilidadRepository horarioRepository,
+                       EntityManager entityManager) {
         this.citaRepository = citaRepository;
         this.clienteRepository = clienteRepository;
         this.empleadoRepository = empleadoRepository;
         this.servicioRepository = servicioRepository;
         this.horarioRepository = horarioRepository;
+        this.entityManager = entityManager;
     }
 
     // ══════════════════════════════════════════════════════════════════════
@@ -199,6 +204,64 @@ public class CitaService {
                 .toList();
     }
 
+    /** Obtiene una cita únicamente cuando pertenece al cliente autenticado. */
+    public Cita obtenerCitaDelCliente(Long citaId, Long clienteId) {
+        return citaRepository.buscarPorIdYClienteId(citaId, clienteId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cita", citaId));
+    }
+
+    /** Reprograma una cita propia sin permitir horarios pasados, bloqueados u ocupados. */
+    @Transactional
+    public void editarCitaDelCliente(Long citaId, Long clienteId,
+                                     EdicionCitaClienteRequestDTO request) {
+        Cita cita = obtenerCitaDelCliente(citaId, clienteId);
+        if (!ESTADOS_ACTIVOS.contains(cita.getEstado())) {
+            throw new IllegalStateException("Solo puedes editar citas pendientes o confirmadas.");
+        }
+
+        LocalDate fecha = request.getFecha();
+        LocalTime horaInicio = request.getHora();
+        if (fecha.isBefore(LocalDate.now())
+                || (fecha.equals(LocalDate.now()) && !horaInicio.isAfter(LocalTime.now()))) {
+            throw new IllegalArgumentException("La nueva fecha y hora deben ser posteriores al momento actual.");
+        }
+
+        Servicio servicio = cita.getServicio();
+        LocalTime horaFin = horaInicio.plusMinutes(servicio.getDuracionMinutos());
+        List<HorarioDisponibilidad> bloques = horarioRepository.findByEmpleadoIdAndFechaAndEstado(
+                cita.getEmpleado().getId(), fecha, EstadoHorario.DISPONIBLE.name());
+        boolean dentroDeHorario = bloques.stream().anyMatch(bloque ->
+                !horaInicio.isBefore(bloque.getHoraInicio()) && !horaFin.isAfter(bloque.getHoraFin()));
+        if (!dentroDeHorario) {
+            throw new HorarioNoDisponibleException(
+                    "La hora seleccionada no está dentro del horario disponible del especialista.");
+        }
+
+        List<Cita> citasExistentes = citaRepository.findCitasActivasByEmpleadoAndFecha(
+                cita.getEmpleado().getId(), fecha, ESTADOS_ACTIVOS);
+        boolean hayConflicto = citasExistentes.stream()
+                .filter(otraCita -> !otraCita.getId().equals(citaId))
+                .anyMatch(otraCita -> seSolapa(
+                        horaInicio, horaFin, otraCita, servicio.getDuracionMinutos()));
+        if (hayConflicto) {
+            throw new HorarioNoDisponibleException(
+                    "El horario seleccionado se solapa con otra cita activa del especialista.");
+        }
+
+        cita.setFecha(fecha);
+        cita.setHora(horaInicio);
+        cita.setFechaUltimaModificacion(LocalDateTime.now());
+        cita.setDetalleUltimoCambio("Cita reprogramada por el cliente.");
+        citaRepository.save(cita);
+    }
+
+    /** Elimina una cita únicamente si pertenece al cliente autenticado. */
+    @Transactional
+    public void eliminarCitaDelCliente(Long citaId, Long clienteId) {
+        Cita cita = obtenerCitaDelCliente(citaId, clienteId);
+        citaRepository.delete(cita);
+    }
+
     // ══════════════════════════════════════════════════════════════════════
     // RESERVAR CITA
     // ══════════════════════════════════════════════════════════════════════
@@ -212,10 +275,10 @@ public class CitaService {
      * @throws HorarioNoDisponibleException  si el horario ya está ocupado (HTTP 409)
      */
     @Transactional
-    public CitaResponseDTO reservarCita(ReservaCitaRequestDTO request) {
+    public CitaResponseDTO reservarCita(Long clienteId, ReservaCitaRequestDTO request) {
 
         // 1. Validar existencia de entidades relacionadas
-        Cliente cliente = buscarCliente(request.getClienteId());
+        Cliente cliente = buscarCliente(clienteId);
         Empleado empleado = buscarEmpleado(request.getEmpleadoId());
         Servicio servicio = buscarServicio(request.getServicioId());
 
@@ -250,24 +313,26 @@ public class CitaService {
         nuevaCita.setEstado(EstadoCita.PENDIENTE);
         nuevaCita.setFechaRegistro(LocalDateTime.now());
 
-        Cita citaGuardada = citaRepository.save(nuevaCita);
+        Cita citaGuardada = citaRepository.saveAndFlush(nuevaCita);
+        entityManager.clear();
+        Cita citaPersistida = citaRepository.buscarConfirmacionPorId(citaGuardada.getId())
+                .orElseThrow(() -> new RecursoNoEncontradoException("Cita", citaGuardada.getId()));
 
         // 6. Construir y retornar respuesta
         return new CitaResponseDTO(
-                citaGuardada.getId(),
-                cliente.getNombre(),
-                empleado.getNombre(),
-                servicio.getNombre(),
-                citaGuardada.getFecha(),
-                citaGuardada.getHora(),
-                citaGuardada.getEstado(),
-                citaGuardada.getFechaRegistro(),
+                citaPersistida.getId(),
+                citaPersistida.getCliente().getNombre(),
+                citaPersistida.getEmpleado().getNombre(),
+                citaPersistida.getServicio().getNombre(),
+                citaPersistida.getFecha(),
+                citaPersistida.getHora(),
+                citaPersistida.getEstado(),
+                citaPersistida.getFechaRegistro(),
                 String.format(
-                        "¡Cita reservada exitosamente! Su cita para '%s' con %s está agendada para el %s a las %s.",
-                        servicio.getNombre(),
-                        empleado.getNombre(),
-                        citaGuardada.getFecha(),
-                        citaGuardada.getHora()
+                        "¡Cita reservada exitosamente! Tu cita para '%s' quedó registrada para el %s a las %s.",
+                        citaPersistida.getServicio().getNombre(),
+                        citaPersistida.getFecha(),
+                        citaPersistida.getHora()
                 )
         );
     }

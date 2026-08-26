@@ -72,9 +72,18 @@ public class CitaController {
         return ResponseEntity.ok(citaService.consultarDisponibilidad(servicioId, fechaConsulta));
     }
 
-    @PostMapping("/reservar")
-    public ResponseEntity<CitaResponseDTO> reservarCita(@Valid @RequestBody ReservaCitaRequestDTO request) {
-        CitaResponseDTO respuesta = citaService.reservarCita(request);
+    @PostMapping({"", "/reservar"})
+    public ResponseEntity<CitaResponseDTO> reservarCita(
+            @Valid @RequestBody ReservaCitaRequestDTO request,
+            @SessionAttribute(name = "usuario", required = false) Usuario usuario) {
+        if (usuario == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Debes iniciar sesión");
+        }
+        if (!(usuario instanceof Cliente)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acceso exclusivo para clientes");
+        }
+
+        CitaResponseDTO respuesta = citaService.reservarCita(usuario.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
     }
 }

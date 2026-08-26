@@ -4,6 +4,7 @@ import com.gestioncitas.plataformacitas.modelos.Cita;
 import com.gestioncitas.plataformacitas.modelos.EstadoCita;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -51,4 +52,25 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             WHERE c.id = :id
             """)
     java.util.Optional<Cita> buscarPorIdParaAdministrador(@Param("id") Long id);
+
+    @Query("""
+            SELECT c FROM Cita c
+            JOIN FETCH c.cliente
+            JOIN FETCH c.empleado
+            JOIN FETCH c.servicio
+            WHERE c.id = :id
+            """)
+    java.util.Optional<Cita> buscarConfirmacionPorId(@Param("id") Long id);
+
+    @Query("""
+            SELECT c FROM Cita c
+            JOIN FETCH c.cliente
+            JOIN FETCH c.empleado
+            JOIN FETCH c.servicio
+            WHERE c.id = :id
+              AND c.cliente.id = :clienteId
+            """)
+    Optional<Cita> buscarPorIdYClienteId(
+            @Param("id") Long id,
+            @Param("clienteId") Long clienteId);
 }
