@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head(${servicio.id == null ? 'Nuevo servicio' : 'Editar servicio'})}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell narrow">
+    <a class="app-back-link" th:href="@{/admin/servicios}"><i class="bi bi-arrow-left"></i>Volver al listado</a>
+
+    <header class="app-header">
+        <h1 th:text="${servicio.id == null ? 'Nuevo servicio' : 'Editar servicio'}"></h1>
+    </header>
+
+    <div class="app-alert alert-warning" role="alert" th:if="${#lists.isEmpty(categorias)}">
+        No hay categorías registradas. Debes crear al menos una categoría antes de guardar un servicio.
+    </div>
+
+    <form class="app-card" th:object="${servicio}"
+          th:action="${servicio.id == null} ? @{/admin/servicios} : @{/admin/servicios/{id}/editar(id=${servicio.id})}"
+          method="post">
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{activo}">
+        <div class="mb-3">
+            <label class="form-label" for="nombre">Nombre</label>
+            <input id="nombre" class="form-control" type="text" th:field="*{nombre}" maxlength="100" required>
+            <div class="invalid-feedback d-block" th:errors="*{nombre}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="categoria">Categoría</label>
+            <select id="categoria" class="form-select" th:field="*{categoria.id}" required>
+                <option value="">Selecciona una categoría</option>
+                <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
+            </select>
+            <div class="invalid-feedback d-block" th:errors="*{categoria}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="descripcion">Descripción</label>
+            <textarea id="descripcion" class="form-control" th:field="*{descripcion}" maxlength="1000" rows="4"></textarea>
+            <div class="invalid-feedback d-block" th:errors="*{descripcion}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="precio">Precio ($)</label>
+                <input id="precio" class="form-control" type="number" th:field="*{precio}" min="0.01" step="0.01" required>
+                <div class="invalid-feedback d-block" th:errors="*{precio}"></div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="duracion">Duración (minutos)</label>
+                <input id="duracion" class="form-control" type="number" th:field="*{duracionMinutos}" min="1" required>
+                <div class="invalid-feedback d-block" th:errors="*{duracionMinutos}"></div>
+            </div>
+        </div>
+
+        <div class="app-actions">
+            <a class="btn-pill outline" th:href="@{/admin/servicios}">Cancelar</a>
+            <button class="btn-pill" type="submit" th:disabled="${#lists.isEmpty(categorias)}">Guardar servicio</button>
+        </div>
+    </form>
+</main>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

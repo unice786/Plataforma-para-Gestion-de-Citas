@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Mis citas')}"></th:block>
+<body class="app-body" th:attr="data-cliente-id=${cliente.id}, data-csrf=${_csrf != null ? _csrf.token : ''}">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell">
+    <a class="app-back-link" th:href="@{/servicios}"><i class="bi bi-arrow-left"></i>Ir al catálogo</a>
+
+    <header class="app-header">
+        <div>
+            <h1>Mis citas</h1>
+            <p>Citas programadas de <span th:text="${cliente.nombre}"></span>.</p>
+        </div>
+        <a class="btn-pill outline" th:href="@{/mis-citas}">
+            <i class="bi bi-arrow-clockwise"></i>Actualizar
+        </a>
+    </header>
+
+    <div id="alertaExito" class="app-alert alert-success d-none" role="status"></div>
+    <div id="alertaError" class="app-alert alert-danger d-none" role="alert"></div>
+
+    <section class="app-card flush" th:if="${not #lists.isEmpty(citas)}">
+        <div class="table-responsive">
+            <table class="table-app">
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Servicio</th>
+                    <th>Empleado</th>
+                    <th>Estado</th>
+                    <th class="text-end-cell">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cita : ${citas}">
+                    <td th:text="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(cita.hora, 'HH:mm')}"></td>
+                    <td class="cell-strong" th:text="${cita.servicio.nombre}"></td>
+                    <td th:text="${cita.empleado.nombre}"></td>
+                    <td>
+                        <span class="badge-soft" th:text="${cita.estado}"
+                              th:classappend="${cita.estado.name() == 'CANCELADA'} ? ' neutral' : (${cita.estado.name() == 'COMPLETADA'} ? '' : ' info')"></span>
+                    </td>
+                    <td class="text-end-cell">
+                        <div class="d-inline-flex gap-2">
+                            <a th:if="${cita.estado.name() == 'PENDIENTE' or cita.estado.name() == 'CONFIRMADA'}"
+                               th:href="@{/reprogramar/{id}(id=${cita.id})}"
+                               class="btn-pill small outline">
+                                <i class="bi bi-calendar-event"></i>Reprogramar
+                            </a>
+                            <button th:if="${cita.estado.name() == 'PENDIENTE' or cita.estado.name() == 'CONFIRMADA'}"
+                                    type="button" class="btn-pill small danger-outline btn-cancelar"
+                                    th:data-cita-id="${cita.id}"
+                                    th:data-servicio="${cita.servicio.nombre}"
+                                    th:data-fecha="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"
+                                    th:data-hora="${#temporals.format(cita.hora, 'HH:mm')}">
+                                <i class="bi bi-x-circle"></i>Cancelar
+                            </button>
+                            <button th:if="${cita.estado.name() == 'CANCELADA'}"
+                                    type="button" class="btn-pill small danger-outline btn-eliminar"
+                                    th:data-cita-id="${cita.id}"
+                                    th:data-servicio="${cita.servicio.nombre}">
+                                <i class="bi bi-trash"></i>Eliminar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(citas)}">
+        <i class="bi bi-calendar-x"></i>
+        Aún no tienes citas programadas.
+    </div>
+</main>
+
+<div id="modalConfirmar" class="modal-overlay d-none">
+    <div class="modal-box app-card">
+        <h3 style="margin:0 0 8px;font-family:'Baloo 2',sans-serif;font-weight:700;" id="modalTitulo">Cancelar cita</h3>
+        <p id="modalMensaje" style="color:var(--auth-text-soft);margin:0 0 20px;font-size:.95rem;"></p>
+        <div class="app-actions">
+            <button type="button" class="btn-pill outline" id="modalCerrar">Volver</button>
+            <button type="button" class="btn-pill danger-outline" id="modalConfirmarBtn">
+                <i class="bi bi-check-lg"></i><span id="modalBtnTexto">Sí, cancelar</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var body = document.body;
+    var clienteId = body.getAttribute('data-cliente-id');
+    var csrfToken = body.getAttribute('data-csrf') || '';
+    var alertaExito = document.getElementById('alertaExito');
+    var alertaError = document.getElementById('alertaError');
+    var modal = document.getElementById('modalConfirmar');
+    var modalTitulo = document.getElementById('modalTitulo');
+    var modalMensaje = document.getElementById('modalMensaje');
+    var modalBtnTexto = document.getElementById('modalBtnTexto');
+    var btnCerrar = document.getElementById('modalCerrar');
+    var btnConfirmar = document.getElementById('modalConfirmarBtn');
+    var accionPendiente = null;
+
+    function mostrarAlerta(el, msg) { el.textContent = msg; el.classList.remove('d-none'); }
+    function ocultarAlertas() { alertaExito.classList.add('d-none'); alertaError.classList.add('d-none'); }
+
+    document.querySelectorAll('.btn-cancelar').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            ocultarAlertas();
+            accionPendiente = { tipo: 'cancelar', id: btn.dataset.citaId };
+            modalTitulo.textContent = 'Cancelar cita';
+            modalMensaje.textContent = '¿Seguro que quieres cancelar tu cita de "' + btn.dataset.servicio + '" el ' + btn.dataset.fecha + ' a las ' + btn.dataset.hora + '?';
+            modalBtnTexto.textContent = 'Sí, cancelar';
+            modal.classList.remove('d-none');
+        });
+    });
+
+    document.querySelectorAll('.btn-eliminar').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            ocultarAlertas();
+            accionPendiente = { tipo: 'eliminar', id: btn.dataset.citaId };
+            modalTitulo.textContent = 'Eliminar del historial';
+            modalMensaje.textContent = '¿Seguro que quieres eliminar la cita de "' + btn.dataset.servicio + '" de tu historial? Esta acción no se puede deshacer.';
+            modalBtnTexto.textContent = 'Sí, eliminar';
+            modal.classList.remove('d-none');
+        });
+    });
+
+    btnCerrar.addEventListener('click', function() { modal.classList.add('d-none'); accionPendiente = null; });
+    modal.addEventListener('click', function(e) { if (e.target === modal) { modal.classList.add('d-none'); accionPendiente = null; } });
+
+    btnConfirmar.addEventListener('click', function() {
+        if (!accionPendiente) return;
+        btnConfirmar.disabled = true;
+        var url = '/api/citas/' + accionPendiente.id + (accionPendiente.tipo === 'eliminar' ? '/eliminar' : '/cancelar') + '?clienteId=' + clienteId;
+        fetch(url, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        })
+        .then(function(r) {
+            if (r.ok) return r.text().then(function() { return { ok: true }; });
+            return r.json().then(function(d) { return { ok: false, data: d }; });
+        })
+        .then(function(res) {
+            modal.classList.add('d-none');
+            btnConfirmar.disabled = false;
+            accionPendiente = null;
+            if (res.ok) {
+                mostrarAlerta(alertaExito, res.data && res.data.mensaje ? res.data.mensaje : (accionPendiente && accionPendiente.tipo === 'eliminar' ? 'Cita eliminada del historial.' : 'Cita cancelada correctamente.'));
+                setTimeout(function() { location.reload(); }, 1500);
+            } else {
+                mostrarAlerta(alertaError, res.data && res.data.mensaje ? res.data.mensaje : 'No se pudo completar la acción.');
+            }
+        })
+        .catch(function() {
+            modal.classList.add('d-none');
+            btnConfirmar.disabled = false;
+            accionPendiente = null;
+            mostrarAlerta(alertaError, 'Error de conexión. Intenta de nuevo.');
+        });
+    });
+})();
+</script>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

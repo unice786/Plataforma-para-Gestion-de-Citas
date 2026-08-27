@@ -1,0 +1,118 @@
+@startuml
+title Diagrama Entidad-Relación Normalizado (3FN) - Sugoi
+
+entity "usuarios" as usuarios {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  * correo : VARCHAR(150)
+  * password : VARCHAR(255)
+  * activo : BOOLEAN
+  verificado : BOOLEAN DEFAULT FALSE
+  token_verificacion : VARCHAR(255)
+  token_expiracion : DATETIME
+  token_recuperacion : VARCHAR(255)
+  token_recuperacion_expiracion : DATETIME
+  * rol : VARCHAR(20) DEFAULT 'CLIENTE'
+}
+
+entity "clientes" as clientes {
+  * usuario_id : BIGINT <<PK, FK>>
+  --
+  telefono : VARCHAR(20)
+}
+
+entity "especialidades" as especialidades {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(100)
+  descripcion : VARCHAR(255)
+}
+
+entity "empleados" as empleados {
+  * usuario_id : BIGINT <<PK, FK>>
+  --
+  * especialidad_id : BIGINT <<FK>>
+}
+
+entity "administradores" as administradores {
+  * usuario_id : BIGINT <<PK, FK>>
+}
+
+entity "categorias_servicio" as categorias {
+  * id : BIGINT <<PK>>
+  --
+  * nombre : VARCHAR(50)
+  descripcion : TEXT
+}
+
+entity "servicios" as servicios {
+  * id : BIGINT <<PK>>
+  --
+  * categoria_id : BIGINT <<FK>>
+  * nombre : VARCHAR(100)
+  descripcion : TEXT
+  * precio : DECIMAL(10,2)
+  * duracion_minutos : INT
+  * activo : BOOLEAN
+}
+
+entity "horarios_disponibilidad" as horarios {
+  * id : BIGINT <<PK>>
+  --
+  * empleado_id : BIGINT <<FK>>
+  * fecha : DATE
+  * hora_inicio : TIME
+  * hora_fin : TIME
+  * estado : VARCHAR(20) DEFAULT 'DISPONIBLE'
+}
+
+entity "citas" as citas {
+  * id : BIGINT <<PK>>
+  --
+  * cliente_id : BIGINT <<FK>>
+  * empleado_id : BIGINT <<FK>>
+  * servicio_id : BIGINT <<FK>>
+  * fecha : DATE
+  * hora : TIME
+  * estado : VARCHAR(20)
+  * fecha_registro : DATETIME
+  fecha_ultima_modificacion : DATETIME
+  detalle_ultimo_cambio : VARCHAR(500)
+}
+
+entity "notificaciones" as notificaciones {
+  * id : BIGINT <<PK>>
+  --
+  * usuario_id : BIGINT <<FK>>
+  * mensaje : TEXT
+  * tipo : VARCHAR(30)
+  * leida : BOOLEAN DEFAULT FALSE
+  * fecha_creacion : DATETIME
+}
+
+entity "empleado_servicio" as emp_serv {
+  * empleado_id : BIGINT <<PK, FK>>
+  * servicio_id : BIGINT <<PK, FK>>
+}
+
+' Herencia
+usuarios ||--|| clientes
+usuarios ||--|| empleados
+usuarios ||--|| administradores
+
+' Catálogos
+especialidades ||--o{ empleados
+categorias ||--o{ servicios
+
+' Operaciones
+empleados ||--o{ horarios
+clientes ||--o{ citas
+empleados ||--o{ citas
+servicios ||--o{ citas
+empleados ||--o{ emp_serv
+servicios ||--o{ emp_serv
+
+' Notificaciones
+usuarios ||--o{ notificaciones
+@enduml

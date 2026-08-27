@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Administrar horarios')}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell">
+    <header class="app-header">
+        <div>
+            <h1>Administraci&oacute;n de horarios</h1>
+            <p>Gestiona la disponibilidad de tus empleados por rangos de fecha.</p>
+        </div>
+        <div class="d-inline-flex gap-2">
+            <button type="button" class="btn-pill outline" data-bs-toggle="modal" data-bs-target="#bulkModal">
+                <i class="bi bi-calendar-range"></i>Crear en bloque
+            </button>
+            <a class="btn-pill" th:href="@{/admin/horarios/nuevo}">
+                <i class="bi bi-plus-lg"></i>Horario individual
+            </a>
+        </div>
+    </header>
+
+    <div class="app-alert alert-success" role="status" th:if="${exito}" th:text="${exito}"></div>
+    <div class="app-alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <section class="app-card filtros-servicios" style="margin-bottom:22px;">
+        <form class="horarios-filter-form" th:action="@{/admin/horarios}" method="get">
+            <div class="filtros-row">
+                <div class="filtro-grupo">
+                    <label class="form-label">Empleado</label>
+                    <select class="form-select" name="empleadoId">
+                        <option value="">Todos los empleados</option>
+                        <option th:each="emp : ${empleados}" th:value="${emp.id}" th:text="${emp.nombre}"
+                                th:selected="${emp.id == empleadoFiltro}"></option>
+                    </select>
+                </div>
+                <div class="filtro-grupo">
+                    <label class="form-label">Desde</label>
+                    <input class="form-control" type="date" name="desde" th:value="${desdeFiltro}">
+                </div>
+                <div class="filtro-grupo">
+                    <label class="form-label">Hasta</label>
+                    <input class="form-control" type="date" name="hasta" th:value="${hastaFiltro}">
+                </div>
+                <div class="filtro-grupo" style="flex:0;">
+                    <button class="btn-pill small" type="submit"><i class="bi bi-funnel"></i>Filtrar</button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <div th:if="${not #lists.isEmpty(horarios)}" class="horarios-cards-container">
+        <div class="horario-card" th:each="entry : ${horariosAgrupados}">
+            <div class="horario-card-header">
+                <div class="horario-card-employee">
+                    <i class="bi bi-person-circle"></i>
+                    <strong th:text="${entry.key}"></strong>
+                </div>
+                <span class="badge-soft info" th:text="${entry.value.size() + ' horario(s)'}"></span>
+            </div>
+            <div class="horario-card-body">
+                <div class="horario-chip-list">
+                    <div class="horario-chip" th:each="h : ${entry.value}">
+                        <div class="horario-chip-date">
+                            <i class="bi bi-calendar3"></i>
+                            <span th:text="${h.fecha}"></span>
+                        </div>
+                        <div class="horario-chip-time">
+                            <span th:text="${h.horaInicio}"></span> &ndash; <span th:text="${h.horaFin}"></span>
+                        </div>
+                        <span class="badge-soft" th:if="${h.estado == 'DISPONIBLE'}" th:text="Disponible"></span>
+                        <span class="badge-soft neutral" th:unless="${h.estado == 'DISPONIBLE'}" th:text="${h.estado}"></span>
+                        <div class="horario-chip-actions">
+                            <a class="horario-action-btn" th:href="@{/admin/horarios/{id}/editar(id=${h.id})}" title="Editar">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <form class="d-inline" th:action="@{/admin/horarios/{id}/eliminar(id=${h.id})}" method="post">
+                                <button class="horario-action-btn danger" type="submit"
+                                        onclick="return confirm('¿Eliminar este horario?');" title="Eliminar">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(horarios)}">
+        <i class="bi bi-inbox"></i>
+        No hay horarios para los filtros seleccionados.
+    </div>
+</main>
+
+<div class="modal-overlay d-none" id="bulkModal">
+    <div class="modal-box app-card" style="position:relative; z-index:61;">
+        <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+            <h2 style="margin:0;font-family:'Baloo 2',sans-serif;font-size:1.2rem;color:var(--auth-text);">Crear horarios en bloque</h2>
+            <button type="button" class="notif-close" onclick="document.getElementById('bulkModal').classList.add('d-none')">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </header>
+        <form th:action="@{/admin/horarios/bulk}" th:object="${bulk}" method="post">
+            <div class="mb-3">
+                <label class="form-label">Empleado</label>
+                <select class="form-select" th:field="*{empleadoId}" required>
+                    <option value="">Selecciona un empleado</option>
+                    <option th:each="emp : ${empleados}" th:value="${emp.id}" th:text="${emp.nombre}"></option>
+                </select>
+                <div class="invalid-feedback d-block" th:errors="*{empleadoId}"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fecha inicio</label>
+                    <input class="form-control" type="date" th:field="*{fechaInicio}" required>
+                    <div class="invalid-feedback d-block" th:errors="*{fechaInicio}"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fecha fin</label>
+                    <input class="form-control" type="date" th:field="*{fechaFin}" required>
+                    <div class="invalid-feedback d-block" th:errors="*{fechaFin}"></div>
+                </div>
+            </div>
+            <div class="invalid-feedback d-block mb-3" th:if="${#fields.hasErrors('rangoFechasValido')}" th:errors="*{rangoFechasValido}"></div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Hora inicio</label>
+                    <input class="form-control" type="time" step="60" th:field="*{horaInicio}" required>
+                    <div class="invalid-feedback d-block" th:errors="*{horaInicio}"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Hora fin</label>
+                    <input class="form-control" type="time" step="60" th:field="*{horaFin}" required>
+                    <div class="invalid-feedback d-block" th:errors="*{horaFin}"></div>
+                </div>
+            </div>
+            <div class="invalid-feedback d-block mb-3" th:if="${#fields.hasErrors('rangoHorarioValido')}" th:errors="*{rangoHorarioValido}"></div>
+            <div class="mb-3">
+                <label class="form-label">D&iacute;as de la semana (opcional)</label>
+                <div class="dias-semana-grid">
+                    <label class="dia-check"><input type="checkbox" value="MONDAY" th:field="*{diasSeleccionados}"><span>Lun</span></label>
+                    <label class="dia-check"><input type="checkbox" value="TUESDAY" th:field="*{diasSeleccionados}"><span>Mar</span></label>
+                    <label class="dia-check"><input type="checkbox" value="WEDNESDAY" th:field="*{diasSeleccionados}"><span>Mi&eacute;</span></label>
+                    <label class="dia-check"><input type="checkbox" value="THURSDAY" th:field="*{diasSeleccionados}"><span>Jue</span></label>
+                    <label class="dia-check"><input type="checkbox" value="FRIDAY" th:field="*{diasSeleccionados}"><span>Vie</span></label>
+                    <label class="dia-check"><input type="checkbox" value="SATURDAY" th:field="*{diasSeleccionados}"><span>S&aacute;b</span></label>
+                    <label class="dia-check"><input type="checkbox" value="SUNDAY" th:field="*{diasSeleccionados}"><span>Dom</span></label>
+                </div>
+                <small style="color:var(--auth-text-soft);font-size:.82rem;">Si no seleccionas ninguno, se crean para todos los d&iacute;as del rango.</small>
+            </div>
+            <div class="app-actions">
+                <button type="button" class="btn-pill outline" onclick="document.getElementById('bulkModal').classList.add('d-none')">Cancelar</button>
+                <button class="btn-pill" type="submit" th:disabled="${#lists.isEmpty(empleados)}">Crear horarios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Catálogo de servicios')}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell">
+    <header class="app-header text-center justify-content-center">
+        <div>
+            <h1>Servicios disponibles</h1>
+            <p>Elige el servicio que mejor se adapte a ti.</p>
+        </div>
+    </header>
+
+    <div class="app-card filtros-servicios">
+        <div class="filtros-row">
+            <div class="filtro-grupo">
+                <label class="form-label" for="filtroCategoria">Categoría</label>
+                <select id="filtroCategoria" class="form-select">
+                    <option value="">Todas</option>
+                </select>
+            </div>
+            <div class="filtro-grupo">
+                <label class="form-label" for="filtroPrecioMax">Precio máximo</label>
+                <input type="range" id="filtroPrecioMax" min="0" max="200" value="200" class="form-range">
+                <span id="filtroPrecioLabel" class="filtro-valor">$200</span>
+            </div>
+            <div class="filtro-grupo">
+                <label class="form-label" for="filtroDuracion">Duración máxima</label>
+                <select id="filtroDuracion" class="form-select">
+                    <option value="">Cualquiera</option>
+                    <option value="30">30 min o menos</option>
+                    <option value="60">1 hora o menos</option>
+                    <option value="90">1.5 horas o menos</option>
+                    <option value="120">2 horas o menos</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <section class="app-grid" id="listaServicios" th:if="${not #lists.isEmpty(servicios)}">
+        <a class="app-card service-card service-card-link" th:each="servicio : ${servicios}"
+           th:href="@{/reservar(servicioId=${servicio.id})}"
+           th:attr="data-categoria=${servicio.categoria.nombre}, data-precio=${servicio.precio}, data-duracion=${servicio.duracionMinutos}">
+            <span class="service-category" th:text="${servicio.categoria.nombre}"></span>
+            <h2 class="service-name" th:text="${servicio.nombre}"></h2>
+            <p class="service-desc" th:text="${servicio.descripcion}"></p>
+            <div class="service-footer">
+                <span class="service-price" th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}"></span>
+                <span class="service-duration">
+                    <i class="bi bi-clock me-1"></i><span th:text="${servicio.duracionMinutos}"></span> min
+                </span>
+            </div>
+        </a>
+    </section>
+
+    <div class="app-card empty-state d-none" id="sinResultados">
+        <i class="bi bi-search"></i>
+        No se encontraron servicios con esos filtros.
+    </div>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(servicios)}">
+        <i class="bi bi-spa"></i>
+        No hay servicios disponibles por el momento.
+    </div>
+</main>
+
+<script>
+(function() {
+    var cards = document.querySelectorAll('.service-card');
+    var filtroCategoria = document.getElementById('filtroCategoria');
+    var filtroPrecio = document.getElementById('filtroPrecioMax');
+    var filtroPrecioLabel = document.getElementById('filtroPrecioLabel');
+    var filtroDuracion = document.getElementById('filtroDuracion');
+    var sinResultados = document.getElementById('sinResultados');
+    var categorias = new Set();
+
+    cards.forEach(function(c) {
+        var cat = c.getAttribute('data-categoria');
+        if (cat) categorias.add(cat);
+    });
+    categorias.forEach(function(cat) {
+        var opt = document.createElement('option');
+        opt.value = cat; opt.textContent = cat;
+        filtroCategoria.appendChild(opt);
+    });
+
+    function filtrar() {
+        var cat = filtroCategoria.value;
+        var precioMax = parseFloat(filtroPrecio.value);
+        var durMax = filtroDuracion.value ? parseInt(filtroDuracion.value) : Infinity;
+        var visibles = 0;
+
+        cards.forEach(function(c) {
+            var cCat = c.getAttribute('data-categoria');
+            var cPrecio = parseFloat(c.getAttribute('data-precio'));
+            var cDur = parseInt(c.getAttribute('data-duracion'));
+            var ok = true;
+            if (cat && cCat !== cat) ok = false;
+            if (cPrecio > precioMax) ok = false;
+            if (cDur > durMax) ok = false;
+            c.style.display = ok ? '' : 'none';
+            if (ok) visibles++;
+        });
+
+        sinResultados.classList.toggle('d-none', visibles > 0);
+    }
+
+    filtroCategoria.addEventListener('change', filtrar);
+    filtroPrecio.addEventListener('input', function() {
+        filtroPrecioLabel.textContent = '$' + filtroPrecio.value;
+        filtrar();
+    });
+    filtroDuracion.addEventListener('change', filtrar);
+})();
+</script>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Administrar servicios')}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell">
+    <header class="app-header">
+        <div>
+            <h1>Administración de servicios</h1>
+            <p>Crea, edita o retira servicios del catálogo.</p>
+        </div>
+        <a class="btn-pill" th:href="@{/admin/servicios/nuevo}">
+            <i class="bi bi-plus-lg"></i>Nuevo servicio
+        </a>
+    </header>
+
+    <div class="app-alert alert-success" role="status" th:if="${exito}" th:text="${exito}"></div>
+    <div class="app-alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <section class="app-card flush" th:if="${not #lists.isEmpty(servicios)}">
+        <div class="table-responsive">
+            <table class="table-app">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
+                    <th>Estado</th>
+                    <th class="text-end-cell">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="servicio : ${servicios}">
+                    <td>
+                        <span class="cell-strong" th:text="${servicio.nombre}"></span>
+                        <small class="cell-muted" th:text="${servicio.descripcion}"></small>
+                    </td>
+                    <td th:text="${servicio.categoria.nombre}"></td>
+                    <td th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}"></td>
+                    <td><span th:text="${servicio.duracionMinutos}"></span> min</td>
+                    <td>
+                        <span class="badge-soft" th:if="${servicio.activo}">Activo</span>
+                        <span class="badge-soft neutral" th:unless="${servicio.activo}">Retirado</span>
+                    </td>
+                    <td class="text-end-cell">
+                        <div class="d-inline-flex gap-2">
+                            <a class="btn-pill outline small" th:href="@{/admin/servicios/{id}/editar(id=${servicio.id})}">
+                                <i class="bi bi-pencil-square"></i>Editar
+                            </a>
+                            <form class="d-inline" th:if="${servicio.activo}"
+                                  th:action="@{/admin/servicios/{id}/eliminar(id=${servicio.id})}" method="post">
+                                <button class="btn-pill danger-outline small" type="submit"
+                                        onclick="return confirm('¿Quieres retirar este servicio del catálogo?');">
+                                    <i class="bi bi-trash3"></i>Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(servicios)}">
+        <i class="bi bi-inbox"></i>
+        Todavía no hay servicios registrados.
+    </div>
+</main>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

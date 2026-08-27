@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Reprogramar cita')}"></th:block>
+<body class="app-body"
+      th:attr="data-cita-id=${cita.id}, data-cliente-id=${clienteId}, data-servicio-id=${cita.servicio.id}, data-csrf=${_csrf != null ? _csrf.token : ''}">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell narrow">
+    <a class="app-back-link" th:href="@{/mis-citas}"><i class="bi bi-arrow-left"></i>Mis citas</a>
+
+    <header class="app-header">
+        <div>
+            <h1>Reprogramar cita</h1>
+            <p>Elige una nueva fecha y horario para tu cita.</p>
+        </div>
+    </header>
+
+    <div class="app-card mb-3">
+        <h6 style="color:var(--auth-text-soft);font-size:.82rem;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">
+            Cita actual
+        </h6>
+        <div class="row" style="font-size:.95rem;">
+            <div class="col-sm-6 mb-2">
+                <strong>Servicio:</strong> <span th:text="${cita.servicio.nombre}"></span>
+            </div>
+            <div class="col-sm-6 mb-2">
+                <strong>Empleado:</strong> <span th:text="${cita.empleado.nombre}"></span>
+            </div>
+            <div class="col-sm-6 mb-2">
+                <strong>Fecha:</strong> <span th:text="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"></span>
+            </div>
+            <div class="col-sm-6 mb-2">
+                <strong>Hora:</strong> <span th:text="${#temporals.format(cita.hora, 'HH:mm')}"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertaExito" class="app-alert alert-success d-none" role="status"></div>
+    <div id="alertaError" class="app-alert alert-danger d-none" role="alert"></div>
+
+    <form class="app-card" id="formReprogramar">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="nuevaFecha">Nueva fecha</label>
+                <input id="nuevaFecha" class="form-control" type="date" required>
+            </div>
+            <div class="col-md-6 mb-3 d-flex align-items-end">
+                <button type="button" class="btn-pill outline w-100" id="btnConsultar">
+                    <i class="bi bi-search"></i>Ver horarios disponibles
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Horarios disponibles</label>
+            <div id="slots" class="slots-grid">
+                <p class="text-secondary-emphasis small mb-0" style="color:var(--auth-text-soft);">
+                    Selecciona una fecha para ver los horarios disponibles.
+                </p>
+            </div>
+        </div>
+
+        <input type="hidden" id="empleadoId" required>
+        <input type="hidden" id="hora" required>
+
+        <div id="resumen" class="resumen-cita d-none mb-3"></div>
+
+        <div class="app-actions">
+            <a class="btn-pill outline" th:href="@{/mis-citas}">Cancelar</a>
+            <button class="btn-pill" type="submit" id="btnReprogramar" disabled>
+                <i class="bi bi-calendar-check"></i>Confirmar reprogramación
+            </button>
+        </div>
+    </form>
+</main>
+
+<script th:src="@{/js/reprogramar.js}"></script>
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>
