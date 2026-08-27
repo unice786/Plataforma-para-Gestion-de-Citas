@@ -523,6 +523,40 @@
     color:var(--auth-text);
 }
 .service-card .service-duration{ color:var(--auth-text-soft); }
+.service-filters{
+    display:grid;
+    grid-template-columns:minmax(230px,2fr) repeat(4,minmax(130px,1fr)) auto;
+    gap:14px;
+    align-items:end;
+    margin-bottom:16px;
+    padding:20px;
+}
+.service-filter-field label{
+    display:block;
+    margin:0 0 6px 8px;
+    color:var(--auth-text-soft);
+    font-size:.8rem;
+    font-weight:700;
+}
+.service-filter-field input,.service-filter-field select{
+    box-sizing:border-box;
+    width:100%;
+    height:44px;
+    padding:0 14px;
+    border:1px solid var(--auth-input-border);
+    border-radius:12px;
+    background:var(--auth-input-bg);
+    color:var(--auth-input-text);
+    font:inherit;
+}
+.service-filter-field input:focus,.service-filter-field select:focus{ outline:0; border-color:var(--auth-accent); box-shadow:0 0 0 3px rgba(27,90,158,.16); }
+.service-search-input{ position:relative; }
+.service-search-input i{ position:absolute; top:50%; left:14px; transform:translateY(-50%); color:var(--auth-icon); }
+.service-search-input input{ padding-left:39px; }
+.service-filter-clear{ white-space:nowrap; margin-bottom:1px; }
+.service-result-count{ margin:0 0 14px; color:var(--auth-text-soft); font-size:.88rem; font-weight:600; }
+@media (max-width:1050px){ .service-filters{ grid-template-columns:repeat(3,1fr); } .service-filter-search{ grid-column:span 2; } }
+@media (max-width:650px){ .service-filters{ grid-template-columns:1fr; } .service-filter-search{ grid-column:auto; } .service-filter-clear{ width:100%; justify-content:center; } }
 
 /* ---------- Tablas ---------- */
 .table-app{

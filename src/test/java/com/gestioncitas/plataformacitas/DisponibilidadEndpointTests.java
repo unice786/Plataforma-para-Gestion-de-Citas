@@ -109,6 +109,34 @@ class DisponibilidadEndpointTests {
     }
 
     @Test
+    void endpointServiciosFiltraPorCategoriaPrecioDuracionYTexto() throws Exception {
+        CategoriaServicio categoria = new CategoriaServicio();
+        categoria.setNombre("Estética");
+        categoria = categoriaServicioRepository.save(categoria);
+
+        Servicio servicioEstetica = new Servicio();
+        servicioEstetica.setNombre("Limpieza facial");
+        servicioEstetica.setDescripcion("Tratamiento facial profundo");
+        servicioEstetica.setPrecio(new BigDecimal("40.00"));
+        servicioEstetica.setDuracionMinutos(60);
+        servicioEstetica.setActivo(true);
+        servicioEstetica.setCategoria(categoria);
+        servicioRepository.save(servicioEstetica);
+
+        mockMvc.perform(get("/api/servicios")
+                        .param("categoria", "estética")
+                        .param("precioMin", "35")
+                        .param("precioMax", "45")
+                        .param("duracion", "60")
+                        .param("query", "facial"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].nombre").value("Limpieza facial"))
+                .andExpect(jsonPath("$[0].categoriaNombre").value("Estética"));
+    }
+
+    @Test
     void endpointDisponibilidadDevuelveSlotsParaManana() throws Exception {
         LocalDate manana = LocalDate.now().plusDays(1);
 

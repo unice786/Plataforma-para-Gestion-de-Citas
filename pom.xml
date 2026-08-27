@@ -50,11 +50,11 @@
 			<artifactId>mysql-connector-j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		<!-- Base de datos H2 en memoria, solo para pruebas -->
+		<!-- Base de datos H2 en memoria para desarrollo local y pruebas -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<scope>test</scope>
+			<scope>runtime</scope>
 		</dependency>
 <!-- Herramientas de Desarrollo -->
 		<dependency>

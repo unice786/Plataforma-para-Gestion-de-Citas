@@ -52,23 +52,61 @@
         </div>
     </header>
 
-    <section class="app-grid" th:if="${not #lists.isEmpty(servicios)}">
+    <section class="app-card service-filters" aria-label="Filtrar servicios">
+        <div class="service-filter-field service-filter-search">
+            <label for="filtroTexto">Buscar servicio</label>
+            <div class="service-search-input">
+                <i class="bi bi-search" aria-hidden="true"></i>
+                <input id="filtroTexto" type="search" placeholder="Nombre o descripción" autocomplete="off">
+            </div>
+        </div>
+        <div class="service-filter-field">
+            <label for="filtroCategoria">Tipo de servicio</label>
+            <select id="filtroCategoria">
+                <option value="">Todas las categorías</option>
+            </select>
+        </div>
+        <div class="service-filter-field">
+            <label for="filtroPrecioMin">Precio mínimo</label>
+            <input id="filtroPrecioMin" type="number" min="0" step="0.01" inputmode="decimal" placeholder="$0.00">
+        </div>
+        <div class="service-filter-field">
+            <label for="filtroPrecioMax">Precio máximo</label>
+            <input id="filtroPrecioMax" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Sin límite">
+        </div>
+        <div class="service-filter-field">
+            <label for="filtroDuracion">Duración estimada</label>
+            <select id="filtroDuracion">
+                <option value="">Cualquier duración</option>
+            </select>
+        </div>
+        <button id="limpiarFiltros" type="button" class="btn-pill outline small service-filter-clear">
+            <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+        </button>
+    </section>
+
+    <p id="serviceResultCount" class="service-result-count" aria-live="polite"></p>
+
+    <section id="serviceResults" class="app-grid" aria-live="polite" aria-busy="false">
         <article class="app-card service-card" th:each="servicio : ${servicios}">
             <span class="service-category" th:text="${servicio.categoria.nombre}"></span>
             <h2 class="service-name" th:text="${servicio.nombre}"></h2>
             <p class="service-desc" th:text="${servicio.descripcion}"></p>
             <div class="service-footer">
                 <span class="service-price" th:text="'$' + ${#numbers.formatDecimal(servicio.precio, 1, 2)}"></span>
-                <span class="service-duration">
-                    <i class="bi bi-clock me-1"></i><span th:text="${servicio.duracionMinutos}"></span> min
-                </span>
+                <span class="service-duration"><i class="bi bi-clock me-1"></i><span th:text="${servicio.duracionMinutos}"></span> min</span>
             </div>
         </article>
     </section>
 
-    <div class="app-card empty-state" th:if="${#lists.isEmpty(servicios)}">
-        <i class="bi bi-spa"></i>
-        No hay servicios disponibles por el momento.
+    <div id="serviceEmptyState" class="app-card empty-state d-none" role="status">
+        <i class="bi bi-search"></i>
+        <strong>No encontramos servicios con esos filtros</strong>
+        <span>Prueba con otro texto o amplía el rango de precio.</span>
+    </div>
+
+    <div id="serviceLoadingState" class="loading-state d-none" role="status">
+        <span class="loading-spinner" aria-hidden="true"></span> Actualizando servicios...
     </div>
 </main>
 
@@ -89,5 +127,6 @@
         });
     })();
 </script>
+<script th:src="@{/js/catalogo-servicios.js}"></script>
 </body>
 </html>
