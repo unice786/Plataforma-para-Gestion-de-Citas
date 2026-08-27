@@ -1,5 +1,6 @@
 package com.gestioncitas.plataformacitas.controladores;
 
+import com.gestioncitas.plataformacitas.modelos.RolUsuario;
 import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
 import jakarta.servlet.http.HttpSession;
@@ -25,7 +26,7 @@ public class CatalogoServicioController {
     @GetMapping("/reservar")
     public String mostrarReserva(HttpSession session, Model model) {
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        if (usuario == null) {
+        if (usuario == null || usuario.getRol() != RolUsuario.CLIENTE) {
             return "redirect:/login";
         }
 

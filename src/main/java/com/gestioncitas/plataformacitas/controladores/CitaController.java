@@ -2,6 +2,7 @@ package com.gestioncitas.plataformacitas.controladores;
 
 import com.gestioncitas.plataformacitas.dto.CitaResponseDTO;
 import com.gestioncitas.plataformacitas.dto.HorarioDisponibleDTO;
+import com.gestioncitas.plataformacitas.dto.ReprogramarCitaDTO;
 import com.gestioncitas.plataformacitas.dto.ReservaCitaRequestDTO;
 import com.gestioncitas.plataformacitas.servicios.CitaService;
 import jakarta.validation.Valid;
@@ -11,7 +12,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,5 +57,16 @@ public class CitaController {
     public ResponseEntity<CitaResponseDTO> reservarCita(@Valid @RequestBody ReservaCitaRequestDTO request) {
         CitaResponseDTO respuesta = citaService.reservarCita(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+    }
+
+    @PutMapping("/{id}/reprogramar")
+    public ResponseEntity<CitaResponseDTO> reprogramarCita(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody ReprogramarCitaDTO request) {
+        if (!id.equals(request.getCitaId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        CitaResponseDTO respuesta = citaService.reprogramarCita(request);
+        return ResponseEntity.ok(respuesta);
     }
 }

@@ -4,8 +4,11 @@ import com.gestioncitas.plataformacitas.dto.HorarioRequestDTO;
 import com.gestioncitas.plataformacitas.dto.HorarioResponseDTO;
 import com.gestioncitas.plataformacitas.excepciones.HorarioNoDisponibleException;
 import com.gestioncitas.plataformacitas.excepciones.RecursoNoEncontradoException;
+import com.gestioncitas.plataformacitas.modelos.RolUsuario;
+import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.servicios.EmpleadoService;
 import com.gestioncitas.plataformacitas.servicios.HorarioDisponibilidadService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,13 +33,15 @@ public class HorarioController {
 	}
 
 	@GetMapping
-	public String listar(Model model) {
+	public String listar(Model model, HttpSession session) {
+		if (!esAdmin(session)) return "redirect:/login";
 		model.addAttribute("horarios", horarioService.listarTodos());
 		return "admin-horarios";
 	}
 
 	@GetMapping("/nuevo")
-	public String mostrarFormularioNuevo(Model model) {
+	public String mostrarFormularioNuevo(Model model, HttpSession session) {
+		if (!esAdmin(session)) return "redirect:/login";
 		prepararFormulario(model, new HorarioRequestDTO());
 		return "admin-horario-formulario";
 	}
@@ -45,7 +50,9 @@ public class HorarioController {
 	public String crear(@Valid @ModelAttribute("horario") HorarioRequestDTO horario,
 						BindingResult resultado,
 						Model model,
-						RedirectAttributes atributos) {
+						RedirectAttributes atributos,
+						HttpSession session) {
+		if (!esAdmin(session)) return "redirect:/login";
 		if (resultado.hasErrors()) {
 			prepararFormulario(model, horario);
 			return "admin-horario-formulario";
@@ -64,7 +71,9 @@ public class HorarioController {
 
 	@GetMapping("/{id}/editar")
 	public String mostrarFormularioEdicion(@PathVariable Long id, Model model,
-										   RedirectAttributes atributos) {
+										   RedirectAttributes atributos,
+										   HttpSession session) {
+		if (!esAdmin(session)) return "redirect:/login";
 		try {
 			HorarioResponseDTO existente = horarioService.buscarPorId(id);
 			HorarioRequestDTO horario = new HorarioRequestDTO();
@@ -86,7 +95,9 @@ public class HorarioController {
 						 @Valid @ModelAttribute("horario") HorarioRequestDTO horario,
 						 BindingResult resultado,
 						 Model model,
-						 RedirectAttributes atributos) {
+						 RedirectAttributes atributos,
+						 HttpSession session) {
+		if (!esAdmin(session)) return "redirect:/login";
 		if (resultado.hasErrors()) {
 			model.addAttribute("horarioId", id);
 			prepararFormulario(model, horario);
@@ -109,7 +120,8 @@ public class HorarioController {
 	}
 
 	@PostMapping("/{id}/eliminar")
-	public String eliminar(@PathVariable Long id, RedirectAttributes atributos) {
+	public String eliminar(@PathVariable Long id, RedirectAttributes atributos, HttpSession session) {
+		if (!esAdmin(session)) return "redirect:/login";
 		try {
 			horarioService.eliminar(id);
 			atributos.addFlashAttribute("exito", "Horario eliminado correctamente.");
@@ -122,5 +134,10 @@ public class HorarioController {
 	private void prepararFormulario(Model model, HorarioRequestDTO horario) {
 		model.addAttribute("horario", horario);
 		model.addAttribute("empleados", empleadoService.listarActivos());
+	}
+
+	private boolean esAdmin(HttpSession session) {
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+		return usuario != null && usuario.getRol() == RolUsuario.ADMINISTRADOR;
 	}
 }

@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
@@ -14,7 +16,9 @@ import com.gestioncitas.plataformacitas.modelos.Cita;
 import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.Especialidad;
+import com.gestioncitas.plataformacitas.modelos.RolUsuario;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
+import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
 import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
 import com.gestioncitas.plataformacitas.repositorios.ClienteRepository;
@@ -30,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -50,6 +55,7 @@ class CitaAdminControllerTests {
     private LocalDate fechaPrimera;
     private LocalDate fechaSegunda;
     private Cita citaAna;
+    private MockHttpSession adminSession;
 
     @BeforeEach
     void prepararDatos() {
@@ -91,13 +97,21 @@ class CitaAdminControllerTests {
         fechaSegunda = LocalDate.now().plusDays(4);
         citaAna = crearCita(ana, empleado, servicio, fechaPrimera, LocalTime.of(9, 0));
         crearCita(bruno, empleado, servicio, fechaSegunda, LocalTime.of(11, 30));
+
+        adminSession = new MockHttpSession();
+        Cliente adminUser = new Cliente();
+        adminUser.setId(999L);
+        adminUser.setNombre("Admin");
+        adminUser.setCorreo("admin@test.com");
+        adminUser.setRol(RolUsuario.ADMINISTRADOR);
+        adminSession.setAttribute("usuario", adminUser);
     }
 
     @Test
     void muestraTodasLasCitasConClienteServicioFechaYHora() throws Exception {
-        mockMvc.perform(get("/admin/citas"))
+        mockMvc.perform(get("/admin/citas").session(adminSession))
                 .andExpect(status().isOk())
-                .andExpect(view().name("admin/citas/lista"))
+                .andExpect(view().name("citas/lista"))
                 .andExpect(content().string(containsString("Ana López")))
                 .andExpect(content().string(containsString("Bruno Díaz")))
                 .andExpect(content().string(containsString("Masaje relajante")))
@@ -106,7 +120,7 @@ class CitaAdminControllerTests {
 
     @Test
     void filtraCitasPorFecha() throws Exception {
-        mockMvc.perform(get("/admin/citas").param("fecha", fechaPrimera.toString()))
+        mockMvc.perform(get("/admin/citas").param("fecha", fechaPrimera.toString()).session(adminSession))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Ana López")))
                 .andExpect(content().string(org.hamcrest.Matchers.not(containsString("Bruno Díaz"))));
@@ -114,7 +128,7 @@ class CitaAdminControllerTests {
 
     @Test
     void filtraCitasPorNombreParcialDelCliente() throws Exception {
-        mockMvc.perform(get("/admin/citas").param("cliente", "bru"))
+        mockMvc.perform(get("/admin/citas").param("cliente", "bru").session(adminSession))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Bruno Díaz")))
                 .andExpect(content().string(org.hamcrest.Matchers.not(containsString("Ana López"))));
@@ -126,6 +140,7 @@ class CitaAdminControllerTests {
 
         mockMvc.perform(post("/admin/citas/{id}/editar", citaAna.getId())
                         .with(csrf())
+                        .session(adminSession)
                         .param("fecha", nuevaFecha.toString())
                         .param("hora", "10:15")
                         .param("servicioId", citaAna.getServicio().getId().toString()))
@@ -141,9 +156,9 @@ class CitaAdminControllerTests {
 
     @Test
     void muestraElFormularioParaModificarUnaCita() throws Exception {
-        mockMvc.perform(get("/admin/citas/{id}/editar", citaAna.getId()))
+        mockMvc.perform(get("/admin/citas/{id}/editar", citaAna.getId()).session(adminSession))
                 .andExpect(status().isOk())
-                .andExpect(view().name("admin/citas/formulario"))
+                .andExpect(view().name("citas/formulario"))
                 .andExpect(content().string(containsString("Modificar cita")));
     }
 
@@ -151,11 +166,12 @@ class CitaAdminControllerTests {
     void rechazaUnaModificacionQueSeSolapaConOtraCita() throws Exception {
         mockMvc.perform(post("/admin/citas/{id}/editar", citaAna.getId())
                         .with(csrf())
+                        .session(adminSession)
                         .param("fecha", fechaSegunda.toString())
                         .param("hora", "11:30")
                         .param("servicioId", citaAna.getServicio().getId().toString()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("admin/citas/formulario"))
+                .andExpect(view().name("citas/formulario"))
                 .andExpect(content().string(containsString("solapa")));
 
         Cita sinCambios = citaRepository.findById(citaAna.getId()).orElseThrow();
@@ -165,7 +181,7 @@ class CitaAdminControllerTests {
 
     @Test
     void administradorPuedeCancelarUnaCitaSinEliminarSuHistorial() throws Exception {
-        mockMvc.perform(post("/admin/citas/{id}/cancelar", citaAna.getId()).with(csrf()))
+        mockMvc.perform(post("/admin/citas/{id}/cancelar", citaAna.getId()).with(csrf()).session(adminSession))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/admin/citas"));
 

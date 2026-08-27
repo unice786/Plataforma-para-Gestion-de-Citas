@@ -1,11 +1,13 @@
 package com.gestioncitas.plataformacitas.servicios;
 
+import com.gestioncitas.plataformacitas.modelos.Administrador;
 import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
 import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.Especialidad;
 import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
 import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
+import com.gestioncitas.plataformacitas.modelos.RolUsuario;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
@@ -95,15 +97,14 @@ public class DataInitializer implements CommandLineRunner {
     private void inicializarAdmin() {
         String correoAdmin = "unice891@gmail.com";
 
-        // Verificar si el usuario admin ya existe
         Optional<Usuario> existingUser = usuarioRepository.findByCorreo(correoAdmin);
 
         if (existingUser.isPresent()) {
-            // Usuario ya existe - actualizarlo a admin
             Usuario usuario = existingUser.get();
             usuario.setNombre("Administrador");
             usuario.setActivo(true);
             usuario.setVerificado(true);
+            usuario.setRol(RolUsuario.ADMINISTRADOR);
             usuario.setTokenVerificacion(null);
             usuario.setTokenExpiracion(null);
             usuario.setTokenRecuperacion(null);
@@ -112,15 +113,14 @@ public class DataInitializer implements CommandLineRunner {
 
             System.out.println("[DataInitializer] Usuario " + correoAdmin + " actualizado a admin.");
         } else {
-            // Usuario no existe - crear nuevo admin como Cliente (Usuario es abstracta)
-            Cliente admin = new Cliente();
+            Administrador admin = new Administrador();
             admin.setNombre("Administrador");
             admin.setCorreo(correoAdmin);
             admin.setPassword(passwordEncoder.encode("123456"));
             admin.setActivo(true);
             admin.setVerificado(true);
-            admin.setTelefono("0999999999");
-            clienteRepository.save(admin);
+            admin.setRol(RolUsuario.ADMINISTRADOR);
+            usuarioRepository.save(admin);
 
             System.out.println("[DataInitializer] Cuenta admin creada con correo " + correoAdmin + ".");
         }
@@ -134,6 +134,7 @@ public class DataInitializer implements CommandLineRunner {
         cliente.setPassword(passwordEncoder.encode("123456"));
         cliente.setActivo(true);
         cliente.setVerificado(true);
+        cliente.setRol(RolUsuario.CLIENTE);
         clienteRepository.save(cliente);
     }
 
@@ -297,6 +298,7 @@ public class DataInitializer implements CommandLineRunner {
         empleado.setPassword(passwordEncoder.encode("123456"));
         empleado.setActivo(true);
         empleado.setVerificado(true);
+        empleado.setRol(RolUsuario.EMPLEADO);
         empleado.setEspecialidad(especialidad);
         empleadoRepository.save(empleado);
         System.out.println("[DataInitializer] Especialista creado: " + nombre + ".");

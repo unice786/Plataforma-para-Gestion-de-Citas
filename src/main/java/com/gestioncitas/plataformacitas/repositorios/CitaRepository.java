@@ -4,6 +4,7 @@ import com.gestioncitas.plataformacitas.modelos.Cita;
 import com.gestioncitas.plataformacitas.modelos.EstadoCita;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +14,9 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     @EntityGraph(attributePaths = "servicio")
     List<Cita> findByClienteIdOrderByFechaDescHoraDesc(Long clienteId);
+
+    @EntityGraph(attributePaths = {"servicio", "empleado"})
+    Optional<Cita> findByIdAndClienteId(Long id, Long clienteId);
 
     @Query("""
             SELECT c FROM Cita c
@@ -25,27 +29,22 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     List<Cita> findCitasActivasByEmpleadoAndFecha(
             @Param("empleadoId") Long empleadoId,
             @Param("fecha") LocalDate fecha,
-            @Param("estados") List<EstadoCita> estados);
+            @Param("estados") List<EstadoCita> estados
+    );
 
     @Query("""
             SELECT c FROM Cita c
-            JOIN FETCH c.cliente
             JOIN FETCH c.servicio
-            WHERE (:fecha IS NULL OR c.fecha = :fecha)
-              AND (:cliente IS NULL
-                   OR LOWER(c.cliente.nombre) LIKE LOWER(CONCAT('%', :cliente, '%')))
-            ORDER BY c.fecha DESC, c.hora DESC
+            WHERE c.empleado.id = :empleadoId
+              AND c.fecha = :fecha
+              AND c.estado IN :estados
+              AND c.id <> :citaId
+            ORDER BY c.hora ASC
             """)
-    List<Cita> buscarParaAdministrador(
+    List<Cita> findCitasActivasByEmpleadoAndFechaExcludingId(
+            @Param("empleadoId") Long empleadoId,
             @Param("fecha") LocalDate fecha,
-            @Param("cliente") String cliente);
-
-    @Query("""
-            SELECT c FROM Cita c
-            JOIN FETCH c.cliente
-            JOIN FETCH c.empleado
-            JOIN FETCH c.servicio
-            WHERE c.id = :id
-            """)
-    java.util.Optional<Cita> buscarPorIdParaAdministrador(@Param("id") Long id);
+            @Param("estados") List<EstadoCita> estados,
+            @Param("citaId") Long citaId
+    );
 }

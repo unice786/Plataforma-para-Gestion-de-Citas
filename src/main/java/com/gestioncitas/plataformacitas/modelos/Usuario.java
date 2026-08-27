@@ -48,4 +48,8 @@ public abstract class Usuario {
 
     @Column(name = "token_recuperacion_expiracion")
     private LocalDateTime tokenRecuperacionExpiracion;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private RolUsuario rol = RolUsuario.CLIENTE;
 }

@@ -1,10 +1,13 @@
 package com.gestioncitas.plataformacitas.controladores;
 
+import com.gestioncitas.plataformacitas.modelos.RolUsuario;
+import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
 import com.gestioncitas.plataformacitas.servicios.CitaService;
 import com.gestioncitas.plataformacitas.dto.EdicionCitaRequestDTO;
 import com.gestioncitas.plataformacitas.excepciones.HorarioNoDisponibleException;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -40,17 +43,20 @@ public class CitaAdminController {
             @RequestParam(value = "fecha", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam(value = "cliente", required = false) String cliente,
-            Model model) {
+            Model model,
+            HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
 
         String clienteBusqueda = (cliente == null || cliente.isBlank()) ? null : cliente.trim();
         model.addAttribute("citas", citaRepository.buscarParaAdministrador(fecha, clienteBusqueda));
         model.addAttribute("fecha", fecha);
         model.addAttribute("cliente", clienteBusqueda == null ? "" : clienteBusqueda);
-        return "admin/citas/lista";
+        return "citas/lista";
     }
 
     @GetMapping("/{id}/editar")
-    public String mostrarEdicion(@PathVariable Long id, Model model) {
+    public String mostrarEdicion(@PathVariable Long id, Model model, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         var cita = citaRepository.buscarPorIdParaAdministrador(id)
                 .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                         org.springframework.http.HttpStatus.NOT_FOUND, "Cita no encontrada"));
@@ -61,15 +67,16 @@ public class CitaAdminController {
         model.addAttribute("cita", cita);
         model.addAttribute("edicionCita", request);
         model.addAttribute("servicios", servicioRepository.findByActivoTrueOrderByNombreAsc());
-        return "admin/citas/formulario";
+        return "citas/formulario";
     }
 
     @PostMapping("/{id}/editar")
     public String editar(@PathVariable Long id, @Valid @ModelAttribute("edicionCita") EdicionCitaRequestDTO edicionCita,
-                         BindingResult resultado, Model model, RedirectAttributes redirect) {
+                         BindingResult resultado, Model model, RedirectAttributes redirect, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         if (resultado.hasErrors()) {
             cargarFormulario(id, model, edicionCita);
-            return "admin/citas/formulario";
+            return "citas/formulario";
         }
         try {
             citaService.editarCita(id, edicionCita);
@@ -78,12 +85,13 @@ public class CitaAdminController {
         } catch (HorarioNoDisponibleException | IllegalArgumentException | IllegalStateException ex) {
             resultado.reject("edicion", ex.getMessage());
             cargarFormulario(id, model, edicionCita);
-            return "admin/citas/formulario";
+            return "citas/formulario";
         }
     }
 
     @PostMapping("/{id}/cancelar")
-    public String cancelar(@PathVariable Long id, RedirectAttributes redirect) {
+    public String cancelar(@PathVariable Long id, RedirectAttributes redirect, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         try {
             citaService.cancelarCita(id);
             redirect.addFlashAttribute("exito", "La cita fue cancelada y el cambio quedó registrado.");
@@ -100,5 +108,10 @@ public class CitaAdminController {
         model.addAttribute("cita", cita);
         model.addAttribute("edicionCita", edicionCita);
         model.addAttribute("servicios", servicioRepository.findByActivoTrueOrderByNombreAsc());
+    }
+
+    private boolean esAdmin(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        return usuario != null && usuario.getRol() == RolUsuario.ADMINISTRADOR;
     }
 }

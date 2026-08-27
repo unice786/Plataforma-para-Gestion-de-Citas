@@ -1,9 +1,12 @@
 package com.gestioncitas.plataformacitas.controladores;
 
 import com.gestioncitas.plataformacitas.modelos.CategoriaServicio;
+import com.gestioncitas.plataformacitas.modelos.RolUsuario;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
+import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
 import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,13 +32,15 @@ public class ServicioController {
     }
 
     @GetMapping
-    public String listar(Model model) {
+    public String listar(Model model, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         model.addAttribute("servicios", servicioRepository.findAllConCategoriaOrderByNombreAsc());
         return "admin-servicios";
     }
 
     @GetMapping("/nuevo")
-    public String mostrarFormularioNuevo(Model model) {
+    public String mostrarFormularioNuevo(Model model, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         prepararFormulario(model, new Servicio());
         return "admin-servicio-formulario";
     }
@@ -44,7 +49,9 @@ public class ServicioController {
     public String crear(@Valid @ModelAttribute("servicio") Servicio servicio,
                         BindingResult resultado,
                         Model model,
-                        RedirectAttributes atributos) {
+                        RedirectAttributes atributos,
+                        HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         validarCategoria(servicio, resultado);
         if (resultado.hasErrors()) {
             prepararFormulario(model, servicio);
@@ -59,7 +66,9 @@ public class ServicioController {
 
     @GetMapping("/{id}/editar")
     public String mostrarFormularioEdicion(@PathVariable Long id, Model model,
-                                           RedirectAttributes atributos) {
+                                           RedirectAttributes atributos,
+                                           HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         Servicio servicio = servicioRepository.findById(id).orElse(null);
         if (servicio == null) {
             atributos.addFlashAttribute("error", "El servicio solicitado no existe.");
@@ -74,7 +83,9 @@ public class ServicioController {
                          @Valid @ModelAttribute("servicio") Servicio servicio,
                          BindingResult resultado,
                          Model model,
-                         RedirectAttributes atributos) {
+                         RedirectAttributes atributos,
+                         HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         Servicio existente = servicioRepository.findById(id).orElse(null);
         if (existente == null) {
             atributos.addFlashAttribute("error", "El servicio solicitado no existe.");
@@ -99,7 +110,8 @@ public class ServicioController {
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Long id, RedirectAttributes atributos) {
+    public String eliminar(@PathVariable Long id, RedirectAttributes atributos, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
         Servicio servicio = servicioRepository.findById(id).orElse(null);
         if (servicio == null) {
             atributos.addFlashAttribute("error", "El servicio solicitado no existe.");
@@ -133,5 +145,10 @@ public class ServicioController {
         } else {
             servicio.setCategoria(categoria);
         }
+    }
+
+    private boolean esAdmin(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        return usuario != null && usuario.getRol() == RolUsuario.ADMINISTRADOR;
     }
 }
