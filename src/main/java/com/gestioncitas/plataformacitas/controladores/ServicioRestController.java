@@ -1,0 +1,45 @@
+package com.gestioncitas.plataformacitas.controladores;
+
+import com.gestioncitas.plataformacitas.dto.ServicioResponseDTO;
+import com.gestioncitas.plataformacitas.modelos.Servicio;
+import com.gestioncitas.plataformacitas.repositorios.ServicioRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * API REST del catálogo para el formulario de reserva (SCRUM-1).
+ * Expone GET /api/servicios con los servicios activos.
+ */
+@RestController
+@RequestMapping("/api/servicios")
+public class ServicioRestController {
+
+    private final ServicioRepository servicioRepository;
+
+    public ServicioRestController(ServicioRepository servicioRepository) {
+        this.servicioRepository = servicioRepository;
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<ServicioResponseDTO>> listarServiciosActivos() {
+        List<Servicio> servicios = servicioRepository.findByActivoTrueOrderByNombreAsc();
+        List<ServicioResponseDTO> dtos = servicios.stream()
+                .map(s -> new ServicioResponseDTO(
+                        s.getId(),
+                        s.getNombre(),
+                        s.getDescripcion(),
+                        s.getDuracionMinutos(),
+                        s.getPrecio(),
+                        s.getCategoria() != null ? s.getCategoria().getNombre() : ""
+                ))
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
+    }
+}
