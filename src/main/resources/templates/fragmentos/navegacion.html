@@ -12,11 +12,23 @@
         </a>
         <div class="app-nav-links">
             <a th:href="@{/inicio}"><i class="bi bi-house-door"></i>Inicio</a>
-            <a th:href="@{/servicios}"><i class="bi bi-spa"></i>Servicios</a>
-            <a th:href="@{/reservar}"><i class="bi bi-calendar-plus"></i>Reservar</a>
-            <a th:href="@{/mis-citas}"><i class="bi bi-calendar-check"></i>Mis citas</a>
-            <a th:href="@{/admin/servicios}"><i class="bi bi-gear"></i>Administraci&oacute;n</a>
-            <a th:href="@{/admin/horarios}"><i class="bi bi-clock"></i>Horarios</a>
+
+            <th:block th:if="${session.usuario != null and session.usuario.rol.name() == 'CLIENTE'}">
+                <a th:href="@{/servicios}"><i class="bi bi-spa"></i>Servicios</a>
+                <a th:href="@{/reservar}"><i class="bi bi-calendar-plus"></i>Reservar</a>
+                <a th:href="@{/mis-citas}"><i class="bi bi-calendar-check"></i>Mis citas</a>
+            </th:block>
+
+            <th:block th:if="${session.usuario != null and session.usuario.rol.name() == 'ADMINISTRADOR'}">
+                <a th:href="@{/servicios}"><i class="bi bi-spa"></i>Servicios</a>
+                <a th:href="@{/admin/servicios}"><i class="bi bi-gear"></i>Administraci&oacute;n</a>
+                <a th:href="@{/admin/citas}"><i class="bi bi-calendar2-check"></i>Citas</a>
+                <a th:href="@{/admin/horarios}"><i class="bi bi-clock"></i>Horarios</a>
+            </th:block>
+
+            <th:block th:if="${session.usuario != null and session.usuario.rol.name() == 'EMPLEADO'}">
+                <a th:href="@{/mis-citas}"><i class="bi bi-calendar-check"></i>Mis citas</a>
+            </th:block>
         </div>
         <div class="app-nav-user">
             <span><i class="bi bi-person-circle me-1"></i><th:block th:if="${session.usuario != null}" th:text="${session.usuario.nombre}"></th:block></span>

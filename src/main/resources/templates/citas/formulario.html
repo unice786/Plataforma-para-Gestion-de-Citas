@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Modificar cita')}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell narrow">
+    <a class="app-back-link" th:href="@{/admin/citas}"><i class="bi bi-arrow-left"></i>Volver a citas</a>
+
+    <header class="app-header">
+        <span class="service-eyebrow"><i class="bi bi-pencil-square"></i> Administración</span>
+        <h1>Modificar cita</h1>
+        <p>Actualiza la fecha, hora o servicio solicitado por <strong th:text="${cita.cliente.nombre}"></strong>.</p>
+    </header>
+
+    <form class="app-card" th:object="${edicionCita}" th:action="@{/admin/citas/{id}/editar(id=${cita.id})}" method="post">
+        <div class="app-alert alert-danger" role="alert" th:if="${#fields.hasGlobalErrors()}" th:errors="*{global}"></div>
+        <div class="mb-3">
+            <label class="form-label" for="fecha">Fecha</label>
+            <input id="fecha" class="form-control" type="date" th:value="${edicionCita.fecha == null ? '' : #temporals.format(edicionCita.fecha, 'yyyy-MM-dd')}" required>
+            <div class="invalid-feedback d-block" th:errors="*{fecha}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="hora">Hora</label>
+            <input id="hora" class="form-control" type="time" th:value="${edicionCita.hora == null ? '' : #temporals.format(edicionCita.hora, 'HH:mm')}" required>
+            <div class="invalid-feedback d-block" th:errors="*{hora}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="servicio">Servicio</label>
+            <select id="servicio" class="form-select" th:field="*{servicioId}" required>
+                <option value="">Selecciona un servicio</option>
+                <option th:each="servicio : ${servicios}" th:value="${servicio.id}" th:text="|${servicio.nombre} (${servicio.duracionMinutos} min)|"></option>
+            </select>
+            <div class="invalid-feedback d-block" th:errors="*{servicioId}"></div>
+        </div>
+
+        <div class="app-actions">
+            <a class="btn-pill outline" th:href="@{/admin/citas}">Cancelar edición</a>
+            <button class="btn-pill" type="submit"><i class="bi bi-check-lg"></i> Guardar cambios</button>
+        </div>
+    </form>
+</main>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

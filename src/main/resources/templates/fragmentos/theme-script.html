@@ -1,0 +1,20 @@
+<th:block th:fragment="themeScript" xmlns:th="http://www.thymeleaf.org">
+    <script>
+        (function(){
+            var htmlEl = document.documentElement;
+            var toggle = document.getElementById('themeToggle');
+            var icon = document.getElementById('themeIcon');
+            if(!toggle || !icon) return;
+            function applyIcon(){
+                icon.className = htmlEl.getAttribute('data-theme') === 'dark' ? 'bi bi-moon-stars-fill' : 'bi bi-sun-fill';
+            }
+            applyIcon();
+            toggle.addEventListener('click', function(){
+                var next = htmlEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                htmlEl.setAttribute('data-theme', next);
+                localStorage.setItem('auth-theme', next);
+                applyIcon();
+            });
+        })();
+    </script>
+</th:block>
