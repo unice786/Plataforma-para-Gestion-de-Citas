@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Mis citas')}"></th:block>
+<body class="app-body" th:attr="data-empleado-id=${empleado.id}, data-csrf=${_csrf != null ? _csrf.token : ''}">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell">
+    <a class="app-back-link" th:href="@{/inicio}"><i class="bi bi-arrow-left"></i>Inicio</a>
+
+    <header class="app-header">
+        <div>
+            <h1>Mis citas asignadas</h1>
+            <p>Citas programadas para <span th:text="${empleado.nombre}"></span>.</p>
+        </div>
+        <a class="btn-pill outline" th:href="@{/empleado/citas}">
+            <i class="bi bi-arrow-clockwise"></i>Actualizar
+        </a>
+    </header>
+
+    <div id="alertaExito" class="app-alert alert-success d-none" role="status"></div>
+    <div id="alertaError" class="app-alert alert-danger d-none" role="alert"></div>
+
+    <section class="app-card flush" th:if="${not #lists.isEmpty(citas)}">
+        <div class="table-responsive">
+            <table class="table-app">
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Servicio</th>
+                    <th>Cliente</th>
+                    <th>Estado</th>
+                    <th class="text-end-cell">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cita : ${citas}">
+                    <td th:text="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#temporals.format(cita.hora, 'HH:mm')}"></td>
+                    <td class="cell-strong" th:text="${cita.servicio.nombre}"></td>
+                    <td>
+                        <span class="cell-strong" th:text="${cita.cliente.nombre}"></span>
+                        <small class="cell-muted" th:text="${cita.cliente.correo}"></small>
+                    </td>
+                    <td>
+                        <span class="badge-soft" th:text="${cita.estado}"
+                              th:classappend="${cita.estado.name() == 'CANCELADA'} ? ' neutral' : (${cita.estado.name() == 'COMPLETADA'} ? '' : ' info')"></span>
+                    </td>
+                    <td class="text-end-cell">
+                        <div class="d-inline-flex gap-2">
+                            <button th:if="${cita.estado.name() == 'PENDIENTE'}"
+                                    type="button" class="btn-pill small info btn-confirmar"
+                                    th:data-cita-id="${cita.id}"
+                                    th:data-servicio="${cita.servicio.nombre}"
+                                    th:data-fecha="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"
+                                    th:data-hora="${#temporals.format(cita.hora, 'HH:mm')}">
+                                <i class="bi bi-check-circle"></i>Confirmar
+                            </button>
+                            <button th:if="${cita.estado.name() == 'CONFIRMADA'}"
+                                    type="button" class="btn-pill small btn-completar"
+                                    th:data-cita-id="${cita.id}"
+                                    th:data-servicio="${cita.servicio.nombre}"
+                                    th:data-fecha="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"
+                                    th:data-hora="${#temporals.format(cita.hora, 'HH:mm')}">
+                                <i class="bi bi-check2-all"></i>Completar
+                            </button>
+                            <button th:if="${cita.estado.name() == 'PENDIENTE' or cita.estado.name() == 'CONFIRMADA'}"
+                                    type="button" class="btn-pill small danger-outline btn-cancelar"
+                                    th:data-cita-id="${cita.id}"
+                                    th:data-servicio="${cita.servicio.nombre}"
+                                    th:data-fecha="${#temporals.format(cita.fecha, 'dd/MM/yyyy')}"
+                                    th:data-hora="${#temporals.format(cita.hora, 'HH:mm')}">
+                                <i class="bi bi-x-circle"></i>Cancelar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(citas)}">
+        <i class="bi bi-calendar-x"></i>
+        Aún no tienes citas asignadas.
+    </div>
+</main>
+
+<div id="modalConfirmar" class="modal-overlay d-none">
+    <div class="modal-box app-card">
+        <h3 style="margin:0 0 8px;font-family:'Baloo 2',sans-serif;font-weight:700;" id="modalTitulo">Confirmar acción</h3>
+        <p id="modalMensaje" style="color:var(--auth-text-soft);margin:0 0 20px;font-size:.95rem;"></p>
+        <div class="app-actions">
+            <button type="button" class="btn-pill outline" id="modalCerrar">Volver</button>
+            <button type="button" class="btn-pill danger-outline" id="modalConfirmarBtn">
+                <i class="bi bi-check-lg"></i><span id="modalBtnTexto">Confirmar</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    var body = document.body;
+    var empleadoId = body.getAttribute('data-empleado-id');
+    var csrfToken = body.getAttribute('data-csrf') || '';
+    var alertaExito = document.getElementById('alertaExito');
+    var alertaError = document.getElementById('alertaError');
+    var modal = document.getElementById('modalConfirmar');
+    var modalTitulo = document.getElementById('modalTitulo');
+    var modalMensaje = document.getElementById('modalMensaje');
+    var modalBtnTexto = document.getElementById('modalBtnTexto');
+    var btnCerrar = document.getElementById('modalCerrar');
+    var btnConfirmar = document.getElementById('modalConfirmarBtn');
+    var accionPendiente = null;
+
+    function mostrarAlerta(el, msg) { el.textContent = msg; el.classList.remove('d-none'); }
+    function ocultarAlertas() { alertaExito.classList.add('d-none'); alertaError.classList.add('d-none'); }
+
+    document.querySelectorAll('.btn-confirmar').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            ocultarAlertas();
+            accionPendiente = { tipo: 'confirmar', id: btn.dataset.citaId };
+            modalTitulo.textContent = 'Confirmar cita';
+            modalMensaje.textContent = '¿Deseas confirmar la cita de "' + btn.dataset.servicio + '" el ' + btn.dataset.fecha + ' a las ' + btn.dataset.hora + '?';
+            modalBtnTexto.textContent = 'Sí, confirmar';
+            modal.classList.remove('d-none');
+        });
+    });
+
+    document.querySelectorAll('.btn-completar').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            ocultarAlertas();
+            accionPendiente = { tipo: 'completar', id: btn.dataset.citaId };
+            modalTitulo.textContent = 'Completar cita';
+            modalMensaje.textContent = '¿Marcar como completada la cita de "' + btn.dataset.servicio + '" el ' + btn.dataset.fecha + ' a las ' + btn.dataset.hora + '?';
+            modalBtnTexto.textContent = 'Sí, completar';
+            modal.classList.remove('d-none');
+        });
+    });
+
+    document.querySelectorAll('.btn-cancelar').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            ocultarAlertas();
+            accionPendiente = { tipo: 'cancelar', id: btn.dataset.citaId };
+            modalTitulo.textContent = 'Cancelar cita';
+            modalMensaje.textContent = '¿Seguro que quieres cancelar la cita de "' + btn.dataset.servicio + '" el ' + btn.dataset.fecha + ' a las ' + btn.dataset.hora + '?';
+            modalBtnTexto.textContent = 'Sí, cancelar';
+            modal.classList.remove('d-none');
+        });
+    });
+
+    btnCerrar.addEventListener('click', function() { modal.classList.add('d-none'); accionPendiente = null; });
+    modal.addEventListener('click', function(e) { if (e.target === modal) { modal.classList.add('d-none'); accionPendiente = null; } });
+
+    btnConfirmar.addEventListener('click', function() {
+        if (!accionPendiente) return;
+        btnConfirmar.disabled = true;
+        var endpoint = '/api/citas/' + accionPendiente.id + '/' + accionPendiente.tipo + (accionPendiente.tipo === 'cancelar' ? '-empleado' : '') + '?empleadoId=' + empleadoId;
+        fetch(endpoint, {
+            method: 'PUT',
+            headers: { 'X-CSRF-TOKEN': csrfToken }
+        })
+        .then(function(r) {
+            if (r.ok) return r.text().then(function() { return { ok: true }; });
+            return r.json().then(function(d) { return { ok: false, data: d }; });
+        })
+        .then(function(res) {
+            modal.classList.add('d-none');
+            btnConfirmar.disabled = false;
+            var tipoAccion = accionPendiente ? accionPendiente.tipo : '';
+            accionPendiente = null;
+            if (res.ok) {
+                var msg = tipoAccion === 'confirmar' ? 'Cita confirmada correctamente.' :
+                          tipoAccion === 'completar' ? 'Cita marcada como completada.' :
+                          'Cita cancelada correctamente.';
+                mostrarAlerta(alertaExito, msg);
+                setTimeout(function() { location.reload(); }, 1500);
+            } else {
+                mostrarAlerta(alertaError, res.data && res.data.mensaje ? res.data.mensaje : 'No se pudo completar la acción.');
+            }
+        })
+        .catch(function() {
+            modal.classList.add('d-none');
+            btnConfirmar.disabled = false;
+            accionPendiente = null;
+            mostrarAlerta(alertaError, 'Error de conexión. Intenta de nuevo.');
+        });
+    });
+})();
+</script>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

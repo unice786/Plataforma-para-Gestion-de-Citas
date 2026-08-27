@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head(${horarioId == null ? 'Nuevo horario' : 'Editar horario'})}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell narrow">
+    <a class="app-back-link" th:href="@{/admin/horarios}"><i class="bi bi-arrow-left"></i>Volver al listado</a>
+
+    <header class="app-header">
+        <h1 th:text="${horarioId == null ? 'Nuevo horario' : 'Editar horario'}"></h1>
+    </header>
+
+    <div class="app-alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <div class="app-alert alert-warning" role="alert" th:if="${#lists.isEmpty(empleados)}">
+        No hay empleados activos. Debes registrar al menos un empleado antes de guardar un horario.
+    </div>
+
+    <form class="app-card" th:object="${horario}"
+          th:action="${horarioId == null} ? @{/admin/horarios} : @{/admin/horarios/{id}/editar(id=${horarioId})}"
+          method="post">
+        <div class="mb-3">
+            <label class="form-label" for="empleadoId">Empleado</label>
+            <select id="empleadoId" class="form-select" th:field="*{empleadoId}" required>
+                <option value="">Selecciona un empleado</option>
+                <option th:each="empleado : ${empleados}" th:value="${empleado.id}" th:text="${empleado.nombre}"></option>
+            </select>
+            <div class="invalid-feedback d-block" th:errors="*{empleadoId}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="fecha">Fecha</label>
+            <input id="fecha" class="form-control" type="date" th:field="*{fecha}" required>
+            <div class="invalid-feedback d-block" th:errors="*{fecha}"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="horaInicio">Hora inicio</label>
+                <input id="horaInicio" class="form-control" type="time" step="60" th:field="*{horaInicio}" required>
+                <div class="invalid-feedback d-block" th:errors="*{horaInicio}"></div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label" for="horaFin">Hora fin</label>
+                <input id="horaFin" class="form-control" type="time" step="60" th:field="*{horaFin}" required>
+                <div class="invalid-feedback d-block" th:errors="*{horaFin}"></div>
+            </div>
+        </div>
+        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('rangoHorarioValido')}" th:errors="*{rangoHorarioValido}"></div>
+
+        <div class="app-actions">
+            <a class="btn-pill outline" th:href="@{/admin/horarios}">Cancelar</a>
+            <button class="btn-pill" type="submit" th:disabled="${#lists.isEmpty(empleados)}">Guardar horario</button>
+        </div>
+    </form>
+</main>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>
