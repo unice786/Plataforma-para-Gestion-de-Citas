@@ -1,0 +1,445 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------< com.gestioncitas:plataforma-citas >------------------
+[INFO] Building plataforma-citas 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.4:run (default-cli) > test-compile @ plataforma-citas >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ plataforma-citas ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 19 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ plataforma-citas ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 58 source files with javac [debug parameters release 21] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ plataforma-citas ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ plataforma-citas ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 9 source files with javac [debug parameters release 21] to target\test-classes
+[INFO] 
+[INFO] <<< spring-boot:3.3.4:run (default-cli) < test-compile @ plataforma-citas <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.4:run (default-cli) @ plataforma-citas ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-27T09:40:46.544-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Starting PlataformaCitasApplication using Java 21.0.10 with PID 25384 (C:\Users\HP\Documents\plataforma-citas\target\classes started by HP in C:\Users\HP\Documents\plataforma-citas)
+2026-08-27T09:40:46.546-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : The following 1 profile is active: "local"
+2026-08-27T09:40:46.585-06:00  INFO 25384 --- [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-08-27T09:40:46.585-06:00  INFO 25384 --- [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-08-27T09:40:47.289-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-27T09:40:47.374-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 71 ms. Found 9 JPA repository interfaces.
+2026-08-27T09:40:48.002-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-08-27T09:40:48.018-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-27T09:40:48.018-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-08-27T09:40:48.074-06:00  INFO 25384 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-08-27T09:40:48.075-06:00  INFO 25384 --- [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1489 ms
+2026-08-27T09:40:48.103-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-27T09:40:48.320-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:plataformadb user=SA
+2026-08-27T09:40:48.320-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-27T09:40:48.333-06:00  INFO 25384 --- [  restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:plataformadb'
+2026-08-27T09:40:48.462-06:00  INFO 25384 --- [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-27T09:40:48.542-06:00  INFO 25384 --- [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.3.Final
+2026-08-27T09:40:48.582-06:00  INFO 25384 --- [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-27T09:40:48.914-06:00  INFO 25384 --- [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-27T09:40:50.168-06:00  INFO 25384 --- [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-27T09:40:50.236-06:00  INFO 25384 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T09:40:50.598-06:00  INFO 25384 --- [  restartedMain] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-27T09:40:51.355-06:00  WARN 25384 --- [  restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 252b5022-d7d0-4bd8-b744-548819d352de
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-27T09:40:51.362-06:00  INFO 25384 --- [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-27T09:40:51.918-06:00  INFO 25384 --- [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-08-27T09:40:51.953-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-08-27T09:40:51.961-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Started PlataformaCitasApplication in 5.802 seconds (process running for 6.264)
+[DataInitializer] Clientes demo creados con BCrypt.
+[DataInitializer] Cuenta admin creada con correo unice891@gmail.com.
+[DataInitializer] Servicio demo creado: Consulta General y Diagn髎tico.
+[DataInitializer] Servicio demo creado: Sesi髇 Terap閡tica Integral.
+[DataInitializer] Servicio demo creado: Revisi髇 y Seguimiento Premium.
+[DataInitializer] Servicio demo creado: Corte Cl醩ico.
+[DataInitializer] Servicio demo creado: Corte + Perfilado de Barba.
+[DataInitializer] Servicio demo creado: Arreglo de Barba.
+[DataInitializer] Servicio demo creado: Tinte o Color.
+[DataInitializer] Cat醠ogo de servicios verificado (7 servicios).
+[DataInitializer] Especialista creado: Carlos Mendoza (Especialista).
+[DataInitializer] Especialista creado: Dra. Sof韆 Herrera.
+[DataInitializer] Especialista creado: Luis Ram韗ez (Barbero).
+[DataInitializer] Especialista creado: Valentina Cruz (Estilista).
+[DataInitializer] Especialistas verificados y vinculados a los servicios de su rubro.
+[DataInitializer] Se generaron 488 bloques de disponibilidad para los pr髕imos 60 d韆s.
+2026-08-27T09:41:08.146-06:00  INFO 25384 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-27T09:41:08.146-06:00  INFO 25384 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-27T09:41:08.148-06:00  INFO 25384 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-08-27T09:44:35.517-06:00  WARN 25384 --- [nio-8080-exec-7] c.g.p.servicios.CorreoService            : [DEV] Env铆o de correo deshabilitado. Enlace para sam@sam: http://localhost:8080/verificar?token=dd432a0b-285d-4883-bb40-4be7a6747847
+2026-08-27T10:34:12.987-06:00  INFO 25384 --- [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 78 class path changes (8 additions, 58 deletions, 12 modifications)
+2026-08-27T10:34:13.014-06:00  INFO 25384 --- [       Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:34:13.030-06:00  WARN 25384 --- [       Thread-5] o.s.b.f.support.DisposableBeanAdapter    : Invocation of destroy method failed on bean with name 'inMemoryDatabaseShutdownExecutor': org.h2.jdbc.JdbcSQLNonTransientConnectionException: La base de datos ya esta cerrada (para des-habilitar el cerrado automatico durante el shutdown de la VM, agregue ";DB_CLOSE_ON_EXIT=FALSE" a la URL de conexi贸n)
+Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-224]
+2026-08-27T10:34:13.031-06:00  INFO 25384 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-27T10:34:13.031-06:00  INFO 25384 --- [       Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-27T10:34:13.165-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Starting PlataformaCitasApplication using Java 21.0.10 with PID 25384 (C:\Users\HP\Documents\plataforma-citas\target\classes started by HP in C:\Users\HP\Documents\plataforma-citas)
+2026-08-27T10:34:13.165-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : The following 1 profile is active: "local"
+2026-08-27T10:34:13.432-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-27T10:34:13.436-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 4 ms. Found 0 JPA repository interfaces.
+2026-08-27T10:34:13.643-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-08-27T10:34:13.645-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-27T10:34:13.645-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-08-27T10:34:13.676-06:00  INFO 25384 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-08-27T10:34:13.677-06:00  INFO 25384 --- [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 508 ms
+2026-08-27T10:34:13.695-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-08-27T10:34:13.704-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn20: url=jdbc:h2:mem:plataformadb user=SA
+2026-08-27T10:34:13.704-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-08-27T10:34:13.704-06:00  INFO 25384 --- [  restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:plataformadb'
+2026-08-27T10:34:13.758-06:00  INFO 25384 --- [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-27T10:34:13.762-06:00  INFO 25384 --- [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-27T10:34:13.778-06:00  INFO 25384 --- [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-27T10:34:13.812-06:00  INFO 25384 --- [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-27T10:34:13.812-06:00  INFO 25384 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:34:14.144-06:00  WARN 25384 --- [  restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 72a2faf9-4bda-4c91-ac70-b889113e51d5
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-27T10:34:14.179-06:00  INFO 25384 --- [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-27T10:34:14.265-06:00  INFO 25384 --- [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-08-27T10:34:14.289-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-08-27T10:34:14.296-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Started PlataformaCitasApplication in 1.168 seconds (process running for 3208.598)
+2026-08-27T10:34:14.302-06:00  INFO 25384 --- [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation delta:
+
+
+==========================
+CONDITION EVALUATION DELTA
+==========================
+
+
+Positive matches:
+-----------------
+
+   SpringBootWebSecurityConfiguration.SecurityFilterChainConfiguration matched:
+      - AllNestedConditions 2 matched 0 did not; NestedCondition on DefaultWebSecurityCondition.Beans @ConditionalOnMissingBean (types: org.springframework.security.web.SecurityFilterChain; SearchStrategy: all) did not find any beans; NestedCondition on DefaultWebSecurityCondition.Classes @ConditionalOnClass found required classes 'org.springframework.security.web.SecurityFilterChain', 'org.springframework.security.config.annotation.web.builders.HttpSecurity' (DefaultWebSecurityCondition)
+
+
+Negative matches:
+-----------------
+
+    None
+
+
+Exclusions:
+-----------
+
+    None
+
+
+Unconditional classes:
+----------------------
+
+    None
+
+
+
+2026-08-27T10:34:17.667-06:00  INFO 25384 --- [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 70 class path changes (70 additions, 0 deletions, 0 modifications)
+2026-08-27T10:34:17.681-06:00  INFO 25384 --- [       Thread-7] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:34:17.682-06:00  WARN 25384 --- [       Thread-7] o.s.b.f.support.DisposableBeanAdapter    : Invocation of destroy method failed on bean with name 'inMemoryDatabaseShutdownExecutor': org.h2.jdbc.JdbcSQLNonTransientConnectionException: La base de datos ya esta cerrada (para des-habilitar el cerrado automatico durante el shutdown de la VM, agregue ";DB_CLOSE_ON_EXIT=FALSE" a la URL de conexi贸n)
+Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-224]
+2026-08-27T10:34:17.682-06:00  INFO 25384 --- [       Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-08-27T10:34:17.682-06:00  INFO 25384 --- [       Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-27T10:34:17.848-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Starting PlataformaCitasApplication using Java 21.0.10 with PID 25384 (C:\Users\HP\Documents\plataforma-citas\target\classes started by HP in C:\Users\HP\Documents\plataforma-citas)
+2026-08-27T10:34:17.848-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : The following 1 profile is active: "local"
+2026-08-27T10:34:18.213-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-27T10:34:18.269-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 10 JPA repository interfaces.
+2026-08-27T10:34:18.449-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-08-27T10:34:18.451-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-27T10:34:18.451-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-08-27T10:34:18.481-06:00  INFO 25384 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-08-27T10:34:18.481-06:00  INFO 25384 --- [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 629 ms
+2026-08-27T10:34:18.502-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-08-27T10:34:18.506-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection conn30: url=jdbc:h2:mem:plataformadb user=SA
+2026-08-27T10:34:18.506-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-08-27T10:34:18.506-06:00  INFO 25384 --- [  restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:plataformadb'
+2026-08-27T10:34:18.547-06:00  INFO 25384 --- [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-27T10:34:18.549-06:00  INFO 25384 --- [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-27T10:34:18.566-06:00  INFO 25384 --- [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-27T10:34:18.956-06:00  INFO 25384 --- [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-27T10:34:19.003-06:00  INFO 25384 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:34:19.556-06:00  WARN 25384 --- [  restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: fad1a575-01b5-478f-815a-2e07d3f19264
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-27T10:34:19.558-06:00  INFO 25384 --- [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-27T10:34:19.893-06:00  INFO 25384 --- [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-08-27T10:34:19.914-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-08-27T10:34:19.917-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Started PlataformaCitasApplication in 2.111 seconds (process running for 3214.22)
+[DataInitializer] Clientes demo creados con BCrypt.
+[DataInitializer] Cuenta admin creada con correo unice891@gmail.com.
+[DataInitializer] Servicio demo creado: Consulta General y Diagn髎tico.
+[DataInitializer] Servicio demo creado: Sesi髇 Terap閡tica Integral.
+[DataInitializer] Servicio demo creado: Revisi髇 y Seguimiento Premium.
+[DataInitializer] Servicio demo creado: Corte Cl醩ico.
+[DataInitializer] Servicio demo creado: Corte + Perfilado de Barba.
+[DataInitializer] Servicio demo creado: Arreglo de Barba.
+[DataInitializer] Servicio demo creado: Tinte o Color.
+[DataInitializer] Cat醠ogo de servicios verificado (7 servicios).
+[DataInitializer] Especialista creado: Carlos Mendoza (Especialista).
+[DataInitializer] Especialista creado: Dra. Sof韆 Herrera.
+[DataInitializer] Especialista creado: Luis Ram韗ez (Barbero).
+[DataInitializer] Especialista creado: Valentina Cruz (Estilista).
+[DataInitializer] Especialista creado: May Menendez.
+[DataInitializer] Especialistas verificados y vinculados a los servicios de su rubro.
+[DataInitializer] Se generaron 610 bloques de disponibilidad para los pr髕imos 60 d韆s.
+2026-08-27T10:34:21.760-06:00  INFO 25384 --- [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation delta:
+
+
+==========================
+CONDITION EVALUATION DELTA
+==========================
+
+
+Positive matches:
+-----------------
+
+    None
+
+
+Negative matches:
+-----------------
+
+   SpringBootWebSecurityConfiguration.SecurityFilterChainConfiguration:
+      Did not match:
+         - AllNestedConditions 1 matched 1 did not; NestedCondition on DefaultWebSecurityCondition.Beans @ConditionalOnMissingBean (types: org.springframework.security.web.SecurityFilterChain; SearchStrategy: all) found beans of type 'org.springframework.security.web.SecurityFilterChain' securityFilterChain; NestedCondition on DefaultWebSecurityCondition.Classes @ConditionalOnClass found required classes 'org.springframework.security.web.SecurityFilterChain', 'org.springframework.security.config.annotation.web.builders.HttpSecurity' (DefaultWebSecurityCondition)
+
+
+Exclusions:
+-----------
+
+    None
+
+
+Unconditional classes:
+----------------------
+
+    None
+
+
+
+2026-08-27T10:34:43.580-06:00  INFO 25384 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-27T10:34:43.580-06:00  INFO 25384 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-27T10:34:43.580-06:00  INFO 25384 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2026-08-27T10:37:42.615-06:00  INFO 25384 --- [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 70 class path changes (0 additions, 70 deletions, 0 modifications)
+2026-08-27T10:37:42.624-06:00  INFO 25384 --- [      Thread-12] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:37:42.624-06:00  WARN 25384 --- [      Thread-12] o.s.b.f.support.DisposableBeanAdapter    : Invocation of destroy method failed on bean with name 'inMemoryDatabaseShutdownExecutor': org.h2.jdbc.JdbcSQLNonTransientConnectionException: La base de datos ya esta cerrada (para des-habilitar el cerrado automatico durante el shutdown de la VM, agregue ";DB_CLOSE_ON_EXIT=FALSE" a la URL de conexi贸n)
+Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-224]
+2026-08-27T10:37:42.624-06:00  INFO 25384 --- [      Thread-12] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-08-27T10:37:42.624-06:00  INFO 25384 --- [      Thread-12] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-27T10:37:42.707-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Starting PlataformaCitasApplication using Java 21.0.10 with PID 25384 (C:\Users\HP\Documents\plataforma-citas\target\classes started by HP in C:\Users\HP\Documents\plataforma-citas)
+2026-08-27T10:37:42.707-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : The following 1 profile is active: "local"
+2026-08-27T10:37:42.837-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-27T10:37:42.844-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 2 ms. Found 0 JPA repository interfaces.
+2026-08-27T10:37:42.929-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-08-27T10:37:42.929-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-27T10:37:42.929-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-08-27T10:37:42.952-06:00  INFO 25384 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-08-27T10:37:42.953-06:00  INFO 25384 --- [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 246 ms
+2026-08-27T10:37:42.973-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-08-27T10:37:42.976-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection conn40: url=jdbc:h2:mem:plataformadb user=SA
+2026-08-27T10:37:42.976-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-08-27T10:37:42.976-06:00  INFO 25384 --- [  restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:plataformadb'
+2026-08-27T10:37:43.013-06:00  INFO 25384 --- [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-27T10:37:43.015-06:00  INFO 25384 --- [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-27T10:37:43.024-06:00  INFO 25384 --- [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-27T10:37:43.041-06:00  INFO 25384 --- [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-27T10:37:43.041-06:00  INFO 25384 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:37:43.201-06:00  WARN 25384 --- [  restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 3d9c4ff0-260e-4bac-81c2-a8e206200bb9
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-27T10:37:43.203-06:00  INFO 25384 --- [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-27T10:37:43.238-06:00  INFO 25384 --- [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-08-27T10:37:43.253-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-08-27T10:37:43.257-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Started PlataformaCitasApplication in 0.573 seconds (process running for 3417.558)
+2026-08-27T10:37:43.258-06:00  INFO 25384 --- [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation delta:
+
+
+==========================
+CONDITION EVALUATION DELTA
+==========================
+
+
+Positive matches:
+-----------------
+
+   SpringBootWebSecurityConfiguration.SecurityFilterChainConfiguration matched:
+      - AllNestedConditions 2 matched 0 did not; NestedCondition on DefaultWebSecurityCondition.Beans @ConditionalOnMissingBean (types: org.springframework.security.web.SecurityFilterChain; SearchStrategy: all) did not find any beans; NestedCondition on DefaultWebSecurityCondition.Classes @ConditionalOnClass found required classes 'org.springframework.security.web.SecurityFilterChain', 'org.springframework.security.config.annotation.web.builders.HttpSecurity' (DefaultWebSecurityCondition)
+
+
+Negative matches:
+-----------------
+
+    None
+
+
+Exclusions:
+-----------
+
+    None
+
+
+Unconditional classes:
+----------------------
+
+    None
+
+
+
+2026-08-27T10:37:45.546-06:00  INFO 25384 --- [   File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 70 class path changes (70 additions, 0 deletions, 0 modifications)
+2026-08-27T10:37:45.560-06:00  INFO 25384 --- [      Thread-16] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:37:45.560-06:00  WARN 25384 --- [      Thread-16] o.s.b.f.support.DisposableBeanAdapter    : Invocation of destroy method failed on bean with name 'inMemoryDatabaseShutdownExecutor': org.h2.jdbc.JdbcSQLNonTransientConnectionException: La base de datos ya esta cerrada (para des-habilitar el cerrado automatico durante el shutdown de la VM, agregue ";DB_CLOSE_ON_EXIT=FALSE" a la URL de conexi贸n)
+Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-224]
+2026-08-27T10:37:45.561-06:00  INFO 25384 --- [      Thread-16] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown initiated...
+2026-08-27T10:37:45.561-06:00  INFO 25384 --- [      Thread-16] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Shutdown completed.
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-27T10:37:45.679-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Starting PlataformaCitasApplication using Java 21.0.10 with PID 25384 (C:\Users\HP\Documents\plataforma-citas\target\classes started by HP in C:\Users\HP\Documents\plataforma-citas)
+2026-08-27T10:37:45.679-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : The following 1 profile is active: "local"
+2026-08-27T10:37:45.912-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-27T10:37:45.948-06:00  INFO 25384 --- [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 36 ms. Found 10 JPA repository interfaces.
+2026-08-27T10:37:46.054-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-08-27T10:37:46.054-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-27T10:37:46.054-06:00  INFO 25384 --- [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-08-27T10:37:46.073-06:00  INFO 25384 --- [  restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-08-27T10:37:46.073-06:00  INFO 25384 --- [  restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 392 ms
+2026-08-27T10:37:46.084-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2026-08-27T10:37:46.084-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection conn50: url=jdbc:h2:mem:plataformadb user=SA
+2026-08-27T10:37:46.084-06:00  INFO 25384 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2026-08-27T10:37:46.084-06:00  INFO 25384 --- [  restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:plataformadb'
+2026-08-27T10:37:46.115-06:00  INFO 25384 --- [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-27T10:37:46.117-06:00  INFO 25384 --- [  restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-08-27T10:37:46.124-06:00  INFO 25384 --- [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-27T10:37:46.268-06:00  INFO 25384 --- [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-27T10:37:46.277-06:00  INFO 25384 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-27T10:37:46.446-06:00  WARN 25384 --- [  restartedMain] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: c8b218b2-2de6-4895-85ef-ae4129274d6e
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-27T10:37:46.446-06:00  INFO 25384 --- [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-27T10:37:46.553-06:00  INFO 25384 --- [  restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-08-27T10:37:46.560-06:00  INFO 25384 --- [  restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-08-27T10:37:46.564-06:00  INFO 25384 --- [  restartedMain] c.g.p.PlataformaCitasApplication         : Started PlataformaCitasApplication in 0.911 seconds (process running for 3420.865)
+[DataInitializer] Clientes demo creados con BCrypt.
+[DataInitializer] Cuenta admin creada con correo unice891@gmail.com.
+[DataInitializer] Servicio demo creado: Consulta General y Diagn髎tico.
+[DataInitializer] Servicio demo creado: Sesi髇 Terap閡tica Integral.
+[DataInitializer] Servicio demo creado: Revisi髇 y Seguimiento Premium.
+[DataInitializer] Servicio demo creado: Corte Cl醩ico.
+[DataInitializer] Servicio demo creado: Corte + Perfilado de Barba.
+[DataInitializer] Servicio demo creado: Arreglo de Barba.
+[DataInitializer] Servicio demo creado: Tinte o Color.
+[DataInitializer] Cat醠ogo de servicios verificado (7 servicios).
+[DataInitializer] Especialista creado: Carlos Mendoza (Especialista).
+[DataInitializer] Especialista creado: Dra. Sof韆 Herrera.
+[DataInitializer] Especialista creado: Luis Ram韗ez (Barbero).
+[DataInitializer] Especialista creado: Valentina Cruz (Estilista).
+[DataInitializer] Especialista creado: May Menendez.
+[DataInitializer] Especialistas verificados y vinculados a los servicios de su rubro.
+[DataInitializer] Se generaron 610 bloques de disponibilidad para los pr髕imos 60 d韆s.
+2026-08-27T10:37:47.533-06:00  INFO 25384 --- [  restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation delta:
+
+
+==========================
+CONDITION EVALUATION DELTA
+==========================
+
+
+Positive matches:
+-----------------
+
+    None
+
+
+Negative matches:
+-----------------
+
+   SpringBootWebSecurityConfiguration.SecurityFilterChainConfiguration:
+      Did not match:
+         - AllNestedConditions 1 matched 1 did not; NestedCondition on DefaultWebSecurityCondition.Beans @ConditionalOnMissingBean (types: org.springframework.security.web.SecurityFilterChain; SearchStrategy: all) found beans of type 'org.springframework.security.web.SecurityFilterChain' securityFilterChain; NestedCondition on DefaultWebSecurityCondition.Classes @ConditionalOnClass found required classes 'org.springframework.security.web.SecurityFilterChain', 'org.springframework.security.config.annotation.web.builders.HttpSecurity' (DefaultWebSecurityCondition)
+
+
+Exclusions:
+-----------
+
+    None
+
+
+Unconditional classes:
+----------------------
+
+    None
+
+
+
+2026-08-27T10:38:09.781-06:00  INFO 25384 --- [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-27T10:38:09.783-06:00  INFO 25384 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-27T10:38:09.784-06:00  INFO 25384 --- [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms

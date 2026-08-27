@@ -981,6 +981,7 @@ select option{
     padding:24px;
 }
 .modal-box{width:100%;max-width:420px;padding:28px !important;}
+.modal-box.modal-box-wide{max-width:560px;}
 
 /* ---------- Resumen de cita ---------- */
 .resumen-cita{

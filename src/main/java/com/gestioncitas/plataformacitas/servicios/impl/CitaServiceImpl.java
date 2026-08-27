@@ -336,8 +336,15 @@ public class CitaServiceImpl implements CitaService {
 
         Servicio servicio = cita.getServicio();
         Empleado empleado = cita.getEmpleado();
+        LocalDate fechaAnterior = cita.getFecha();
+        LocalTime horaAnterior = cita.getHora();
         LocalTime nuevaHoraInicio = request.getHora();
         LocalTime nuevaHoraFin = nuevaHoraInicio.plusMinutes(servicio.getDuracionMinutos());
+
+        LocalDateTime nuevoInicio = LocalDateTime.of(request.getFecha(), nuevaHoraInicio);
+        if (nuevoInicio.isBefore(LocalDateTime.now())) {
+            throw new HorarioNoDisponibleException("La nueva fecha y hora no pueden estar en el pasado.");
+        }
 
         List<Cita> citasExistentes = citaRepository
                 .findCitasActivasByEmpleadoAndFechaExcludingId(
@@ -357,6 +364,10 @@ public class CitaServiceImpl implements CitaService {
 
         cita.setFecha(request.getFecha());
         cita.setHora(nuevaHoraInicio);
+        cita.setFechaUltimaModificacion(LocalDateTime.now());
+        cita.setDetalleUltimoCambio(String.format(
+                "Cita reprogramada: de %s %s a %s %s.",
+                fechaAnterior, horaAnterior, request.getFecha(), nuevaHoraInicio));
         Cita citaGuardada = citaRepository.save(cita);
 
         String msgCliente = String.format(
@@ -366,9 +377,9 @@ public class CitaServiceImpl implements CitaService {
         notificacionService.crear(cita.getCliente().getId(), msgCliente, "REPROGRAMACION");
 
         String msgAdmin = String.format(
-                "El cliente %s reprogramó la cita para '%s' con %s del %s al %s a las %s.",
+                "El cliente %s reprogramó la cita para '%s' con %s del %s %s al %s a las %s.",
                 cita.getCliente().getNombre(), servicio.getNombre(), empleado.getNombre(),
-                cita.getFecha(), citaGuardada.getFecha(), citaGuardada.getHora());
+                fechaAnterior, horaAnterior, citaGuardada.getFecha(), citaGuardada.getHora());
         notificacionService.crear(empleado.getId(), msgAdmin, "REPROGRAMACION");
         notificacionService.notificarAdmins(msgAdmin, "REPROGRAMACION");
 
