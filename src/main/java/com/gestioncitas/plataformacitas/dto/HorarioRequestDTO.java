@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +15,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class HorarioRequestDTO {
 
+	@NotNull(message = "El empleado es obligatorio")
+	@Positive(message = "El ID del empleado debe ser válido")
 	private Long empleadoId;
 
 	@NotNull(message = "La fecha es obligatoria")

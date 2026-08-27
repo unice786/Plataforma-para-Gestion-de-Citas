@@ -13,6 +13,7 @@ public class ClienteRegistroDTO {
 
     @NotBlank(message = "El correo es obligatorio")
     @Email(message = "Ingresa un correo electrónico válido")
+    @Size(max = 150, message = "El correo no puede superar los 150 caracteres")
     private String correo;
 
     @NotBlank(message = "El teléfono es obligatorio")
@@ -24,6 +25,7 @@ public class ClienteRegistroDTO {
     private String password;
 
     @NotBlank(message = "Confirma tu contraseña")
+    @Size(max = 60, message = "La confirmación no puede superar los 60 caracteres")
     private String confirmarPassword;
 
     public ClienteRegistroDTO() {}

@@ -2,15 +2,18 @@ package com.gestioncitas.plataformacitas.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class ReprogramarCitaDTO {
 
     @NotNull(message = "El ID de la cita es obligatorio")
+    @Positive(message = "El ID de la cita debe ser válido")
     private Long citaId;
 
     @NotNull(message = "El ID del cliente es obligatorio")
+    @Positive(message = "El ID del cliente debe ser válido")
     private Long clienteId;
 
     @NotNull(message = "La fecha es obligatoria")

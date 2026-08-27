@@ -2,18 +2,22 @@ package com.gestioncitas.plataformacitas.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class ReservaCitaRequestDTO {
 
     @NotNull(message = "El ID del cliente es obligatorio")
+    @Positive(message = "El ID del cliente debe ser válido")
     private Long clienteId;
 
     @NotNull(message = "El ID del empleado es obligatorio")
+    @Positive(message = "El ID del empleado debe ser válido")
     private Long empleadoId;
 
     @NotNull(message = "El ID del servicio es obligatorio")
+    @Positive(message = "El ID del servicio debe ser válido")
     private Long servicioId;
 
     @NotNull(message = "La fecha es obligatoria")

@@ -8,6 +8,7 @@ package com.gestioncitas {
         - correo : String
         - password : String
         - activo : Boolean
+        - rol : RolUsuario
     }
 
     class Administrador {
@@ -91,8 +92,20 @@ package com.gestioncitas {
     }
 
     class HorarioDisponibilidadService <<service>> {
-        + asignar(HorarioRequestDTO) : HorarioResponseDTO
+        + crear(HorarioRequestDTO) : HorarioResponseDTO
+        + actualizar(id : Long, HorarioRequestDTO) : HorarioResponseDTO
+        + eliminar(id : Long) : void
+        + buscarPorId(id : Long) : HorarioResponseDTO
+        + listarTodos() : List<HorarioResponseDTO>
+    }
+
+    class CitaService <<service>> {
         + consultarDisponibilidad(empleadoId : Long, fecha : LocalDate) : List<HorarioResponseDTO>
+        + consultarDisponibilidadRango(empleadoId : Long, inicio : LocalDate, fin : LocalDate) : Map<LocalDate, List<HorarioResponseDTO>>
+        + reservarCita(ReservaCitaRequestDTO) : CitaResponseDTO
+        + editarCita(id : Long, EdicionCitaRequestDTO) : CitaResponseDTO
+        + cancelarCita(id : Long) : CitaResponseDTO
+        + reprogramarCita(ReprogramarCitaDTO) : CitaResponseDTO
     }
 
     ' ===== Capa de Acceso a Datos (Repositorios) =====
@@ -125,6 +138,21 @@ package com.gestioncitas {
         + findByEmpleadoIdAndEstado(empleadoId : Long, estado : String) : List<HorarioDisponibilidad>
     }
 
+    class CitaRepository <<repository>> {
+        + buscarParaAdministrador(fecha : LocalDate, cliente : String) : List<Cita>
+        + buscarPorIdParaAdministrador(id : Long) : Optional<Cita>
+        + findByClienteIdOrderByFechaDescHoraDesc(clienteId : Long) : List<Cita>
+        + findByIdAndClienteId(id : Long, clienteId : Long) : Optional<Cita>
+        + findCitasActivasByEmpleadoAndFechaExcludingId(empleadoId, fecha, estados, citaId) : List<Cita>
+    }
+
+    class ReprogramarCitaDTO {
+        - citaId : Long
+        - clienteId : Long
+        - fecha : LocalDate
+        - hora : LocalTime
+    }
+
     ' Relaciones de herencia Java
     Usuario <|-- Administrador
     Usuario <|-- Cliente
@@ -149,6 +177,10 @@ package com.gestioncitas {
     EmpleadoService ..> EspecialidadRepository : usa
     HorarioDisponibilidadService ..> HorarioDisponibilidadRepository : usa
     HorarioDisponibilidadService ..> EmpleadoRepository : usa
+    CitaService ..> CitaRepository : usa
+    CitaService ..> HorarioDisponibilidadRepository : usa
+    CitaService ..> EmpleadoRepository : usa
+    CitaService ..> ReprogramarCitaDTO : usa
 }
 
 @enduml

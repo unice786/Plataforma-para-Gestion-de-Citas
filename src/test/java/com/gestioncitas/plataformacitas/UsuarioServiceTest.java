@@ -6,7 +6,7 @@ import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Usuario;
 import com.gestioncitas.plataformacitas.repositorios.ClienteRepository;
 import com.gestioncitas.plataformacitas.repositorios.UsuarioRepository;
-import com.gestioncitas.plataformacitas.servicios.UsuarioService;
+import com.gestioncitas.plataformacitas.servicios.impl.UsuarioServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ class UsuarioServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UsuarioService usuarioService;
+    private UsuarioServiceImpl usuarioService;
 
     private ClienteRegistroDTO dtoValido;
 

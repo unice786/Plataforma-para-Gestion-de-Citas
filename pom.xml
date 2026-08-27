@@ -39,7 +39,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-
 		<!-- Base de Datos (JPA + MySQL) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

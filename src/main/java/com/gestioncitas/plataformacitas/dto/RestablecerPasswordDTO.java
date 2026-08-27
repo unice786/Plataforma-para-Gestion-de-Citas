@@ -10,8 +10,10 @@ public class RestablecerPasswordDTO {
     private String password;
 
     @NotBlank(message = "Confirma tu nueva contraseña")
+    @Size(max = 60, message = "La confirmación no puede superar los 60 caracteres")
     private String confirmarPassword;
 
+    @NotBlank(message = "El token de recuperación es obligatorio")
     private String token;
 
     public RestablecerPasswordDTO() {}
