@@ -46,11 +46,17 @@
                     </td>
                     <td class="text-end-cell">
                         <div class="d-inline-flex gap-2">
-                            <a th:if="${cita.estado.name() == 'PENDIENTE' or cita.estado.name() == 'CONFIRMADA'}"
-                               th:href="@{/reprogramar/{id}(id=${cita.id})}"
-                               class="btn-pill small outline">
+                            <button th:if="${cita.estado.name() == 'PENDIENTE' or cita.estado.name() == 'CONFIRMADA'}"
+                                    type="button" class="btn-pill small outline btn-reprogramar"
+                                    th:data-cita-id="${cita.id}"
+                                    th:data-servicio-id="${cita.servicio.id}"
+                                    th:data-servicio="${cita.servicio.nombre}"
+                                    th:data-empleado-id="${cita.empleado.id}"
+                                    th:data-empleado="${cita.empleado.nombre}"
+                                    th:data-fecha="${#temporals.format(cita.fecha, 'yyyy-MM-dd')}"
+                                    th:data-hora="${#temporals.format(cita.hora, 'HH:mm')}">
                                 <i class="bi bi-calendar-event"></i>Reprogramar
-                            </a>
+                            </button>
                             <button th:if="${cita.estado.name() == 'PENDIENTE' or cita.estado.name() == 'CONFIRMADA'}"
                                     type="button" class="btn-pill small danger-outline btn-cancelar"
                                     th:data-cita-id="${cita.id}"
@@ -78,6 +84,42 @@
         Aún no tienes citas programadas.
     </div>
 </main>
+
+<div id="modalReprogramar" class="modal-overlay d-none">
+    <div class="modal-box modal-box-wide app-card">
+        <h3 style="margin:0 0 8px;font-family:'Baloo 2',sans-serif;font-weight:700;">Reprogramar cita</h3>
+        <p id="reprogResumenActual" style="color:var(--auth-text-soft);margin:0 0 16px;font-size:.95rem;"></p>
+        <div id="alertaReprog" class="app-alert alert-danger d-none" role="alert" style="margin-bottom:12px;"></div>
+        <form id="formReprogramar">
+            <div class="mb-3">
+                <label class="form-label" for="nuevaFecha">Nueva fecha</label>
+                <input id="nuevaFecha" class="form-control" type="date" required>
+            </div>
+            <div class="mb-3">
+                <button type="button" class="btn-pill outline w-100" id="btnConsultarHorarios">
+                    <i class="bi bi-search"></i>Ver horarios disponibles
+                </button>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Horarios disponibles</label>
+                <div id="slotsReprog" class="slots-grid">
+                    <p class="small mb-0" style="color:var(--auth-text-soft);">Selecciona una fecha y consulta los horarios.</p>
+                </div>
+            </div>
+            <input type="hidden" id="reprogCitaId">
+            <input type="hidden" id="reprogServicioId">
+            <input type="hidden" id="reprogEmpleadoId">
+            <input type="hidden" id="reprogHora">
+            <div id="reprogResumenNuevo" class="resumen-cita d-none mb-3"></div>
+            <div class="app-actions">
+                <button type="button" class="btn-pill outline" id="reprogCerrar">Volver</button>
+                <button type="submit" class="btn-pill" id="btnConfirmarReprog" disabled>
+                    <i class="bi bi-calendar-check"></i>Confirmar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <div id="modalConfirmar" class="modal-overlay d-none">
     <div class="modal-box app-card">
@@ -109,6 +151,143 @@
 
     function mostrarAlerta(el, msg) { el.textContent = msg; el.classList.remove('d-none'); }
     function ocultarAlertas() { alertaExito.classList.add('d-none'); alertaError.classList.add('d-none'); }
+
+    var modalReprog = document.getElementById('modalReprogramar');
+    var alertaReprog = document.getElementById('alertaReprog');
+    var inputNuevaFecha = document.getElementById('nuevaFecha');
+    var slotsReprog = document.getElementById('slotsReprog');
+    var btnConsultarHorarios = document.getElementById('btnConsultarHorarios');
+    var btnConfirmarReprog = document.getElementById('btnConfirmarReprog');
+    var reprogResumenNuevo = document.getElementById('reprogResumenNuevo');
+    var empleadoFiltroId = '';
+
+    function hoyISO() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function mostrarAlertaReprog(msg) { alertaReprog.textContent = msg; alertaReprog.classList.remove('d-none'); }
+    function ocultarAlertaReprog() { alertaReprog.classList.add('d-none'); }
+
+    function limpiarSeleccionHorario() {
+        document.getElementById('reprogHora').value = '';
+        reprogResumenNuevo.classList.add('d-none');
+        btnConfirmarReprog.disabled = true;
+    }
+
+    function cerrarModalReprog() {
+        modalReprog.classList.add('d-none');
+        limpiarSeleccionHorario();
+        slotsReprog.innerHTML = '<p class="small mb-0" style="color:var(--auth-text-soft);">Selecciona una fecha y consulta los horarios.</p>';
+        ocultarAlertaReprog();
+    }
+
+    document.querySelectorAll('.btn-reprogramar').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            ocultarAlertas();
+            ocultarAlertaReprog();
+            document.getElementById('reprogCitaId').value = btn.dataset.citaId;
+            document.getElementById('reprogServicioId').value = btn.dataset.servicioId;
+            document.getElementById('reprogEmpleadoId').value = btn.dataset.empleadoId;
+            empleadoFiltroId = String(btn.dataset.empleadoId);
+            inputNuevaFecha.min = hoyISO();
+            inputNuevaFecha.value = btn.dataset.fecha && btn.dataset.fecha >= hoyISO() ? btn.dataset.fecha : hoyISO();
+            document.getElementById('reprogResumenActual').textContent =
+                '"' + btn.dataset.servicio + '" con ' + btn.dataset.empleado + ' · ' + btn.dataset.fecha + ' a las ' + btn.dataset.hora + '. Elige un nuevo horario.';
+            limpiarSeleccionHorario();
+            slotsReprog.innerHTML = '<p class="small mb-0" style="color:var(--auth-text-soft);">Selecciona una fecha y consulta los horarios.</p>';
+            modalReprog.classList.remove('d-none');
+        });
+    });
+
+    btnConsultarHorarios.addEventListener('click', function() {
+        ocultarAlertaReprog();
+        limpiarSeleccionHorario();
+        var servicioId = document.getElementById('reprogServicioId').value;
+        if (!inputNuevaFecha.value) {
+            mostrarAlertaReprog('Selecciona una fecha para consultar los horarios.');
+            return;
+        }
+        slotsReprog.innerHTML = '<p style="color:var(--auth-text-soft);">Consultando disponibilidad...</p>';
+        fetch('/api/citas/disponibilidad?servicioId=' + servicioId + '&fecha=' + inputNuevaFecha.value)
+            .then(function(r) { return r.json(); })
+            .then(function(slots) {
+                var filtrados = (slots || []).filter(function(s) {
+                    return String(s.empleadoId) === empleadoFiltroId;
+                });
+                if (!filtrados.length) {
+                    slotsReprog.innerHTML = '<p style="color:var(--auth-text-soft);">No hay horarios disponibles para esa fecha. Prueba con otro día.</p>';
+                    return;
+                }
+                slotsReprog.innerHTML = '';
+                filtrados.forEach(function(s) {
+                    var boton = document.createElement('button');
+                    boton.type = 'button';
+                    boton.className = 'slot';
+                    boton.innerHTML = '<span class="slot-hora">' + String(s.horaInicio).substring(0, 5) + '</span>' +
+                        '<span class="slot-emp">' + s.empleadoNombre + '</span>';
+                    boton.addEventListener('click', function() {
+                        slotsReprog.querySelectorAll('.slot').forEach(function(x) { x.classList.remove('activo'); });
+                        boton.classList.add('activo');
+                        document.getElementById('reprogHora').value = s.horaInicio;
+                        reprogResumenNuevo.innerHTML = 'Nueva fecha: <strong>' + inputNuevaFecha.value +
+                            '</strong> · Hora: <strong>' + String(s.horaInicio).substring(0, 5) + '</strong>';
+                        reprogResumenNuevo.classList.remove('d-none');
+                        btnConfirmarReprog.disabled = false;
+                    });
+                    slotsReprog.appendChild(boton);
+                });
+            })
+            .catch(function() {
+                slotsReprog.innerHTML = '';
+                mostrarAlertaReprog('No se pudo consultar la disponibilidad. Intenta de nuevo.');
+            });
+    });
+
+    document.getElementById('reprogCerrar').addEventListener('click', cerrarModalReprog);
+    modalReprog.addEventListener('click', function(e) { if (e.target === modalReprog) cerrarModalReprog(); });
+
+    document.getElementById('formReprogramar').addEventListener('submit', function(evento) {
+        evento.preventDefault();
+        ocultarAlertaReprog();
+        var citaId = document.getElementById('reprogCitaId').value;
+        var hora = document.getElementById('reprogHora').value;
+        if (!inputNuevaFecha.value || !hora) {
+            mostrarAlertaReprog('Selecciona fecha y horario antes de confirmar.');
+            return;
+        }
+        btnConfirmarReprog.disabled = true;
+        fetch('/api/citas/reprogramar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                citaId: Number(citaId),
+                clienteId: Number(clienteId),
+                fecha: inputNuevaFecha.value,
+                hora: hora
+            })
+        })
+        .then(function(r) {
+            return r.json().then(function(datos) { return { ok: r.ok, datos: datos }; });
+        })
+        .then(function(resultado) {
+            if (!resultado.ok) {
+                mostrarAlertaReprog(resultado.datos && resultado.datos.mensaje ? resultado.datos.mensaje : 'No se pudo reprogramar la cita.');
+                btnConfirmarReprog.disabled = false;
+                return;
+            }
+            cerrarModalReprog();
+            mostrarAlerta(alertaExito, resultado.datos.mensaje || 'Cita reprogramada correctamente.');
+            setTimeout(function() { location.reload(); }, 1500);
+        })
+        .catch(function() {
+            mostrarAlertaReprog('Error de conexión al reprogramar. Intenta de nuevo.');
+            btnConfirmarReprog.disabled = false;
+        });
+    });
 
     document.querySelectorAll('.btn-cancelar').forEach(function(btn) {
         btn.addEventListener('click', function() {

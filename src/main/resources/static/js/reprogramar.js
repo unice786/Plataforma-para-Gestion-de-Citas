@@ -111,8 +111,8 @@
 
         btnReprogramar.disabled = true;
 
-        fetch('/api/citas/' + citaId + '/reprogramar', {
-            method: 'PUT',
+        fetch('/api/citas/reprogramar', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken

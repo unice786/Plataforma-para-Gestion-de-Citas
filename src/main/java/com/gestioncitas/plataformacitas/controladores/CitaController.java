@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * API REST de citas (SCRUM-1, autor: Sam Alonso).
  * GET  /api/citas/disponibilidad -> bloques horarios libres
  * POST /api/citas/reservar       -> registra la reserva con anti-double booking
+ * POST /api/citas/reprogramar    -> reprograma fecha/hora (SCRUM-3)
  */
 @RestController
 @RequestMapping("/api/citas")
@@ -60,15 +61,19 @@ public class CitaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
     }
 
+    @PostMapping("/reprogramar")
+    public ResponseEntity<CitaResponseDTO> reprogramarCita(@Valid @RequestBody ReprogramarCitaDTO request) {
+        return ResponseEntity.ok(citaService.reprogramarCita(request));
+    }
+
     @PutMapping("/{id}/reprogramar")
-    public ResponseEntity<CitaResponseDTO> reprogramarCita(
+    public ResponseEntity<CitaResponseDTO> reprogramarCitaPorId(
             @PathVariable("id") Long id,
             @Valid @RequestBody ReprogramarCitaDTO request) {
         if (!id.equals(request.getCitaId())) {
             return ResponseEntity.badRequest().build();
         }
-        CitaResponseDTO respuesta = citaService.reprogramarCita(request);
-        return ResponseEntity.ok(respuesta);
+        return ResponseEntity.ok(citaService.reprogramarCita(request));
     }
 
     @DeleteMapping("/{id}/cancelar")
