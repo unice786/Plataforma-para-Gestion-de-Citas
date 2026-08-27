@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Inicio')}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell">
+    <div th:if="${param.bienvenido}" class="app-alert alert-success">
+        ¡Registro exitoso! Bienvenido/a, <strong th:text="${session.usuario.nombre}"></strong>.
+    </div>
+
+    <header class="app-header text-center justify-content-center">
+        <div>
+            <h1>Bienvenido a la Plataforma de Citas</h1>
+            <p th:text="'Tu cuenta: ' + ${session.usuario.correo}"></p>
+        </div>
+    </header>
+
+    <!-- CLIENTE -->
+    <th:block th:if="${session.usuario != null and session.usuario.rol.name() == 'CLIENTE'}">
+        <p style="color:var(--auth-text-soft);margin:0 0 4px;">¿Qué quieres hacer hoy?</p>
+        <div class="quick-grid">
+            <a class="quick-card" th:href="@{/reservar}">
+                <i class="bi bi-calendar-plus"></i>
+                <strong>Reservar cita</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Agenda en línea</span>
+            </a>
+            <a class="quick-card" th:href="@{/servicios}">
+                <i class="bi bi-spa"></i>
+                <strong>Servicios</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Explora el catálogo</span>
+            </a>
+            <a class="quick-card" th:href="@{/mis-citas}">
+                <i class="bi bi-calendar-check"></i>
+                <strong>Mis citas</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Revisa tus reservas</span>
+            </a>
+        </div>
+    </th:block>
+
+    <!-- ADMINISTRADOR -->
+    <th:block th:if="${session.usuario != null and session.usuario.rol.name() == 'ADMINISTRADOR'}">
+        <p style="color:var(--auth-text-soft);margin:0 0 4px;">Panel de administración</p>
+        <div class="quick-grid">
+            <a class="quick-card" th:href="@{/admin/citas}">
+                <i class="bi bi-calendar2-check"></i>
+                <strong>Citas</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Gestiona las citas</span>
+            </a>
+            <a class="quick-card" th:href="@{/admin/servicios}">
+                <i class="bi bi-gear"></i>
+                <strong>Servicios</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Administrar catálogo</span>
+            </a>
+            <a class="quick-card" th:href="@{/admin/horarios}">
+                <i class="bi bi-clock"></i>
+                <strong>Horarios</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Configurar disponibilidad</span>
+            </a>
+            <a class="quick-card" th:href="@{/servicios}">
+                <i class="bi bi-eye"></i>
+                <strong>Ver catálogo</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Vista pública</span>
+            </a>
+        </div>
+    </th:block>
+
+    <!-- EMPLEADO -->
+    <th:block th:if="${session.usuario != null and session.usuario.rol.name() == 'EMPLEADO'}">
+        <p style="color:var(--auth-text-soft);margin:0 0 4px;">Panel del empleado</p>
+        <div class="quick-grid">
+            <a class="quick-card" th:href="@{/mis-citas}">
+                <i class="bi bi-calendar-check"></i>
+                <strong>Mis citas</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Revisa tus citas asignadas</span>
+            </a>
+            <a class="quick-card" th:href="@{/servicios}">
+                <i class="bi bi-spa"></i>
+                <strong>Servicios</strong>
+                <span style="color:var(--auth-text-soft);font-size:.85rem;">Ver catálogo</span>
+            </a>
+        </div>
+    </th:block>
+</main>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

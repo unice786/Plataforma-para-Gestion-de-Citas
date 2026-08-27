@@ -1,0 +1,113 @@
+package com.gestioncitas.plataformacitas.controladores;
+
+import com.gestioncitas.plataformacitas.dto.CitaResponseDTO;
+import com.gestioncitas.plataformacitas.dto.HorarioDisponibleDTO;
+import com.gestioncitas.plataformacitas.dto.ReprogramarCitaDTO;
+import com.gestioncitas.plataformacitas.dto.ReservaCitaRequestDTO;
+import com.gestioncitas.plataformacitas.servicios.CitaService;
+import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * API REST de citas (SCRUM-1, autor: Sam Alonso).
+ * GET  /api/citas/disponibilidad -> bloques horarios libres
+ * POST /api/citas/reservar       -> registra la reserva con anti-double booking
+ */
+@RestController
+@RequestMapping("/api/citas")
+public class CitaController {
+
+    private final CitaService citaService;
+
+    public CitaController(CitaService citaService) {
+        this.citaService = citaService;
+    }
+
+    @GetMapping("/disponibilidad")
+    public ResponseEntity<List<HorarioDisponibleDTO>> consultarDisponibilidad(
+            @RequestParam("servicioId") Long servicioId,
+            @RequestParam(value = "fecha", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam(value = "desde", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam(value = "hasta", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+
+        if (desde != null && hasta != null) {
+            return ResponseEntity.ok(citaService.consultarDisponibilidadRango(servicioId, desde, hasta));
+        }
+
+        LocalDate fechaConsulta = (fecha != null) ? fecha : LocalDate.now();
+        return ResponseEntity.ok(citaService.consultarDisponibilidad(servicioId, fechaConsulta));
+    }
+
+    @PostMapping("/reservar")
+    public ResponseEntity<CitaResponseDTO> reservarCita(@Valid @RequestBody ReservaCitaRequestDTO request) {
+        CitaResponseDTO respuesta = citaService.reservarCita(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+    }
+
+    @PutMapping("/{id}/reprogramar")
+    public ResponseEntity<CitaResponseDTO> reprogramarCita(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody ReprogramarCitaDTO request) {
+        if (!id.equals(request.getCitaId())) {
+            return ResponseEntity.badRequest().build();
+        }
+        CitaResponseDTO respuesta = citaService.reprogramarCita(request);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @DeleteMapping("/{id}/cancelar")
+    public ResponseEntity<CitaResponseDTO> cancelarCitaCliente(
+            @PathVariable("id") Long id,
+            @RequestParam("clienteId") Long clienteId) {
+        CitaResponseDTO respuesta = citaService.cancelarCitaCliente(id, clienteId);
+        return ResponseEntity.ok(respuesta);
+    }
+
+    @DeleteMapping("/{id}/eliminar")
+    public ResponseEntity<Void> eliminarCitaCliente(
+            @PathVariable("id") Long id,
+            @RequestParam("clienteId") Long clienteId) {
+        citaService.eliminarCitaCliente(id, clienteId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/confirmar")
+    public ResponseEntity<CitaResponseDTO> confirmarCita(
+            @PathVariable("id") Long id,
+            @RequestParam("empleadoId") Long empleadoId) {
+        citaService.confirmarCita(id, empleadoId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/completar")
+    public ResponseEntity<CitaResponseDTO> completarCita(
+            @PathVariable("id") Long id,
+            @RequestParam("empleadoId") Long empleadoId) {
+        citaService.completarCita(id, empleadoId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/cancelar-empleado")
+    public ResponseEntity<CitaResponseDTO> cancelarCitaEmpleado(
+            @PathVariable("id") Long id,
+            @RequestParam("empleadoId") Long empleadoId) {
+        citaService.cancelarCitaEmpleado(id, empleadoId);
+        return ResponseEntity.ok().build();
+    }
+}
