@@ -14,15 +14,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "empleados")
 @PrimaryKeyJoinColumn(name = "usuario_id")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class Empleado extends Usuario {
 

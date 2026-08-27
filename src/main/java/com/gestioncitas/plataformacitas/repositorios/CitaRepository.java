@@ -47,4 +47,27 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("estados") List<EstadoCita> estados,
             @Param("citaId") Long citaId
     );
+
+    @Query("""
+            SELECT c FROM Cita c
+            JOIN FETCH c.servicio
+            JOIN FETCH c.cliente
+            LEFT JOIN FETCH c.empleado
+            WHERE (:fecha IS NULL OR c.fecha = :fecha)
+              AND (:cliente IS NULL OR LOWER(c.cliente.nombre) LIKE LOWER(CONCAT('%', :cliente, '%')))
+            ORDER BY c.fecha DESC, c.hora DESC
+            """)
+    List<Cita> buscarParaAdministrador(
+            @Param("fecha") LocalDate fecha,
+            @Param("cliente") String cliente
+    );
+
+    @Query("""
+            SELECT c FROM Cita c
+            JOIN FETCH c.servicio
+            JOIN FETCH c.cliente
+            LEFT JOIN FETCH c.empleado
+            WHERE c.id = :id
+            """)
+    Optional<Cita> buscarPorIdParaAdministrador(@Param("id") Long id);
 }

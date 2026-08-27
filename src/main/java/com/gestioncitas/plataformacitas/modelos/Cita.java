@@ -12,9 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,8 +21,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "citas")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class Cita {
 	@Id
