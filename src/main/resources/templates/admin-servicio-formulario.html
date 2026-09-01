@@ -20,7 +20,6 @@
           th:action="${servicio.id == null} ? @{/admin/servicios} : @{/admin/servicios/{id}/editar(id=${servicio.id})}"
           method="post">
         <input type="hidden" th:field="*{id}">
-        <input type="hidden" th:field="*{activo}">
         <div class="mb-3">
             <label class="form-label" for="nombre">Nombre</label>
             <input id="nombre" class="form-control" type="text" th:field="*{nombre}" maxlength="100" required>
@@ -29,11 +28,26 @@
 
         <div class="mb-3">
             <label class="form-label" for="categoria">Categoría</label>
-            <select id="categoria" class="form-select" th:field="*{categoria.id}" required>
-                <option value="">Selecciona una categoría</option>
-                <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
-            </select>
+            <div class="d-flex gap-2">
+                <select id="categoria" class="form-select" th:field="*{categoria.id}" required>
+                    <option value="">Selecciona una categoría</option>
+                    <option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nombre}"></option>
+                </select>
+                <a class="btn-pill outline small text-nowrap" th:href="@{/admin/categorias/nuevo}" title="Crear una categoría nueva">
+                    <i class="bi bi-plus-lg"></i>Nueva
+                </a>
+            </div>
             <div class="invalid-feedback d-block" th:errors="*{categoria}"></div>
+        </div>
+
+        <div class="mb-3 form-check form-switch ps-5">
+            <input id="activo" class="form-check-input" type="checkbox" th:field="*{activo}">
+            <label class="form-check-label" for="activo">
+                <strong>Servicio activo</strong>
+                <span style="color:var(--auth-text-soft);font-size:.86rem;display:block;">
+                    Si está activo aparece en el catálogo que ven los clientes y puede reservarse.
+                </span>
+            </label>
         </div>
 
         <div class="mb-3">

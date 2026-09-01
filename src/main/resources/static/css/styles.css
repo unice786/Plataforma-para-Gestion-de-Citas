@@ -377,7 +377,7 @@
     color:var(--auth-text);
     font-family:'Inter',system-ui,sans-serif;
     position:relative;
-    overflow-x:hidden;
+    overflow-x:clip;
     transition:background-color .35s ease,color .35s ease;
 }
 
@@ -386,7 +386,7 @@
     z-index:2;
     max-width:1080px;
     margin:0 auto;
-    padding:88px 24px 64px;
+    padding:32px 24px 64px;
 }
 .app-shell.narrow{
     max-width:760px;
@@ -692,15 +692,16 @@ select option{
 }
 
 @media (max-width:576px){
-    .app-shell{ padding:118px 16px 48px; }
+    .app-shell{ padding:20px 16px 48px; }
     .app-header h1{ font-size:1.7rem; }
     .app-card{ padding:20px; }
     .table-app th,.table-app td{ padding:12px 14px; }
+    .app-nav-user>span{ display:none; }
 }
 
 /* ---------- Barra de navegaci�n de la app ---------- */
 .app-nav{
-    position:fixed;
+    position:sticky;
     top:0;
     left:0;
     right:0;
@@ -715,15 +716,15 @@ select option{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:12px;
+    gap:10px;
     max-width:1080px;
     margin:0 auto;
-    padding:12px 24px;
+    padding:10px 24px;
 }
 .app-nav-brand{
     font-family:'Baloo 2',sans-serif;
     font-weight:800;
-    font-size:1.05rem;
+    font-size:1rem;
     color:var(--auth-text);
     text-decoration:none;
     display:inline-flex;
@@ -736,19 +737,19 @@ select option{
 .app-nav-links{
     display:flex;
     align-items:center;
-    gap:4px;
+    gap:2px;
     flex-wrap:wrap;
 }
 .app-nav-links a{
     color:var(--auth-text-soft);
     text-decoration:none;
     font-weight:600;
-    font-size:.9rem;
-    padding:9px 15px;
+    font-size:.86rem;
+    padding:8px 12px;
     border-radius:100px;
     display:inline-flex;
     align-items:center;
-    gap:7px;
+    gap:6px;
     transition:background-color .2s ease,color .2s ease;
 }
 .app-nav-links a:hover{
@@ -814,9 +815,13 @@ select option{
     font-size:1rem;
 }
 
+@media (max-width:1200px){
+    .app-nav-user>span{ display:none; }
+}
+
 @media (max-width:900px){
-    .app-shell{ padding-top:118px; }
     .app-nav-inner{ flex-wrap:wrap; justify-content:center; padding:12px 16px; }
+    .app-shell{ padding:24px 16px 48px; }
 }
 
 /* ---------- Slots de horario (reserva de citas) ---------- */

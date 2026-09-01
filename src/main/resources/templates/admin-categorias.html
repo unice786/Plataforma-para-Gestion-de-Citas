@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head('Plataforma Citas - Administrar categorías')}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell">
+    <header class="app-header">
+        <div>
+            <h1>Administración de categorías</h1>
+            <p>Crea, edita o elimina las categorías del catálogo de servicios.</p>
+        </div>
+        <a class="btn-pill" th:href="@{/admin/categorias/nuevo}">
+            <i class="bi bi-plus-lg"></i>Nueva categoría
+        </a>
+    </header>
+
+    <div class="app-alert alert-success" role="status" th:if="${exito}" th:text="${exito}"></div>
+    <div class="app-alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
+
+    <section class="app-card flush" th:if="${not #lists.isEmpty(categorias)}">
+        <div class="table-responsive">
+            <table class="table-app">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Servicios</th>
+                    <th class="text-end-cell">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="categoria : ${categorias}">
+                    <td>
+                        <span class="cell-strong" th:text="${categoria.nombre}"></span>
+                    </td>
+                    <td th:text="${categoria.descripcion}"></td>
+                    <td>
+                        <span class="badge-soft" th:text="${conteoServicios.get(categoria.id)}"></span>
+                    </td>
+                    <td class="text-end-cell">
+                        <div class="d-inline-flex gap-2">
+                            <a class="btn-pill outline small" th:href="@{/admin/categorias/{id}/editar(id=${categoria.id})}">
+                                <i class="bi bi-pencil-square"></i>Editar
+                            </a>
+                            <form class="d-inline" th:if="${conteoServicios.get(categoria.id) == 0}"
+                                  th:action="@{/admin/categorias/{id}/eliminar(id=${categoria.id})}" method="post">
+                                <button class="btn-pill danger-outline small" type="submit"
+                                        onclick="return confirm('¿Quieres eliminar esta categoría?');">
+                                    <i class="bi bi-trash3"></i>Eliminar
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="app-card empty-state" th:if="${#lists.isEmpty(categorias)}">
+        <i class="bi bi-inbox"></i>
+        Todavía no hay categorías registradas.
+    </div>
+</main>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

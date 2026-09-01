@@ -149,6 +149,8 @@ public class CitaServiceImpl implements CitaService {
         LocalTime horaInicio = request.getHora();
         LocalTime horaFin = horaInicio.plusMinutes(servicio.getDuracionMinutos());
 
+        validarBloqueDisponible(empleado.getId(), request.getFecha(), horaInicio, horaFin);
+
         List<Cita> citasExistentes = citaRepository.findCitasActivasByEmpleadoAndFecha(
                 empleado.getId(), request.getFecha(), ESTADOS_ACTIVOS);
 
@@ -215,6 +217,7 @@ public class CitaServiceImpl implements CitaService {
         }
 
         LocalTime nuevoFin = request.getHora().plusMinutes(nuevoServicio.getDuracionMinutos());
+        validarBloqueDisponible(cita.getEmpleado().getId(), request.getFecha(), request.getHora(), nuevoFin);
         List<Cita> citasExistentes = citaRepository.findCitasActivasByEmpleadoAndFecha(
                 cita.getEmpleado().getId(), request.getFecha(), ESTADOS_ACTIVOS);
         boolean hayConflicto = citasExistentes.stream()
@@ -340,6 +343,8 @@ public class CitaServiceImpl implements CitaService {
         LocalTime horaAnterior = cita.getHora();
         LocalTime nuevaHoraInicio = request.getHora();
         LocalTime nuevaHoraFin = nuevaHoraInicio.plusMinutes(servicio.getDuracionMinutos());
+
+        validarBloqueDisponible(empleado.getId(), request.getFecha(), nuevaHoraInicio, nuevaHoraFin);
 
         LocalDateTime nuevoInicio = LocalDateTime.of(request.getFecha(), nuevaHoraInicio);
         if (nuevoInicio.isBefore(LocalDateTime.now())) {
@@ -527,6 +532,28 @@ public class CitaServiceImpl implements CitaService {
         LocalTime finExistente = cita.getHora().plusMinutes(cita.getServicio() != null
                 ? cita.getServicio().getDuracionMinutos() : duracionAlternativa);
         return cita.getHora().isBefore(nuevoFin) && nuevoInicio.isBefore(finExistente);
+    }
+
+    private void validarBloqueDisponible(Long empleadoId, LocalDate fecha,
+                                         LocalTime horaInicio, LocalTime horaFin) {
+        List<HorarioDisponibilidad> bloques = horarioRepository
+                .findByEmpleadoIdAndFechaAndEstado(empleadoId, fecha, EstadoHorario.DISPONIBLE.name());
+
+        if (bloques.isEmpty()) {
+            throw new HorarioNoDisponibleException(
+                    "El empleado no tiene disponibilidad registrada para la fecha " + fecha + ".");
+        }
+
+        boolean dentroDeBloque = bloques.stream()
+                .anyMatch(bloque ->
+                        !horaInicio.isBefore(bloque.getHoraInicio())
+                                && !horaFin.isAfter(bloque.getHoraFin()));
+
+        if (!dentroDeBloque) {
+            throw new HorarioNoDisponibleException(
+                    "El horario " + horaInicio + "-" + horaFin + " del " + fecha +
+                            " no está dentro de los bloques de disponibilidad del empleado.");
+        }
     }
 
     private Cliente buscarCliente(Long id) {

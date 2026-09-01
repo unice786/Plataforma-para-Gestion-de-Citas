@@ -16,6 +16,8 @@ import com.gestioncitas.plataformacitas.modelos.Cita;
 import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.Especialidad;
+import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
+import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 import com.gestioncitas.plataformacitas.modelos.RolUsuario;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.modelos.Usuario;
@@ -94,6 +96,8 @@ class CitaAdminControllerTests {
         empleado.setEspecialidad(especialidad);
         empleado = empleadoRepository.save(empleado);
 
+        crearHorariosDisponibles(empleado);
+
         Cliente ana = crearCliente("Ana López", "ana@ejemplo.com");
         Cliente bruno = crearCliente("Bruno Díaz", "bruno@ejemplo.com");
         fechaPrimera = LocalDate.now().plusDays(2);
@@ -108,6 +112,28 @@ class CitaAdminControllerTests {
         adminUser.setCorreo("admin@test.com");
         adminUser.setRol(RolUsuario.ADMINISTRADOR);
         adminSession.setAttribute("usuario", adminUser);
+    }
+
+    private void crearHorariosDisponibles(Empleado emp) {
+        LocalDate hoy = LocalDate.now();
+        for (int i = 0; i <= 7; i++) {
+            LocalDate fecha = hoy.plusDays(i);
+            horarioDisponibilidadRepository.save(crearBloque(emp, fecha,
+                    LocalTime.of(8, 0), LocalTime.of(12, 0)));
+            horarioDisponibilidadRepository.save(crearBloque(emp, fecha,
+                    LocalTime.of(13, 0), LocalTime.of(17, 0)));
+        }
+    }
+
+    private HorarioDisponibilidad crearBloque(Empleado emp, LocalDate fecha,
+                                              LocalTime inicio, LocalTime fin) {
+        HorarioDisponibilidad bloque = new HorarioDisponibilidad();
+        bloque.setEmpleado(emp);
+        bloque.setFecha(fecha);
+        bloque.setHoraInicio(inicio);
+        bloque.setHoraFin(fin);
+        bloque.setEstado(EstadoHorario.DISPONIBLE.name());
+        return bloque;
     }
 
     @Test
@@ -171,7 +197,7 @@ class CitaAdminControllerTests {
                         .with(csrf())
                         .session(adminSession)
                         .param("fecha", fechaSegunda.toString())
-                        .param("hora", "11:30")
+                        .param("hora", "11:00")
                         .param("servicioId", citaAna.getServicio().getId().toString()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("citas/formulario"))

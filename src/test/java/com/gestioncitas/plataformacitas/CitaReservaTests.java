@@ -12,6 +12,8 @@ import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.Especialidad;
 import com.gestioncitas.plataformacitas.modelos.EstadoCita;
+import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
+import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
 import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
@@ -107,6 +109,8 @@ class CitaReservaTests {
         empleado.setServicios(List.of(servicio));
         empleado = empleadoRepository.save(empleado);
 
+        crearHorariosDisponibles(empleado);
+
         cliente = new Cliente();
         cliente.setNombre("Ana López");
         cliente.setCorreo("ana.lopez@ejemplo.com");
@@ -114,6 +118,28 @@ class CitaReservaTests {
         cliente.setTelefono("0991234567");
         cliente.setActivo(true);
         cliente = clienteRepository.save(cliente);
+    }
+
+    private void crearHorariosDisponibles(Empleado emp) {
+        LocalDate hoy = LocalDate.now();
+        for (int i = 0; i <= 7; i++) {
+            LocalDate fecha = hoy.plusDays(i);
+            horarioDisponibilidadRepository.save(crearBloque(emp, fecha,
+                    LocalTime.of(8, 0), LocalTime.of(12, 0)));
+            horarioDisponibilidadRepository.save(crearBloque(emp, fecha,
+                    LocalTime.of(13, 0), LocalTime.of(17, 0)));
+        }
+    }
+
+    private HorarioDisponibilidad crearBloque(Empleado emp, LocalDate fecha,
+                                              LocalTime inicio, LocalTime fin) {
+        HorarioDisponibilidad bloque = new HorarioDisponibilidad();
+        bloque.setEmpleado(emp);
+        bloque.setFecha(fecha);
+        bloque.setHoraInicio(inicio);
+        bloque.setHoraFin(fin);
+        bloque.setEstado(EstadoHorario.DISPONIBLE.name());
+        return bloque;
     }
 
     @Test
@@ -180,6 +206,27 @@ class CitaReservaTests {
 
         // Solo debe existir una cita en BD
         assertThat(citaRepository.findAll()).hasSize(1);
+    }
+
+    @Test
+    void noReservaFueraDeLosBloquesDeDisponibilidadDelEmpleado() throws Exception {
+        LocalDate fecha = LocalDate.now().plusDays(1);
+
+        // 12:30 cae en el receso de almuerzo (12:00-13:00), fuera de los bloques 08-12 y 13-17.
+        mockMvc.perform(post("/api/citas/reservar").with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "clienteId": %d,
+                                  "empleadoId": %d,
+                                  "servicioId": %d,
+                                  "fecha": "%s",
+                                  "hora": "12:30:00"
+                                }
+                                """.formatted(cliente.getId(), empleado.getId(), servicio.getId(), fecha)))
+                .andExpect(status().isConflict());
+
+        assertThat(citaRepository.findAll()).isEmpty();
     }
 
     @Test

@@ -136,6 +136,7 @@ package com.gestioncitas {
         + confirmarCita(citaId, empleadoId) : void
         + completarCita(citaId, empleadoId) : void
         + cancelarCitaEmpleado(citaId, empleadoId) : void
+        - validarBloqueDisponible(empleadoId, fecha, horaInicio, horaFin) : void
     }
 
     class NotificacionService <<service>> {
@@ -166,6 +167,14 @@ package com.gestioncitas {
     }
 
     class ClienteRepository <<repository>> {
+    }
+
+    class CategoriaServicioRepository <<repository>> {
+        + findAllByOrderByNombreAsc() : List<CategoriaServicio>
+    }
+
+    class ServicioRepository <<repository>> {
+        + countByCategoriaId(categoriaId) : long
     }
 
     class EmpleadoRepository <<repository>> {
@@ -199,6 +208,17 @@ package com.gestioncitas {
     class NotificacionRepository <<repository>> {
         + findByUsuarioIdOrderByFechaCreacionDesc(usuarioId) : List<Notificacion>
         + countByUsuarioIdAndLeidaFalse(usuarioId) : long
+    }
+
+    ' ===== Capa de Presentacion (Controladores) =====
+
+    class CategoriaController <<controller>> {
+        + listar(model, session) : String
+        + mostrarFormularioNuevo(model, session) : String
+        + crear(categoria, resultado, atributos, session) : String
+        + mostrarFormularioEdicion(id, model, atributos, session) : String
+        + editar(id, categoria, resultado, atributos, session) : String
+        + eliminar(id, atributos, session) : String
     }
 
     ' ===== DTOs =====
@@ -360,6 +380,10 @@ package com.gestioncitas {
     NotificacionService ..> NotificacionRepository : usa
     NotificacionService ..> UsuarioRepository : usa
     HistorialCitasService ..> CitaRepository : usa
+
+    ' Dependencias de los controladores sobre los repositorios
+    CategoriaController ..> CategoriaServicioRepository : usa
+    CategoriaController ..> ServicioRepository : usa
 }
 
 @enduml

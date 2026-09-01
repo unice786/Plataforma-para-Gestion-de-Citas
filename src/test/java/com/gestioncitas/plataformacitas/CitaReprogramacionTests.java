@@ -12,6 +12,8 @@ import com.gestioncitas.plataformacitas.modelos.Cliente;
 import com.gestioncitas.plataformacitas.modelos.Empleado;
 import com.gestioncitas.plataformacitas.modelos.Especialidad;
 import com.gestioncitas.plataformacitas.modelos.EstadoCita;
+import com.gestioncitas.plataformacitas.modelos.EstadoHorario;
+import com.gestioncitas.plataformacitas.modelos.HorarioDisponibilidad;
 import com.gestioncitas.plataformacitas.modelos.Servicio;
 import com.gestioncitas.plataformacitas.repositorios.CategoriaServicioRepository;
 import com.gestioncitas.plataformacitas.repositorios.CitaRepository;
@@ -109,6 +111,8 @@ class CitaReprogramacionTests {
         empleado.setServicios(List.of(servicio));
         empleado = empleadoRepository.save(empleado);
 
+        crearHorariosDisponibles(empleado);
+
         cliente = new Cliente();
         cliente.setNombre("Ana López");
         cliente.setCorreo("ana.lopez@ejemplo.com");
@@ -124,6 +128,28 @@ class CitaReprogramacionTests {
         otroCliente.setTelefono("0998765432");
         otroCliente.setActivo(true);
         otroCliente = clienteRepository.save(otroCliente);
+    }
+
+    private void crearHorariosDisponibles(Empleado emp) {
+        LocalDate hoy = LocalDate.now();
+        for (int i = 0; i <= 7; i++) {
+            LocalDate fecha = hoy.plusDays(i);
+            horarioDisponibilidadRepository.save(crearBloque(emp, fecha,
+                    LocalTime.of(8, 0), LocalTime.of(12, 0)));
+            horarioDisponibilidadRepository.save(crearBloque(emp, fecha,
+                    LocalTime.of(13, 0), LocalTime.of(17, 0)));
+        }
+    }
+
+    private HorarioDisponibilidad crearBloque(Empleado emp, LocalDate fecha,
+                                              LocalTime inicio, LocalTime fin) {
+        HorarioDisponibilidad bloque = new HorarioDisponibilidad();
+        bloque.setEmpleado(emp);
+        bloque.setFecha(fecha);
+        bloque.setHoraInicio(inicio);
+        bloque.setHoraFin(fin);
+        bloque.setEstado(EstadoHorario.DISPONIBLE.name());
+        return bloque;
     }
 
     private Cita crearCita(EstadoCita estado, LocalDate fecha, LocalTime hora) {

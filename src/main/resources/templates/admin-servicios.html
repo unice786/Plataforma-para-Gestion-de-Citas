@@ -43,7 +43,7 @@
                     <td><span th:text="${servicio.duracionMinutos}"></span> min</td>
                     <td>
                         <span class="badge-soft" th:if="${servicio.activo}">Activo</span>
-                        <span class="badge-soft neutral" th:unless="${servicio.activo}">Retirado</span>
+                        <span class="badge-soft neutral" th:unless="${servicio.activo}">Retirado (oculto)</span>
                     </td>
                     <td class="text-end-cell">
                         <div class="d-inline-flex gap-2">
@@ -53,8 +53,15 @@
                             <form class="d-inline" th:if="${servicio.activo}"
                                   th:action="@{/admin/servicios/{id}/eliminar(id=${servicio.id})}" method="post">
                                 <button class="btn-pill danger-outline small" type="submit"
-                                        onclick="return confirm('¿Quieres retirar este servicio del catálogo?');">
-                                    <i class="bi bi-trash3"></i>Eliminar
+                                        onclick="return confirm('¿Quieres retirar este servicio del catálogo temporalmente?');">
+                                    <i class="bi bi-pause-circle"></i>Retirar
+                                </button>
+                            </form>
+                            <form class="d-inline" th:unless="${servicio.activo}"
+                                  th:action="@{/admin/servicios/{id}/reactivar(id=${servicio.id})}" method="post">
+                                <button class="btn-pill outline small" type="submit"
+                                        onclick="return confirm('¿Quieres volver a activar este servicio en el catálogo?');">
+                                    <i class="bi bi-play-circle"></i>Activar
                                 </button>
                             </form>
                         </div>

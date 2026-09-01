@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="~{fragmentos/head :: head(${categoria.id == null ? 'Nueva categoría' : 'Editar categoría'})}"></th:block>
+<body class="app-body">
+<th:block th:replace="~{fragmentos/decor :: decor}"></th:block>
+<nav th:replace="~{fragmentos/navegacion :: navegacion}"></nav>
+
+<main class="app-shell narrow">
+    <a class="app-back-link" th:href="@{/admin/categorias}"><i class="bi bi-arrow-left"></i>Volver al listado</a>
+
+    <header class="app-header">
+        <h1 th:text="${categoria.id == null ? 'Nueva categoría' : 'Editar categoría'}"></h1>
+    </header>
+
+    <form class="app-card" th:object="${categoria}"
+          th:action="${categoria.id == null} ? @{/admin/categorias} : @{/admin/categorias/{id}/editar(id=${categoria.id})}"
+          method="post">
+        <input type="hidden" th:field="*{id}">
+        <div class="mb-3">
+            <label class="form-label" for="nombre">Nombre</label>
+            <input id="nombre" class="form-control" type="text" th:field="*{nombre}" maxlength="50" required>
+            <div class="invalid-feedback d-block" th:errors="*{nombre}"></div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="descripcion">Descripción</label>
+            <textarea id="descripcion" class="form-control" th:field="*{descripcion}" maxlength="255" rows="3"></textarea>
+            <div class="invalid-feedback d-block" th:errors="*{descripcion}"></div>
+        </div>
+
+        <div class="app-actions">
+            <a class="btn-pill outline" th:href="@{/admin/categorias}">Cancelar</a>
+            <button class="btn-pill" type="submit">Guardar categoría</button>
+        </div>
+    </form>
+</main>
+
+<th:block th:replace="~{fragmentos/theme-script :: themeScript}"></th:block>
+</body>
+</html>

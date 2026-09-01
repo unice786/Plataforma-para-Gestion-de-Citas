@@ -8,7 +8,7 @@
 <nav class="app-nav" th:fragment="navegacion">
     <div class="app-nav-inner">
         <a class="app-nav-brand" th:href="@{/inicio}">
-            <i class="bi bi-heart-fill"></i>Plataforma de Citas
+            Plataforma de Citas
         </a>
         <div class="app-nav-links">
             <a th:href="@{/inicio}"><i class="bi bi-house-door"></i>Inicio</a>
@@ -22,6 +22,7 @@
             <th:block th:if="${session.usuario != null and session.usuario.rol.name() == 'ADMINISTRADOR'}">
                 <a th:href="@{/servicios}"><i class="bi bi-spa"></i>Servicios</a>
                 <a th:href="@{/admin/servicios}"><i class="bi bi-gear"></i>Administraci&oacute;n</a>
+                <a th:href="@{/admin/categorias}"><i class="bi bi-tags"></i>Categor&iacute;as</a>
                 <a th:href="@{/admin/citas}"><i class="bi bi-calendar2-check"></i>Citas</a>
                 <a th:href="@{/admin/horarios}"><i class="bi bi-clock"></i>Horarios</a>
             </th:block>

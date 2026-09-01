@@ -344,7 +344,7 @@ public class DataInitializer implements CommandLineRunner {
                     bloqueTarde.setEmpleado(emp);
                     bloqueTarde.setFecha(fecha);
                     bloqueTarde.setHoraInicio(LocalTime.of(13, 0));
-                    bloqueTarde.setHoraFin(LocalTime.of(18, 0));
+                    bloqueTarde.setHoraFin(LocalTime.of(17, 0));
                     bloqueTarde.setEstado(EstadoHorario.DISPONIBLE.name());
                     horarioRepository.save(bloqueTarde);
 

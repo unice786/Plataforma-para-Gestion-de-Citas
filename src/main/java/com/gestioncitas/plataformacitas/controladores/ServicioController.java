@@ -69,7 +69,7 @@ public class ServicioController {
                                            RedirectAttributes atributos,
                                            HttpSession session) {
         if (!esAdmin(session)) return "redirect:/login";
-        Servicio servicio = servicioRepository.findById(id).orElse(null);
+        Servicio servicio = servicioRepository.findConCategoriaPorId(id).orElse(null);
         if (servicio == null) {
             atributos.addFlashAttribute("error", "El servicio solicitado no existe.");
             return "redirect:/admin/servicios";
@@ -104,6 +104,7 @@ public class ServicioController {
         existente.setPrecio(servicio.getPrecio());
         existente.setDuracionMinutos(servicio.getDuracionMinutos());
         existente.setCategoria(servicio.getCategoria());
+        existente.setActivo(servicio.getActivo() == null || servicio.getActivo());
         servicioRepository.save(existente);
         atributos.addFlashAttribute("exito", "Servicio actualizado correctamente.");
         return "redirect:/admin/servicios";
@@ -119,6 +120,20 @@ public class ServicioController {
             servicio.setActivo(false);
             servicioRepository.save(servicio);
             atributos.addFlashAttribute("exito", "Servicio retirado del catálogo correctamente.");
+        }
+        return "redirect:/admin/servicios";
+    }
+
+    @PostMapping("/{id}/reactivar")
+    public String reactivar(@PathVariable Long id, RedirectAttributes atributos, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/login";
+        Servicio servicio = servicioRepository.findById(id).orElse(null);
+        if (servicio == null) {
+            atributos.addFlashAttribute("error", "El servicio solicitado no existe.");
+        } else {
+            servicio.setActivo(true);
+            servicioRepository.save(servicio);
+            atributos.addFlashAttribute("exito", "Servicio activado y visible en el catálogo correctamente.");
         }
         return "redirect:/admin/servicios";
     }
