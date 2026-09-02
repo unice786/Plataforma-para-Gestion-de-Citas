@@ -6,6 +6,8 @@ skinparam linetype ortho
 
 package com.gestioncitas {
 
+    ' ===== Tablas (Entidades JPA) =====
+
     abstract class Usuario {
         - id : Long
         - nombre : String
@@ -95,43 +97,43 @@ package com.gestioncitas {
 
     class UsuarioService <<service>> {
         + autenticar(correo, password) : Optional<Usuario>
-        + registrar(ClienteRegistroDTO) : Optional<Cliente>
+        + registrar(cliente) : Optional<Cliente>
         + verificar(token) : Optional<Usuario>
         + solicitarRecuperacion(correo) : Optional<Usuario>
         + tokenRecuperacionExiste(token) : boolean
         + tokenRecuperacionValido(token) : boolean
-        + restablecerPassword(RestablecerPasswordDTO) : Optional<Usuario>
+        + restablecerPassword(token, password) : Optional<Usuario>
     }
 
     class EmpleadoService <<service>> {
-        + crear(EmpleadoRequestDTO) : EmpleadoResponseDTO
-        + actualizar(id, EmpleadoRequestDTO) : EmpleadoResponseDTO
-        + darDeBaja(id) : EmpleadoResponseDTO
-        + listarActivos() : List<EmpleadoResponseDTO>
+        + crear(empleado) : Empleado
+        + actualizar(id, empleado) : Empleado
+        + darDeBaja(id) : Empleado
+        + listarActivos() : List<Empleado>
     }
 
     class HorarioDisponibilidadService <<service>> {
-        + crear(HorarioRequestDTO) : HorarioResponseDTO
-        + asignar(HorarioRequestDTO) : HorarioResponseDTO
-        + actualizar(id, HorarioRequestDTO) : HorarioResponseDTO
+        + crear(horario) : HorarioDisponibilidad
+        + asignar(horario) : HorarioDisponibilidad
+        + actualizar(id, horario) : HorarioDisponibilidad
         + eliminar(id) : void
-        + buscarPorId(id) : HorarioResponseDTO
-        + listarTodos() : List<HorarioResponseDTO>
-        + listarPorEmpleado(empleadoId) : List<HorarioResponseDTO>
-        + listarPorRangoFechas(desde, hasta) : List<HorarioResponseDTO>
-        + listarDisponibles(empleadoId, fecha) : List<HorarioResponseDTO>
-        + consultarDisponibilidad(empleadoId, fecha) : List<HorarioResponseDTO>
-        + crearEnBloque(HorarioBulkRequestDTO) : List<HorarioResponseDTO>
+        + buscarPorId(id) : HorarioDisponibilidad
+        + listarTodos() : List<HorarioDisponibilidad>
+        + listarPorEmpleado(empleadoId) : List<HorarioDisponibilidad>
+        + listarPorRangoFechas(desde, hasta) : List<HorarioDisponibilidad>
+        + listarDisponibles(empleadoId, fecha) : List<HorarioDisponibilidad>
+        + consultarDisponibilidad(empleadoId, fecha) : List<HorarioDisponibilidad>
+        + crearEnBloque(empleadoId, periodo, dias) : List<HorarioDisponibilidad>
     }
 
     class CitaService <<service>> {
-        + consultarDisponibilidad(servicioId, fecha) : List<HorarioDisponibleDTO>
-        + consultarDisponibilidadRango(servicioId, desde, hasta) : List<HorarioDisponibleDTO>
-        + reservarCita(ReservaCitaRequestDTO) : CitaResponseDTO
-        + editarCita(id, EdicionCitaRequestDTO) : void
+        + consultarDisponibilidad(servicioId, fecha) : List<HorarioDisponibilidad>
+        + consultarDisponibilidadRango(servicioId, desde, hasta) : List<HorarioDisponibilidad>
+        + reservarCita(cita) : Cita
+        + editarCita(id, cita) : void
         + cancelarCita(id) : void
-        + cancelarCitaCliente(citaId, clienteId) : CitaResponseDTO
-        + reprogramarCita(ReprogramarCitaDTO) : CitaResponseDTO
+        + cancelarCitaCliente(citaId, clienteId) : Cita
+        + reprogramarCita(cita) : Cita
         + eliminarCitaCliente(citaId, clienteId) : void
         + confirmarCita(citaId, empleadoId) : void
         + completarCita(citaId, empleadoId) : void
@@ -148,7 +150,7 @@ package com.gestioncitas {
     }
 
     class HistorialCitasService <<service>> {
-        + listarPorCliente(clienteId) : List<HistorialCitasResponse>
+        + listarPorCliente(clienteId) : List<Cita>
     }
 
     class CorreoService <<service>> {
@@ -156,202 +158,12 @@ package com.gestioncitas {
         + enviarRecuperacion(usuario) : void
     }
 
-    ' ===== Capa de Acceso a Datos (Repositorios) =====
-
-    class UsuarioRepository <<repository>> {
-        + findByCorreo(correo) : Optional<Usuario>
-        + findByTokenVerificacion(token) : Optional<Usuario>
-        + findByTokenRecuperacion(token) : Optional<Usuario>
-        + existsByCorreo(correo) : boolean
-        + findByRol(rol) : List<Usuario>
-    }
-
-    class ClienteRepository <<repository>> {
-    }
-
-    class CategoriaServicioRepository <<repository>> {
-        + findAllByOrderByNombreAsc() : List<CategoriaServicio>
-    }
-
-    class ServicioRepository <<repository>> {
-        + countByCategoriaId(categoriaId) : long
-    }
-
-    class EmpleadoRepository <<repository>> {
-        + existsByCorreo(correo) : boolean
-        + existsByCorreoAndIdNot(correo, id) : boolean
-        + findByActivoTrue() : List<Empleado>
-        + findEmpleadosByServicioId(servicioId) : List<Empleado>
-    }
-
-    class EspecialidadRepository <<repository>> {
-    }
-
-    class HorarioDisponibilidadRepository <<repository>> {
-        + findByEmpleadoIdAndFechaAndEstado(empleadoId, fecha, estado) : List<HorarioDisponibilidad>
-        + findByEmpleadoIdAndEstado(empleadoId, estado) : List<HorarioDisponibilidad>
-        + findByEmpleadoIdOrderByFechaAscHoraInicioAsc(empleadoId) : List<HorarioDisponibilidad>
-        + findByFechaBetweenOrderByFechaAscHoraInicioAsc(desde, hasta) : List<HorarioDisponibilidad>
-        + findByEmpleadoIdAndFechaBetweenOrderByFechaAscHoraInicioAsc(empleadoId, desde, hasta) : List<HorarioDisponibilidad>
-    }
-
-    class CitaRepository <<repository>> {
-        + buscarParaAdministrador(fecha, cliente) : List<Cita>
-        + buscarPorIdParaAdministrador(id) : Optional<Cita>
-        + findByClienteIdOrderByFechaDescHoraDesc(clienteId) : List<Cita>
-        + findByEmpleadoIdOrderByFechaDescHoraDesc(empleadoId) : List<Cita>
-        + findByIdAndClienteId(id, clienteId) : Optional<Cita>
-        + findCitasActivasByEmpleadoAndFecha(empleadoId, fecha, estados) : List<Cita>
-        + findCitasActivasByEmpleadoAndFechaExcludingId(empleadoId, fecha, estados, citaId) : List<Cita>
-    }
-
-    class NotificacionRepository <<repository>> {
-        + findByUsuarioIdOrderByFechaCreacionDesc(usuarioId) : List<Notificacion>
-        + countByUsuarioIdAndLeidaFalse(usuarioId) : long
-    }
-
-    ' ===== Capa de Presentacion (Controladores) =====
-
-    class CategoriaController <<controller>> {
-        + listar(model, session) : String
-        + mostrarFormularioNuevo(model, session) : String
-        + crear(categoria, resultado, atributos, session) : String
-        + mostrarFormularioEdicion(id, model, atributos, session) : String
-        + editar(id, categoria, resultado, atributos, session) : String
-        + eliminar(id, atributos, session) : String
-    }
-
-    ' ===== DTOs =====
-
-    class ReservaCitaRequestDTO {
-        - clienteId : Long
-        - empleadoId : Long
-        - servicioId : Long
-        - fecha : LocalDate
-        - hora : LocalTime
-    }
-
-    class EdicionCitaRequestDTO {
-        - fecha : LocalDate
-        - hora : LocalTime
-        - servicioId : Long
-    }
-
-    class ReprogramarCitaDTO {
-        - citaId : Long
-        - clienteId : Long
-        - fecha : LocalDate
-        - hora : LocalTime
-    }
-
-    class HorarioRequestDTO {
-        - empleadoId : Long
-        - fecha : LocalDate
-        - horaInicio : LocalTime
-        - horaFin : LocalTime
-    }
-
-    class HorarioBulkRequestDTO {
-        - empleadoId : Long
-        - fechaInicio : LocalDate
-        - fechaFin : LocalDate
-        - horaInicio : LocalTime
-        - horaFin : LocalTime
-        - diasSeleccionados : Set<DayOfWeek>
-    }
-
-    class HorarioDisponibleDTO {
-        - empleadoId : Long
-        - empleadoNombre : String
-        - fecha : LocalDate
-        - horaInicio : LocalTime
-        - horaFin : LocalTime
-    }
-
-    class CitaResponseDTO {
-        - id : Long
-        - clienteNombre : String
-        - empleadoNombre : String
-        - servicioNombre : String
-        - fecha : LocalDate
-        - hora : LocalTime
-        - estado : EstadoCita
-        - fechaRegistro : LocalDateTime
-        - mensaje : String
-    }
-
-    class HorarioResponseDTO {
-        - id : Long
-        - empleadoId : Long
-        - empleadoNombre : String
-        - fecha : LocalDate
-        - horaInicio : LocalTime
-        - horaFin : LocalTime
-        - estado : String
-    }
-
-    class EmpleadoRequestDTO {
-        - nombre : String
-        - correo : String
-        - password : String
-        - telefono : String
-        - especialidadId : Long
-    }
-
-    class EmpleadoResponseDTO {
-        - id : Long
-        - nombre : String
-        - correo : String
-        - telefono : String
-        - nombreEspecialidad : String
-        - activo : Boolean
-    }
-
-    class ClienteRegistroDTO {
-        - nombre : String
-        - correo : String
-        - telefono : String
-        - password : String
-        - confirmarPassword : String
-    }
-
-    class RestablecerPasswordDTO {
-        - password : String
-        - confirmarPassword : String
-        - token : String
-    }
-
-    class ServicioResponseDTO {
-        - id : Long
-        - nombre : String
-        - descripcion : String
-        - duracionMinutos : Integer
-        - precio : BigDecimal
-        - categoriaNombre : String
-    }
-
-    class HistorialCitasResponse {
-        - id : Long
-        - fecha : LocalDate
-        - hora : LocalTime
-        - nombreServicio : String
-        - nombreEmpleado : String
-        - estado : String
-    }
-
-    class ErrorResponseDTO {
-        - timestamp : LocalDateTime
-        - status : int
-        - error : String
-        - mensaje : String
-    }
-
-    ' Relaciones de herencia Java
+    ' Relaciones de herencia Java (tablas)
     Usuario <|-- Administrador
     Usuario <|-- Cliente
     Usuario <|-- Empleado
 
-    ' Relaciones de composicion/asociacion
+    ' Relaciones de composicion/asociacion entre tablas
     Empleado "1" --> "1" Especialidad : tiene
     Servicio "1" --> "1" CategoriaServicio : pertenece a
     HorarioDisponibilidad "*" --> "1" Empleado : asignado a
@@ -365,25 +177,18 @@ package com.gestioncitas {
 
     Usuario "1" *-- "*" Notificacion : recibe
 
-    ' Dependencias de la capa de servicios sobre los repositorios
-    UsuarioService ..> UsuarioRepository : usa
-    UsuarioService ..> ClienteRepository : usa
-    UsuarioService ..> CorreoService : usa
-    EmpleadoService ..> EmpleadoRepository : usa
-    EmpleadoService ..> EspecialidadRepository : usa
-    HorarioDisponibilidadService ..> HorarioDisponibilidadRepository : usa
-    HorarioDisponibilidadService ..> EmpleadoRepository : usa
-    CitaService ..> CitaRepository : usa
-    CitaService ..> HorarioDisponibilidadRepository : usa
-    CitaService ..> EmpleadoRepository : usa
-    CitaService ..> NotificacionService : usa
-    NotificacionService ..> NotificacionRepository : usa
-    NotificacionService ..> UsuarioRepository : usa
-    HistorialCitasService ..> CitaRepository : usa
+    ' Dependencias de los servicios sobre las entidades
+    UsuarioService ..> Usuario : gestiona
+    UsuarioService ..> Cliente : registra
+    EmpleadoService ..> Empleado : gestiona
+    HorarioDisponibilidadService ..> HorarioDisponibilidad : gestiona
+    CitaService ..> Cita : gestiona
+    NotificacionService ..> Notificacion : gestiona
+    HistorialCitasService ..> Cita : consulta
 
-    ' Dependencias de los controladores sobre los repositorios
-    CategoriaController ..> CategoriaServicioRepository : usa
-    CategoriaController ..> ServicioRepository : usa
+    ' Dependencia entre servicios
+    UsuarioService ..> CorreoService : envia correos
+    CitaService ..> NotificacionService : notifica
 }
 
 @enduml
